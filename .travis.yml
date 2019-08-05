@@ -9,6 +9,7 @@ cache: pip
 install:
 # needs a file called requirements.txt in the repo with the name of the dependencies to install
   - pip install -r requirements.txt
+  - pip install coveralls
 
 ## SCRIPT ##
 # command to run tests
@@ -22,4 +23,7 @@ script:
 #      - guerin.claire01@gmail.com
 #    on_success: never # default: change
 #    on_failure: always # default: always
+
+after_success:
+  - coveralls
 
