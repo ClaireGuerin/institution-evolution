@@ -17,4 +17,4 @@ notifications:
 
 # command to run tests
 script:
-	- python tests.py
+	- python functional_tests.py
