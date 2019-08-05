@@ -5,10 +5,8 @@ language: python
 python:
   - "3.7"
 # commands to install dependencies through pip
-#cache: pip
+cache: pip
 install:
-  - pip install .
-before_script:
 # needs a file called requirements.txt in the repo with the name of the dependencies to install
   - pip install -r requirements.txt
 
