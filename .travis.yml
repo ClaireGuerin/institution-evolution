@@ -1,5 +1,5 @@
 ## INSTALL ##
-dist: bionic # required for Python >= 3.7
+dist: xe # required for Python >= 3.7
 language: python
 # python version(s)
 python:
@@ -8,7 +8,7 @@ python:
 #cache: pip
 install:
 	- pip install .
-before script:
+before_script:
 # needs a file called requirements.txt in the repo with the name of the dependencies to install
 	- pip install -r requirements.txt
 
@@ -18,10 +18,10 @@ script:
 	- pytest
 
 ## HEADOUT ##
-notifications:
-	email:
-		recipients:
-			- guerin.claire01@gmail.com
-		on_success: never # default: change
-		on_failure: always # default: always
+#notifications:
+#	email:
+#		recipients:
+#			- guerin.claire01@gmail.com
+#		on_success: never # default: change
+#		on_failure: always # default: always
 
