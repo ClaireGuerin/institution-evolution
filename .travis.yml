@@ -1,27 +1,34 @@
 ## INSTALL ##
 dist: xe # required for Python >= 3.7
+
+# Disable sudo to speed up the build
+sudo: false
+
+# Set the build language to python
 language: python
-# python version(s)
+
+# Set the python version(s)
 python:
   - "3.7"
+  
 # commands to install dependencies through pip
 cache: pip
 install:
 # needs a file called requirements.txt in the repo with the name of the dependencies to install
   - pip install -r requirements.txt
-  - pip install coveralls
+  - pip install codecov
 
 ## SCRIPT ##
 # command to run tests
 script:
-  - py.test --cov=institution-evolution test/
+  - py.test --cov --cov-report html
 
 env:
   - CODECOV_TOKEN=c5829cea-c917-4312-8240-cc9b731863f0
   
 ## HEADOUT ##
 after_success:
-  - coveralls
+  - codecov
 
 notifications:
   email:
