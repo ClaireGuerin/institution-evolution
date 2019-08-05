@@ -14,8 +14,11 @@ install:
 ## SCRIPT ##
 # command to run tests
 script:
-  - py.test
+  - py.test --cov-report term --cov=app/test/
 
+env:
+  - CODECOV_TOKEN=c5829cea-c917-4312-8240-cc9b731863f0
+  
 ## HEADOUT ##
 after_success:
   - coveralls
