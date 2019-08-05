@@ -17,13 +17,13 @@ script:
   - py.test
 
 ## HEADOUT ##
-#notifications:
-#  email:
-#    recipients:
-#      - guerin.claire01@gmail.com
-#    on_success: never # default: change
-#    on_failure: always # default: always
-
 after_success:
   - coveralls
+
+notifications:
+  email:
+    recipients:
+      - guerin.claire01@gmail.com
+    on_success: change # default: change
+    on_failure: change # default: always
 
