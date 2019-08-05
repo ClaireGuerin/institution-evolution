@@ -1,13 +1,21 @@
+## INSTALL ##
 dist: bionic # required for Python >= 3.7
 language: python
 # python version(s)
 python:
 	- "3.7"
 # commands to install dependencies through pip
-#cache: pip
+cache: pip
 # needs a file called requirements.txt in the repo with the name of the dependencies to install
-#install:
-# - pip install -r requirements.txt
+install:
+	- pip install -r requirements.txt
+
+## SCRIPT ##
+# command to run tests
+script:
+	- python functional_tests.py
+
+## HEADOUT ##
 notifications:
 	email:
 		recipients:
@@ -15,6 +23,3 @@ notifications:
 		on_success: never # default: change
 		on_failure: always # default: always
 
-# command to run tests
-script:
-	- python functional_tests.py

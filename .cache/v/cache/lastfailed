@@ -1,3 +1,4 @@
 {
-  "functional_tests.py": true
+  "functional_tests.py::TestSimpleRun::()": true, 
+  "functional_tests.py::TestSimpleRun::()::test_initialisation_file_exists": true
 }
