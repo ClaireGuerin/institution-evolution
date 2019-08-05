@@ -15,7 +15,7 @@ before_script:
 ## SCRIPT ##
 # command to run tests
 script:
-	- pytest
+	- py.test
 
 ## HEADOUT ##
 #notifications:
