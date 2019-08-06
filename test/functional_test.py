@@ -31,7 +31,7 @@ class TestSimpleRun(object):
 		
 		with open(self.pathToFile) as f:
 			for line in f.readlines():
-				self.parval = line.split(',')[1]
+				self.parval = int(line.split(',')[1])
 				assert type(self.parval) is int
 				assert self.parval > 0	
 			
