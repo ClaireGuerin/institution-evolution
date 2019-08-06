@@ -1,5 +1,5 @@
 ## INSTALL ##
-dist: xe # required for Python >= 3.7
+dist: xenial # required for Python >= 3.7
 
 # Disable sudo to speed up the build
 sudo: false
@@ -14,7 +14,7 @@ python:
 # commands to install dependencies through pip
 cache: pip
 install:
-# needs a file called requirements.txt in the repo with the name of the dependencies to install
+  # needs a file called requirements.txt in the repo with the name of the dependencies to install
   - pip install -r requirements.txt
   - pip install codecov
 
@@ -22,9 +22,10 @@ install:
 # command to run tests
 script:
   - py.test --cov --cov-report html
-
-env:
-  - CODECOV_TOKEN=c5829cea-c917-4312-8240-cc9b731863f0
+  
+# codecov token. Apparently unnecessary with Travis-CI
+#env:
+#  - CODECOV_TOKEN=c5829cea-c917-4312-8240-cc9b731863f0
   
 ## HEADOUT ##
 after_success:
