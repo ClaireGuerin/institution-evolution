@@ -21,7 +21,7 @@ install:
 ## SCRIPT ##
 # command to run tests
 script:
-  - py.test --cov --cov-report html
+  - python -m py.test --cov --cov-report html
   
 # codecov token. Apparently unnecessary with Travis-CI
 #env:
