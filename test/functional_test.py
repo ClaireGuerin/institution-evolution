@@ -28,13 +28,12 @@ class TestSimpleRun(object):
 	def test_initialisation_values_provided(self):
 		self.dirpath = os.getcwd()
 		self.pathToFile = "{0}/{1}".format(self.dirpath, INITIALISATION_FILE)
-		with open(self.pathToFile) as f:
-			self.initParDict = {f.readline()}
-		assert type(self.initParDict) is dict
 		
-		for par in ['numberOfDemes','initialDemeSize','numberOfGenerations']:
-			assert type(self.initParDict[par]) is str
-			assert self.initParDict[par] > 0
+		with open(self.pathToFile) as f:
+			for line in f.readlines():
+				self.parval = line.split(',')[1]
+				assert type(self.parval) is int
+				assert self.parval > 0	
 			
 
 		# She provides parameters needed by the program to run functions in a file called parameters.txt

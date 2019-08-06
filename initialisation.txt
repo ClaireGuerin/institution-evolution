@@ -1,1 +1,3 @@
-numberOfDemes:x,initialDemeSize:x,numberOfGenerations:x
+numberOfDemes,
+initialDemeSize,
+numberOfGenerations,
