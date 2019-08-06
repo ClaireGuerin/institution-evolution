@@ -2,6 +2,7 @@ import pytest
 import os
 
 INITIALISATION_FILE = 'initialisation.txt'
+PARAMETER_FILE = 'parameters.txt'
 
 class TestSimpleRun(object):
 	
@@ -34,9 +35,13 @@ class TestSimpleRun(object):
 				self.parval = int(line.split(',')[1])
 				assert type(self.parval) is int
 				assert self.parval > 0	
-			
-
-		# She provides parameters needed by the program to run functions in a file called parameters.txt
+				
+	def test_parameter_file_exists(self):
+		# Claire provides parameters needed by the program to run functions in a file called parameters.txt
+		self.dirpath = os.getcwd()
+		self.fileslist = os.listdir(self.dirpath)
+		assert PARAMETER_FILE in self.fileslist, "Initialisation file not found in {0}".format(self.dirpath) 
+		
 		# She runs the program
 		# After the run, the results are saved in a folder called "res"
 		# Satisfied, she goes to sleep.
