@@ -1,6 +1,6 @@
 import pytest
 import os
-from filemanip import FileManipulation as fman
+import filemanip as fman
 from main import Population as pop
 
 INITIALISATION_FILE = 'initialisation.txt'
