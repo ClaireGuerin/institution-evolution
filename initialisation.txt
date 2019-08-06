@@ -1,3 +1,3 @@
 numberOfDemes,10
-initialDemeSize,0
+initialDemeSize,1
 numberOfGenerations,10
