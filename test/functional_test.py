@@ -29,7 +29,9 @@ class TestSimpleRun(object):
 		self.dirpath = os.getcwd()
 		self.pathToFile = "{0}/{1}".format(self.dirpath, INITIALISATION_FILE)
 		with open(self.pathToFile) as f:
-			self.initParDict = f.readline()
+			self.initParDict = {f.readline()}
+		assert type(self.initParDict) is dict
+		
 		for par in ['numberOfDemes','initialDemeSize','numberOfGenerations']:
 			assert type(self.initParDict[par]) is str
 			assert self.initParDict[par] > 0
