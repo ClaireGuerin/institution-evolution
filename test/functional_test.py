@@ -16,7 +16,11 @@ class TestSimpleRun(object):
 				
 	def checkObjectAttribute(self, obj, attrs):
 		for attr in attrs:
-			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)			
+			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)		
+			
+	def extractParameters(self, fileToRead, col):
+		with open(self.pathToFile) as f:
+			return [int(line.split(',')[col]) for line in f.readlines()]
 	
 	def test_initialisation_file_exists(self):
 		# Claire wants to model the evolution of a structured population.
@@ -35,11 +39,10 @@ class TestSimpleRun(object):
 		self.dirpath = os.getcwd()
 		self.pathToFile = "{0}/{1}".format(self.dirpath, INITIALISATION_FILE)
 		
-		with open(self.pathToFile) as f:
-			for line in f.readlines():
-				self.parval = int(line.split(',')[1])
-				assert type(self.parval) is int
-				assert self.parval > 0	
+		self.pars = self.extractParameters(pathToFile, 1)
+		for par in self.pars:
+			assert type(par) is int
+			assert par > 0	
 				
 	def test_parameter_file_exists(self):
 		# Claire provides parameters needed by the program to run functions in a file called parameters.txt
@@ -48,7 +51,7 @@ class TestSimpleRun(object):
 		assert PARAMETER_FILE in self.fileslist, "Initialisation file not found in {0}".format(self.dirpath) 
 		
 		# She runs the program:
-	def test_population_is_initialised(self):
+	def test_population_is_initialised_with_right_values(self):
 		# First, the population is initialised according to the initialisation settings
 		self.runpop = pop()
 		self.checkObjectAttribute(self.runpop, ['numberOfDemes','initialDemeSize','numberOfGenerations'])
