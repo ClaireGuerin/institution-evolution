@@ -58,7 +58,7 @@ class TestSimpleRun(object):
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
 		self.population = pop()
-		self.population.runPop()
+		self.population.runSimulation()
 		
 		self.outputFile = fman.getPathToFile(OUTPUT_FILE)
 		with open(self.outputFile) as f:
