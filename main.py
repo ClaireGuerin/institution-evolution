@@ -2,6 +2,7 @@ import os
 import filemanip as fman
 
 INITIALISATION_FILE = 'initialisation.txt'
+PARAMETER_FILE = 'parameters.txt'
 OUTPUT_FOLDER = 'res'
 OUTPUT_FILE = 'output.txt'
 

@@ -2,10 +2,7 @@ import pytest
 import os
 import filemanip as fman
 from main import Population as pop
-
-INITIALISATION_FILE = 'initialisation.txt'
-PARAMETER_FILE = 'parameters.txt'
-OUTPUT_FILE = 'res/output.txt'
+from main import INITIALISATION_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE
 
 class TestSimpleRun(object):
 	
@@ -60,7 +57,7 @@ class TestSimpleRun(object):
 		self.population = pop()
 		self.population.runSimulation()
 		
-		self.outputFile = fman.getPathToFile(OUTPUT_FILE)
+		self.outputFile = fman.getPathToFile('{0}/{1}'.format(OUTPUT_FOLDER, OUTPUT_FILE))
 		with open(self.outputFile) as f:
 			self.lineNumber = len(f.readlines())
 			
