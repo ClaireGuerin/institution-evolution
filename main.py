@@ -14,3 +14,6 @@ class Population:
 		
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
+			
+	def runSim(self):
+		pass
