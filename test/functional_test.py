@@ -49,15 +49,17 @@ class TestSimpleRun(object):
 		self.pathToFile = fman.getPathToFile(INITIALISATION_FILE)
 		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
-		self.runpop = pop()
+		self.population = pop()
 		
-		self.assertObjectAttributesExist(self.runpop, self.attributeNames)
-		self.assertObjectAttributeValues(self.runpop, self.attributeNames, self.attributeValues)
+		self.assertObjectAttributesExist(self.population, self.attributeNames)
+		self.assertObjectAttributeValues(self.population, self.attributeNames, self.attributeValues)
 		
 	def test_program_writes_output_for_x_generations(self):
-		self.runpop = pop()
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
+		self.population = pop()
+		self.population.runPop()
+		
 		self.outputFile = fman.getPathToFile(OUTPUT_FILE)
 		with open(self.outputFile) as f:
 			self.lineNumber = len(f.readlines())
