@@ -5,6 +5,7 @@ from main import Population as pop
 
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
+OUTPUT_FILE = 'res/output.txt'
 
 class TestSimpleRun(object):
 	
@@ -53,10 +54,21 @@ class TestSimpleRun(object):
 		self.assertObjectAttributesExist(self.runpop, self.attributeNames)
 		self.assertObjectAttributeValues(self.runpop, self.attributeNames, self.attributeValues)
 		
-	def test_program_runs_x_generations(self):
+	def test_program_writes_output_for_x_generations(self):
+		self.runpop = pop()
 		# Second, the population evolves over x generations following the iteration function
-		
 		# After the run, the results are saved in a folder called "res"
+		self.outputFile = fman.getPathToFile(OUTPUT_FILE)
+		with open(self.outputFile) as f:
+			self.lineNumber = len(f.readlines())
+			
+		self.pathToFile = fman.getPathToFile(INITIALISATION_FILE)
+		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
+		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
+		self.nGen = self.attributeValues[self.attributeNames.index('numberOfGenerations')]
+			
+		assert self.lineNumber == self.nGen
+		
 		# Satisfied, she goes to sleep.
 
 		assert False, "Finish the functional test!"
