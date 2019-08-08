@@ -69,5 +69,3 @@ class TestSimpleRun(object):
 		assert self.lineNumber == self.nGen
 		
 		# Satisfied, she goes to sleep.
-
-		assert False, "Finish the functional test!"
