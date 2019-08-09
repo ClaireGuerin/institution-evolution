@@ -1,2 +1,10 @@
 class runOneCycle(object):
-	pass
+	
+	def migration(self):
+		pass
+	
+	def reproduction(self):
+		pass
+	
+	def mutation(self):
+		pass
