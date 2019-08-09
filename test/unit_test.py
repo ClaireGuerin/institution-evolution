@@ -12,3 +12,8 @@ class TestLifeCycle(object):
 		for method in self.methods:
 			assert hasattr(lc.runOneCycle, method), "{0} method does not exist".format(method)
 			assert callable(getattr(lc.runOneCycle, method)), "{0} method is not callable".format(method)
+	
+	def test_migration_returns_a_destination_deme(self):
+		self.destinationDeme = lc.runOneCycle().migration()
+		
+		assert self.destinationDeme is not None, "{0} returns nothing".format(self.destinationDeme)
