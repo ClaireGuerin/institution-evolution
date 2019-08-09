@@ -68,7 +68,7 @@ class TestSimpleRun(object):
 			
 		assert self.lineNumber == self.nGen
 		
-	def test_program_write_non_empty_output(self):
+	def test_program_writes_non_empty_output(self):
 		self.outputFile = fman.getPathToFile('{0}/{1}'.format(OUTPUT_FOLDER, OUTPUT_FILE))
 		with open(self.outputFile) as f:
 			self.res = [len(line.strip()) for line in f.readlines()]

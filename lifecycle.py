@@ -1,0 +1,2 @@
+class runOneCycle(object):
+	pass
