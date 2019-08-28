@@ -1,7 +1,7 @@
 import pytest
 import os
 import filemanip as fman
-from main import Population as pop
+from main import Population as Pop
 from main import INITIALISATION_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE
 
 class TestSimpleRun(object):
@@ -46,7 +46,7 @@ class TestSimpleRun(object):
 		self.pathToFile = fman.getPathToFile(INITIALISATION_FILE)
 		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
-		self.population = pop()
+		self.population = Pop()
 		
 		self.assertObjectAttributesExist(self.population, self.attributeNames)
 		self.assertObjectAttributeValues(self.population, self.attributeNames, self.attributeValues)
@@ -54,7 +54,7 @@ class TestSimpleRun(object):
 	def test_program_writes_output_for_x_generations(self):
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
-		self.population = pop()
+		self.population = Pop()
 		self.population.runSimulation()
 		
 		self.outputFile = fman.getPathToFile('{0}/{1}'.format(OUTPUT_FOLDER, OUTPUT_FILE))
