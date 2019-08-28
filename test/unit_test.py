@@ -1,6 +1,7 @@
 import pytest
 from individual import Individual as Ind
 from deme import Deme as Dem
+from main import Population as Pop
 
 class TestIndividual(object):
 	
@@ -21,6 +22,12 @@ class TestDeme(object):
 	def test_deme_attributes(self):
 		self.deme = Dem()
 		self.assertObjectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood"])
+		
+class TestPopulation(object):
+	
+	def test_population_contains_demes(self):
+		self.pop = Pop()
+		assert hasattr(self.pop, "demes"), "This population has no deme yet!"
 		
 	
 		
