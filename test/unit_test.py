@@ -48,7 +48,7 @@ class TestIndividual(object):
 		
 	def test_mutants_get_deviation_from_phenotype(self):
 		self.indiv = Ind()
-		self.indiv.mutate(mutRate=1,mutationStep=0.05)
+		self.indiv.mutate(mutRate=1,mutStep=0.05)
 		assert hasattr(self.indiv, "mutationDeviation"), "Individual is a mutant: it needs to be set a deviation from phenotype"
 		assert -1 < self.indiv.mutationDeviation < 1
 		
@@ -67,10 +67,14 @@ class TestIndividual(object):
 		self.fakepop = Pop()
 		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
 		
-		self.distri = [ind.mutate(mutRate=1,0.05) for ind in self.fakepop.allPopulationDemes[0].individuals]
-		self.stat, self.pval = scistats.kstest(self.distri, 'norm', args=(0,0.05))
+		self.distri = []
+		for ind in self.fakepop.allPopulationDemes[0].individuals:
+			ind.mutate(mutRate=1,mutStep=0.05) 
+			self.distri.append(ind.mutationDeviation)
+			
+		stat, pval = scistats.kstest(self.distri, 'norm', args=(0,0.05), N=self.nIndividuals)
 		
-		assert self.pval > 0.05
+		assert pval > 0.05
 		
 		
 			
