@@ -1,4 +1,5 @@
 import pytest
+<<<<<<< HEAD
 from individual import Individual as Ind
 from deme import Deme as Dem
 from main import Population as Pop
@@ -142,6 +143,11 @@ class TestIndividual(object):
 		self.indiv.mutate(mutRate=1, mutStep=0.05)
 		assert len(self.phen) == len(self.indiv.phenotypicValues)
 		
+#	def test_migration_returns_a_destination_deme(self):
+#		self.destinationDeme = lc.runOneCycle().migration()
+		
+#		assert self.destinationDeme is not None, "{0} returns nothing".format(self.destinationDeme)
+		
 class TestDeme(object):
 	
 	def assertObjectAttributesExist(self, obj, attrs):
@@ -180,5 +186,3 @@ class TestPopulation(object):
 		for deme in self.pop.allPopulationDemes:
 			for ind in deme.individuals:
 				self.assertObjectAttributesAreNotNone(ind, ["phenotypicValues", "currentDeme"])
-		
-	
