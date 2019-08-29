@@ -4,3 +4,4 @@ class Deme(object):
 		self.demeNumber = None
 		self.demeSize = None
 		self.publicGood = None
+		

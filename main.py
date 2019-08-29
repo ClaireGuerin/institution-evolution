@@ -1,6 +1,7 @@
 import os
 import filemanip as fman
 from deme import Deme as Dem
+from individual import Individual as Ind
 
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
@@ -19,10 +20,12 @@ class Population:
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
 			
-	def createDemes(self):
+	def createAndPopulateDemes(self):
 		self.allPopulationDemes = []
 		for deme in range(self.numberOfDemes):
-			self.allPopulationDemes.append(Dem())
+			newDemeInstance = Dem()
+			newDemeInstance.individuals = [Ind()] * self.initialDemeSize
+			self.allPopulationDemes.append(newDemeInstance)
 					
 	def runSimulation(self):
 		self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)

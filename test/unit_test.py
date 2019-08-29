@@ -27,8 +27,20 @@ class TestPopulation(object):
 	
 	def test_population_contains_demes(self):
 		self.pop = Pop()
-		self.pop.createDemes()
+		self.pop.createAndPopulateDemes()
 		assert hasattr(self.pop, "allPopulationDemes"), "This population has no deme yet!"
+		
+		for deme in self.pop.allPopulationDemes:
+			assert type(deme) is Dem
+		
+	def test_demes_are_populated(self):
+		self.pop = Pop()
+		self.pop.createAndPopulateDemes()
+		for deme in self.pop.allPopulationDemes:
+			assert hasattr(deme, "individuals"), "{0} is not populated. Create a list of individuals!".format(deme)
+			for ind in deme.individuals:
+				assert type(ind) is Ind
+		
 		
 	
 		
