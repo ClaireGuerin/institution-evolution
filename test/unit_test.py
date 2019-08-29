@@ -2,7 +2,7 @@ import pytest
 from individual import Individual as Ind
 from deme import Deme as Dem
 from main import Population as Pop
-from scipy.stats import binom_test
+import scipy.stats as scistats
 
 class TestIndividual(object):
 	
@@ -33,7 +33,7 @@ class TestIndividual(object):
 		assert hasattr(self.indiv, "mutant"), "We don't know if our individual is a mutant because it doesn't have this attribute"
 		assert type(self.indiv.mutant) is bool
 		
-	def test_assert_mutants_are_drawn_from_binomial(self):
+	def test_mutants_are_drawn_from_binomial(self):
 		self.nIndividuals = 100000
 		self.fakepop = Pop()
 		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
@@ -43,12 +43,37 @@ class TestIndividual(object):
 			ind.mutate(mutRate = self.fakepop.mutationRate)
 			if ind.mutant:
 				self.mutantCount += 1
-		self.test = binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
+		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
 		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals,self.fakepop.mutationRate)
 		
-#	def assert_only_mutants_change_phenotype(self):
-#		self.nonMutantIndiv = Ind()
+	def test_mutants_get_deviation_from_phenotype(self):
+		self.indiv = Ind()
+		self.indiv.mutate(mutRate = 1)
+		assert hasattr(self.indiv, "mutationDeviation"), "Individual is a mutant: it needs to be set a deviation from phenotype"
+		assert -1 < self.indiv.mutationDeviation < 1
 		
+	def test_only_mutants_change_phenotype(self):
+		self.mutantIndivTrue = Ind()
+		self.mutantIndivFalse = Ind()
+		
+		self.mutantIndivTrue.mutate(mutRate = 1)
+		self.mutantIndivFalse.mutate(mutRate = 0)
+		
+		assert self.mutantIndivTrue.mutationDeviation != 0, "Your mutant phenotype does not deviate!"
+		assert self.mutantIndivFalse.mutationDeviation == 0, "Phenotype deviates even though individual not a mutant!"
+		
+	def test_mutation_deviation_follows_normal_distribution(self):
+		self.nIndividuals = 100000
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
+		
+		self.distri = [ind.mutate(mutRate = 1) for ind in self.fakepop.allPopulationDemes[0].individuals]
+		self.stat, self.pval = scistats.kstest(self.distri, 'norm', args=(0,0.05))
+		
+		assert self.pval > 0.05
+		
+		
+			
 	
 	
 class TestDeme(object):

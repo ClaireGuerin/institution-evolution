@@ -11,6 +11,11 @@ class Individual(object):
 
 	def mutate(self, mutRate):
 		self.mutant = bool(rd.binomial(1,mutRate))
+		
+		if self.mutant:
+			self.mutationDeviation = -0.5
+		else:
+			self.mutationDeviation = 0
 		return 0.5
 		
 	def migrate(self):
