@@ -1,5 +1,4 @@
 import pytest
-<<<<<<< HEAD
 from individual import Individual as Ind
 from deme import Deme as Dem
 from main import Population as Pop
