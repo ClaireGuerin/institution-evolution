@@ -1,3 +1,5 @@
+import numpy.random as rd
+
 class Individual(object):
 	
 	def __init__(self):
@@ -8,6 +10,7 @@ class Individual(object):
 		self.offspringNumber = None
 
 	def mutate(self):
+		self.mutant = bool(rd.binomial(1,0.5))
 		return 0.5
 		
 	def migrate(self):

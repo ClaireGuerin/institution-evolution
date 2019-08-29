@@ -51,7 +51,7 @@ class TestSimpleRun(object):
 			lines = [float(x) for x in f.readlines()]
 			for line in lines: 
 				assert type(line) is float 
-				assert line >= 0 and line <= 1
+				assert 0 <= line <= 1
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self):

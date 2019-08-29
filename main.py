@@ -24,11 +24,23 @@ class Population:
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 			
-	def createAndPopulateDemes(self):
+		self.pathToParFile = fman.getPathToFile(PARAMETER_FILE)		
+		self.parattrs = fman.extractColumnFromFile(self.pathToParFile,0, str)
+		self.parvals = fman.extractColumnFromFile(self.pathToParFile,1, float)
+		
+		for parattr,parval in zip(self.parattrs, self.parvals):
+			setattr(self, parattr, parval)
+			
+	def createAndPopulateDemes(self, nDemes = None, dSize = None):
+		if nDemes == None:
+			nDemes = self.numberOfDemes
+		if dSize == None:
+			dSize = self.initialDemeSize
+		
 		self.allPopulationDemes = []
-		for deme in range(self.numberOfDemes):
+		for deme in range(nDemes):
 			newDemeInstance = Dem()
-			newDemeInstance.individuals = [Ind()] * self.initialDemeSize
+			newDemeInstance.individuals = [Ind()] * dSize
 			
 			for ind in newDemeInstance.individuals:
 				setattr(ind, "phenotypicValues", self.initialPhenotypes)

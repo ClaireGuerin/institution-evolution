@@ -2,6 +2,7 @@ import pytest
 from individual import Individual as Ind
 from deme import Deme as Dem
 from main import Population as Pop
+from scipy.stats import binom_test
 
 class TestIndividual(object):
 	
@@ -26,6 +27,29 @@ class TestIndividual(object):
 		assert type(self.mut) is float
 		assert 0 <= self.mut <= 1
 		
+	def test_mutants_are_defined(self):
+		self.indiv = Ind()
+		self.indiv.mutate()
+		assert hasattr(self.indiv, "mutant"), "We don't know if our individual is a mutant because it doesn't have this attribute"
+		assert type(self.indiv.mutant) is bool
+		
+	def test_assert_mutants_are_drawn_from_binomial(self):
+		self.nIndividuals = 100000
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
+		self.mutantCount = 0
+		for ind in self.fakepop.allPopulationDemes[0].individuals:
+			ind.mutate()
+			if ind.mutant:
+				self.mutantCount += 1
+		self.test = binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
+		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals,self.fakepop.mutationRate)
+		
+#	def assert_only_mutants_change_phenotype(self):
+#		self.nonMutantIndiv = Ind()
+		
+	
+	
 class TestDeme(object):
 	
 	def assertObjectAttributesExist(self, obj, attrs):
