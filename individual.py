@@ -9,11 +9,11 @@ class Individual(object):
 		self.fertilityValue = None
 		self.offspringNumber = None
 
-	def mutate(self, mutRate):
+	def mutate(self, mutRate, mutStep):
 		self.mutant = bool(rd.binomial(1,mutRate))
 		
 		if self.mutant:
-			self.mutationDeviation = -0.5
+			self.mutationDeviation = rd.normal(0,mutStep)
 		else:
 			self.mutationDeviation = 0
 		return 0.5

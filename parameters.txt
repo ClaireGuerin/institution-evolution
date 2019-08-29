@@ -1,1 +1,2 @@
 mutationRate,0.2
+mutationStep,0.05

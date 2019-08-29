@@ -23,13 +23,13 @@ class TestIndividual(object):
 			
 	def test_mutation_function_returns_phenotype(self):
 		self.indiv = Ind()
-		self.mut = self.indiv.mutate(mutRate = 0.5)
+		self.mut = self.indiv.mutate(mutRate=0.5, mutStep=0.5)
 		assert type(self.mut) is float
 		assert 0 <= self.mut <= 1
 		
 	def test_mutants_are_defined(self):
 		self.indiv = Ind()
-		self.indiv.mutate(mutRate = 0.5)
+		self.indiv.mutate(mutRate=0.5, mutStep=0.5)
 		assert hasattr(self.indiv, "mutant"), "We don't know if our individual is a mutant because it doesn't have this attribute"
 		assert type(self.indiv.mutant) is bool
 		
@@ -40,7 +40,7 @@ class TestIndividual(object):
 		
 		self.mutantCount = 0
 		for ind in self.fakepop.allPopulationDemes[0].individuals:
-			ind.mutate(mutRate = self.fakepop.mutationRate)
+			ind.mutate(mutRate=self.fakepop.mutationRate, mutStep=0.05)
 			if ind.mutant:
 				self.mutantCount += 1
 		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
@@ -48,7 +48,7 @@ class TestIndividual(object):
 		
 	def test_mutants_get_deviation_from_phenotype(self):
 		self.indiv = Ind()
-		self.indiv.mutate(mutRate = 1)
+		self.indiv.mutate(mutRate=1,mutationStep=0.05)
 		assert hasattr(self.indiv, "mutationDeviation"), "Individual is a mutant: it needs to be set a deviation from phenotype"
 		assert -1 < self.indiv.mutationDeviation < 1
 		
@@ -56,8 +56,8 @@ class TestIndividual(object):
 		self.mutantIndivTrue = Ind()
 		self.mutantIndivFalse = Ind()
 		
-		self.mutantIndivTrue.mutate(mutRate = 1)
-		self.mutantIndivFalse.mutate(mutRate = 0)
+		self.mutantIndivTrue.mutate(mutRate=1, mutStep=0.05)
+		self.mutantIndivFalse.mutate(mutRate=0, mutStep=0.05)
 		
 		assert self.mutantIndivTrue.mutationDeviation != 0, "Your mutant phenotype does not deviate!"
 		assert self.mutantIndivFalse.mutationDeviation == 0, "Phenotype deviates even though individual not a mutant!"
@@ -67,7 +67,7 @@ class TestIndividual(object):
 		self.fakepop = Pop()
 		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
 		
-		self.distri = [ind.mutate(mutRate = 1) for ind in self.fakepop.allPopulationDemes[0].individuals]
+		self.distri = [ind.mutate(mutRate=1,0.05) for ind in self.fakepop.allPopulationDemes[0].individuals]
 		self.stat, self.pval = scistats.kstest(self.distri, 'norm', args=(0,0.05))
 		
 		assert self.pval > 0.05
