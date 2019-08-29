@@ -6,3 +6,12 @@ class Individual(object):
 		self.resourcesAmount = None
 		self.fertilityValue = None
 		self.offspringNumber = None
+
+	def mutate(self):
+		return 0.5
+		
+	def migrate(self):
+		pass
+	
+	def reproduce(self):
+		pass

@@ -2,7 +2,7 @@ import pytest
 import os
 import filemanip as fman
 from main import Population as Pop
-from main import INITIALISATION_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE
+from main import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE
 
 class TestSimpleRun(object):
 	
@@ -31,14 +31,27 @@ class TestSimpleRun(object):
 		
 		self.pars = fman.extractColumnFromFile(self.pathToFile, 1, int)
 		for par in self.pars:
-			assert type(par) is int
-			assert par > 0	
+			assert type(par) is int, "Did you insert a non integer value for deme number, deme size or generation number?"
+			assert par > 0, "Did you insert a negative value for deme number, deme size or generation number?"
 				
 	def test_parameter_file_exists(self):
 		# Claire provides parameters needed by the program to run functions in a file called parameters.txt
 		self.dirpath = os.getcwd()
 		self.fileslist = os.listdir(self.dirpath)
-		assert PARAMETER_FILE in self.fileslist, "Initialisation file not found in {0}".format(self.dirpath) 
+		assert PARAMETER_FILE in self.fileslist, "Parameter file not found in {0}".format(self.dirpath) 
+		
+	def test_initial_phenotypes_file_exists(self):
+		self.dirpath = os.getcwd()
+		self.fileslist = os.listdir(self.dirpath)
+		assert INITIAL_PHENOTYPES_FILE in self.fileslist, "Initial phenotypes file not found in {0}".format(self.dirpath) 
+		
+	def test_initial_phenotypes_format(self):
+		self.pathToFile = fman.getPathToFile(INITIAL_PHENOTYPES_FILE)
+		with open(self.pathToFile) as f:
+			lines = [float(x) for x in f.readlines()]
+			for line in lines: 
+				assert type(line) is float 
+				assert line >= 0 and line <= 1
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self):
