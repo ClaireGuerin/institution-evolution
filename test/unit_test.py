@@ -23,13 +23,13 @@ class TestIndividual(object):
 			
 	def test_mutation_function_returns_phenotype(self):
 		self.indiv = Ind()
-		self.mut = self.indiv.mutate()
+		self.mut = self.indiv.mutate(mutRate = 0.5)
 		assert type(self.mut) is float
 		assert 0 <= self.mut <= 1
 		
 	def test_mutants_are_defined(self):
 		self.indiv = Ind()
-		self.indiv.mutate()
+		self.indiv.mutate(mutRate = 0.5)
 		assert hasattr(self.indiv, "mutant"), "We don't know if our individual is a mutant because it doesn't have this attribute"
 		assert type(self.indiv.mutant) is bool
 		
@@ -37,9 +37,10 @@ class TestIndividual(object):
 		self.nIndividuals = 100000
 		self.fakepop = Pop()
 		self.fakepop.createAndPopulateDemes(1,self.nIndividuals)
+		
 		self.mutantCount = 0
 		for ind in self.fakepop.allPopulationDemes[0].individuals:
-			ind.mutate()
+			ind.mutate(mutRate = self.fakepop.mutationRate)
 			if ind.mutant:
 				self.mutantCount += 1
 		self.test = binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")

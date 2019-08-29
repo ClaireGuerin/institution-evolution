@@ -9,8 +9,8 @@ class Individual(object):
 		self.fertilityValue = None
 		self.offspringNumber = None
 
-	def mutate(self):
-		self.mutant = bool(rd.binomial(1,0.5))
+	def mutate(self, mutRate):
+		self.mutant = bool(rd.binomial(1,mutRate))
 		return 0.5
 		
 	def migrate(self):
