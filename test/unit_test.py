@@ -27,7 +27,8 @@ class TestPopulation(object):
 	
 	def test_population_contains_demes(self):
 		self.pop = Pop()
-		assert hasattr(self.pop, "demes"), "This population has no deme yet!"
+		self.pop.createDemes()
+		assert hasattr(self.pop, "allPopulationDemes"), "This population has no deme yet!"
 		
 	
 		

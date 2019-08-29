@@ -1,5 +1,6 @@
 import os
 import filemanip as fman
+from deme import Deme as Dem
 
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
@@ -18,6 +19,11 @@ class Population:
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
 			
+	def createDemes(self):
+		self.allPopulationDemes = []
+		for deme in range(self.numberOfDemes):
+			self.allPopulationDemes.append(Dem())
+					
 	def runSimulation(self):
 		self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
 		if not os.path.exists(self.pathToOutputFolder):
