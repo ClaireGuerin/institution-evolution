@@ -76,7 +76,21 @@ class TestIndividual(object):
 		
 		assert pval > 0.05
 		
+	def test_mutation_adds_deviation_to_phenotype(self):
+		self.mutantIndivTrue = Ind()
+		self.mutantIndivFalse = Ind()
 		
+		self.mutantIndivTrue.phenotypicValues = 0.5
+		self.mutantIndivFalse.phenotypicValues = 0.5
+		
+		self.oldPhenTrueMutant = self.mutantIndivTrue.phenotypicValues
+		self.oldPhenFalseMutant = self.mutantIndivFalse.phenotypicValues
+		
+		self.mutantIndivTrue.mutate(mutRate=1, mutStep=0.05)
+		self.mutantIndivFalse.mutate(mutRate=0, mutStep=0.05)
+		
+		assert self.oldPhenTrueMutant + self.mutantIndivTrue.mutationDeviation == self.mutantIndivTrue.phenotypicValues, "Deviation not added to phenotype mutant!"
+		assert self.oldPhenFalseMutant + 0 == self.mutantIndivFalse.phenotypicValues, "Deviation added to non-mutant phenotype!"
 			
 	
 	
