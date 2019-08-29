@@ -2,6 +2,7 @@ import os
 import filemanip as fman
 from deme import Deme as Dem
 from individual import Individual as Ind
+from statistics import mean
 
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
@@ -49,11 +50,23 @@ class Population:
 			self.allPopulationDemes.append(newDemeInstance)
 					
 	def runSimulation(self):
+		self.createAndPopulateDemes()
+		
 		self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
 		if not os.path.exists(self.pathToOutputFolder):
 			os.makedirs(self.pathToOutputFolder)
 			
 		with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
 			for gen in range(self.numberOfGenerations):
-				f.write('\n')
+				meanPhenDeme = []
+				for deme in self.allPopulationDemes:
+					phenDeme = []
+					for ind in deme.individuals:
+						ind.mutate(self.mutationRate, self.mutationStep)
+						ind.migrate()
+						ind.reproduce()
+						
+						phenDeme.append(ind.phenotypicValues[0])
+					meanPhenDeme.append(mean(phenDeme))
+				f.write('{0}\n'.format(mean(meanPhenDeme)))
 			
