@@ -133,10 +133,17 @@ class TestMutationFunction(object):
 		self.indiv.mutate(mutRate=1, mutStep=0.05)
 		assert len(self.phen) == len(self.indiv.phenotypicValues)
 		
-#	def test_migration_returns_a_destination_deme(self):
-#		self.destinationDeme = lc.runOneCycle().migration()
+class TestMigrationFunction(self):
 		
-#		assert self.destinationDeme is not None, "{0} returns nothing".format(self.destinationDeme)
+	def test_migration_returns_a_destination_deme(self, instantiateSingleDemePopulation):
+		"""The migration function should return the new deme, which is an integer among all demes"""
+		self.fakepop = instantiateSingleDemePopulation(1)
+		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]claire
+		
+		self.indiv.migrate()
+		
+		assert type(self.destinationDeme) is integer, "{0} is {1} instead of integer".format(self.destinationDeme, type(self.destinationDeme))
+		assert self.destinationDeme in range(self.fakepop.demeNumber)
 		
 class TestDeme(object):
 	
