@@ -14,16 +14,6 @@ class TestIndividual(object):
 		for attr in attrs:
 			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)
 			
-	def instantiateSingleIndividualPopulation(self):
-		fakepop = Pop()
-		fakepop.createAndPopulateDemes(1,1)
-		return fakepop.allPopulationDemes[0].individuals[0]
-	
-	def instantiateSingleDemePopulation(self, nIndivs):
-		fakepop = Pop()
-		fakepop.createAndPopulateDemes(1,nIndivs)
-		return fakepop
-			
 	def test_individual_attributes_exist(self):
 		self.indiv = Ind()
 		self.assertObjectAttributesExist(self.indiv, ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"])
@@ -35,8 +25,10 @@ class TestIndividual(object):
 			assert hasattr(Ind(), method), "{0} method does not exist".format(method)
 			assert callable(getattr(Ind, method)), "{0} method is not callable".format(method)
 			
-	def test_mutation_function_takes_and_returns_phenotype(self):
-		self.indiv = self.instantiateSingleIndividualPopulation()
+class TestMutationFunction(object):
+			
+	def test_mutation_function_takes_and_returns_phenotype(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
 		assert type(self.indiv.phenotypicValues) is list, "You must give a list of phenotypic values"
 		
 		self.indiv.mutate(mutRate=0.5, mutStep=0.5)
@@ -44,17 +36,17 @@ class TestIndividual(object):
 			assert type(x) is float, "Phenotypic values ({0}) must be of type float, and not {1}".format(x, type(x))
 			assert 0 <= x <= 1, "Phenotypic values must be in range [0,1]"
 			
-	def test_mutants_are_defined(self):
-		self.indiv = self.instantiateSingleIndividualPopulation()
+	def test_mutants_are_defined(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
 		
 		self.indiv.mutate(mutRate=0.5, mutStep=0.5)
 		assert hasattr(self.indiv, "mutant"), "We don't know if our individual is a mutant because it doesn't have this attribute"
 		assert type(self.indiv.mutant) is bool
 		
-	def test_mutants_are_drawn_from_binomial(self):
+	def test_mutants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
 		random.seed(30)
 		self.nIndividuals = 1000
-		self.fakepop = self.instantiateSingleDemePopulation(self.nIndividuals)
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
 		
 		self.mutantCount = 0
 		for ind in self.fakepop.allPopulationDemes[0].individuals:
@@ -69,8 +61,8 @@ class TestIndividual(object):
 		
 		gc.collect()
 		
-	def test_deviation_function_returns_list_of_phenotype_size(self):
-		self.indiv = self.instantiateSingleIndividualPopulation()
+	def test_deviation_function_returns_list_of_phenotype_size(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
 		self.phen = self.indiv.phenotypicValues
 		
 		for mutationBool in [True, False]:
@@ -79,16 +71,16 @@ class TestIndividual(object):
 			assert type(self.indiv.mutationDeviation) is list
 			assert len(self.indiv.mutationDeviation) == len(self.phen)
 		
-	def test_mutants_get_deviation_from_phenotype(self):
-		self.indiv = self.instantiateSingleIndividualPopulation()
+	def test_mutants_get_deviation_from_phenotype(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
 		self.indiv.mutate(mutRate=1,mutStep=0.05)
 		assert hasattr(self.indiv, "mutationDeviation"), "Individual is a mutant: it needs to be set a deviation from phenotype"
 		
 		for x in self.indiv.mutationDeviation:
 			assert -1 < x < 1
 			
-	def test_only_mutants_change_phenotype(self):
-		self.fakepop = self.instantiateSingleDemePopulation(2)
+	def test_only_mutants_change_phenotype(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(2)
 		self.mutantIndivTrue = self.fakepop.allPopulationDemes[0].individuals[0]
 		self.mutantIndivFalse = self.fakepop.allPopulationDemes[0].individuals[1]
 		
@@ -100,10 +92,10 @@ class TestIndividual(object):
 		assert not self.mutantIndivFalse.mutant
 		assert all([x == 0 for x in self.mutantIndivFalse.mutationDeviation]), "Phenotype deviates even though individual not a mutant!"
 		
-	def test_mutation_deviation_follows_normal_distribution(self):
+	def test_mutation_deviation_follows_normal_distribution(self, instantiateSingleDemePopulation):
 		random.seed(30)
 		self.nIndividuals = 1000
-		self.fakepop = self.instantiateSingleDemePopulation(self.nIndividuals)
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
 		
 		self.distri = []
 		for ind in self.fakepop.allPopulationDemes[0].individuals:
@@ -117,10 +109,9 @@ class TestIndividual(object):
 		stat3, pval3 = scistats.shapiro(self.distri), "Test of normality failed"
 		
 		gc.collect()
-	
-	
-	def test_mutation_adds_deviation_to_phenotype(self):
-		self.fakepop = self.instantiateSingleDemePopulation(2)
+ 
+	def test_mutation_adds_deviation_to_phenotype(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(2)
 		
 		self.trueMutant = self.fakepop.allPopulationDemes[0].individuals[0]
 #		self.falseMutant = self.fakepop.allPopulationDemes[0].individuals[1]
@@ -135,8 +126,8 @@ class TestIndividual(object):
 #		self.falseMutant.mutate(mutRate=0, mutStep=0.05)
 #		assert list(map(add, self.oldPhenFalseMutant, [0] * len(self.oldPhenFalseMutant))) == self.falseMutant.phenotypicValues, "Deviation added to non-mutant phenotype!"
 		
-	def test_mutation_does_not_affect_phenotype_size(self):
-		self.indiv = self.instantiateSingleIndividualPopulation()
+	def test_mutation_does_not_affect_phenotype_size(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
 		self.phen = self.indiv.phenotypicValues
 		
 		self.indiv.mutate(mutRate=1, mutStep=0.05)
