@@ -38,32 +38,26 @@ class Population:
 		if dSize == None:
 			dSize = self.initialDemeSize
 			
-		allDemes = list(range(nDemes))
-				
 		self.allPopulationDemes = []
 		for deme in range(nDemes):
 			newDemeInstance = Dem()
 			newDemeInstance.id = deme
 			
-			newDemeInstance.neighbours = self.identifyNeighbours(allDemes, deme)
+			newDemeInstance.neighbours = self.identifyNeighbours(nDemes, deme)
 			
 			newDemeInstance.individuals = [Ind()] * dSize
 			
 			for ind in newDemeInstance.individuals:
 				setattr(ind, "phenotypicValues", self.initialPhenotypes)
 				setattr(ind, "currentDeme", deme)
+				setattr(ind, "neighbours", newDemeInstance.neighbours)
 			
 			self.allPopulationDemes.append(newDemeInstance)
 			
-	def identifyNeighbours(self, demeNumber, demeID):
-		tmp = demeNumber
-		try:
-			del tmp[demeID]
-		except:
-			"list {0} does not have an item at index {1}".format(tmp, demeID)
+	def identifyNeighbours(self, nd, demeID):
+		tmp = list(range(nd))
+		del tmp[demeID]
 		return tmp
-			
-			
 					
 	def runSimulation(self):
 		self.createAndPopulateDemes()

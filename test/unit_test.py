@@ -111,18 +111,47 @@ class TestMutationFunction(object):
 	def test_mutation_adds_deviation_to_phenotype(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(2)
 		
+		# WHEN THERE IS MUTATION
 		self.trueMutant = self.fakepop.allPopulationDemes[0].individuals[0]
-#		self.falseMutant = self.fakepop.allPopulationDemes[0].individuals[1]
-		
 		self.oldPhenTrueMutant = self.trueMutant.phenotypicValues
-#		self.oldPhenFalseMutant = self.falseMutant.phenotypicValues
+		
+		self.trueMutant.mutant = True
+		self.trueMutant.deviate(ms=0.05,n=len(self.oldPhenTrueMutant))
+		assert all(x != 0 for x in self.trueMutant.mutationDeviation), "Deviation = {0}".format(self.trueMutant.mutationDeviation)
+		
+		self.trueMutant.applyMutation(self.trueMutant.mutationDeviation)
+		assert all(x != y for x, y in zip(self.trueMutant.phenotypicValues, self.oldPhenTrueMutant)), "New:{0}, Old:{1}".format(self.falseMutant.phenotypicValues, self.oldPhenFalseMutant)
+		
+		# Reset to test the whole thing together:
+		self.trueMutant.phenotypicValues = self.oldPhenTrueMutant
+		self.trueMutant.mutant = None
+		self.trueMutant.mutationDeviation = None
 		
 		self.trueMutant.mutate(mutRate=1, mutStep=0.05)
 		assert type(self.oldPhenTrueMutant) is list and type(self.trueMutant.mutationDeviation) is list, "Check that both {0} and {1} are lists".format(self.oldPhenTrueMutant, self.trueMutant.mutationDeviation)
-		assert list(map(add, self.oldPhenTrueMutant, self.trueMutant.mutationDeviation)) == self.trueMutant.phenotypicValues, "Deviation not added to phenotype mutant!"
+		assert all([x + y == z for x, y, z in zip(self.oldPhenTrueMutant, self.trueMutant.mutationDeviation, self.trueMutant.phenotypicValues)]), "Deviation not added to mutant phenotype!"
 		
-#		self.falseMutant.mutate(mutRate=0, mutStep=0.05)
-#		assert list(map(add, self.oldPhenFalseMutant, [0] * len(self.oldPhenFalseMutant))) == self.falseMutant.phenotypicValues, "Deviation added to non-mutant phenotype!"
+		# WHEN THERE IS NO MUTATION
+		self.falseMutant = self.fakepop.allPopulationDemes[0].individuals[1]
+		self.oldPhenFalseMutant = self.falseMutant.phenotypicValues
+		
+		self.falseMutant.mutant = False
+		self.falseMutant.deviate(ms=0.05, n=len(self.oldPhenFalseMutant))
+		assert self.falseMutant.mutationDeviation == [0] * len(self.oldPhenFalseMutant), "Deviation = {0}".format(self.falseMutant.mutationDeviation)
+		
+		self.falseMutant.applyMutation(self.falseMutant.mutationDeviation)
+		assert self.falseMutant.phenotypicValues == self.oldPhenFalseMutant, "New:{0}, Old:{1}".format(self.falseMutant.phenotypicValues, self.oldPhenFalseMutant)
+		
+		# Reset to test the whole thing together:
+		self.falseMutant.phenotypicValues = self.oldPhenFalseMutant
+		self.falseMutant.mutant = None
+		self.falseMutant.mutationDeviation = None
+		
+		self.falseMutant.mutate(mutRate=0, mutStep=0.05)
+		assert self.oldPhenFalseMutant == self.falseMutant.phenotypicValues, "Your individual shows mutant characteristic = {0}. Yet its phenotype deviates by {1}".format(self.falseMutant.mutant, [x-y for x, y in zip(self.falseMutant.phenotypicValues, self.oldPhenFalseMutant)])
+		assert all([x == y for x, y in zip(self.oldPhenFalseMutant, self.falseMutant.phenotypicValues)]), "Before: {0}, Deviation: {1}, After: {2}".format(self.oldPhenFalseMutant, self.falseMutant.mutationDeviation, self.falseMutant.phenotypicValues)
+		
+		gc.collect()
 		
 	def test_mutation_does_not_affect_phenotype_size(self, instantiateSingleIndividualPopulation):
 		self.indiv = instantiateSingleIndividualPopulation
@@ -133,58 +162,86 @@ class TestMutationFunction(object):
 		
 class TestMigrationFunction(object):
 	
-	def test_idividual_has_destination_deme_after_migration(self, instantiateSingleDemePopulation):
-		self.fakepop = instantiateSingleDemePopulation(1)
-		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+	def test_individual_has_destination_deme_after_migration(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,1)
 		
-		assert hasattr(self.indiv, "destinationDeme"), "Your individual is going nowhere: no destination deme!"
+		for deme in self.fakepop.allPopulationDemes:
+			indiv = deme.individuals[0]
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+			assert hasattr(indiv, "destinationDeme"), "Your individual is going nowhere: no destination deme!"
 		
 	def test_migration_returns_a_destination_deme_of_correct_format(self, instantiateSingleDemePopulation):
 		"""The migration function should return the new deme, which is an integer among all demes"""
-		self.fakepop = instantiateSingleDemePopulation(1)
-		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,1)
 		
-		assert type(self.indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(self.indiv.destinationDeme, type(self.indiv.destinationDeme))
-		assert self.indiv.destinationDeme in range(self.fakepop.numberOfDemes)
+		for deme in self.fakepop.allPopulationDemes:
+			indiv = deme.individuals[0]
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+			
+			assert type(indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(indiv.destinationDeme, type(indiv.destinationDeme))
+			assert indiv.destinationDeme in range(self.fakepop.numberOfDemes)
 		
 	def test_migrants_are_defined_properly(self, instantiateSingleDemePopulation):
-		self.fakepop = instantiateSingleDemePopulation(1)
-		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,1)
 		
-		assert hasattr(self.indiv, "migrant"), "Your individual does not know whether to migrate or not"
-		assert type(self.indiv.migrant) is bool, "Migrant must be a boolean"		
+		for deme in self.fakepop.allPopulationDemes:
+			indiv = deme.individuals[0]
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+			
+			assert hasattr(indiv, "migrant"), "Your individual does not know whether to migrate or not"
+			assert type(indiv.migrant) is bool, "Migrant must be a boolean"		
 		
 	def test_migrants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
 		random.seed(30)
 		self.nIndividuals = 1000
-		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd, self.nIndividuals)
 		
-		self.migrantCount = 0
-		for ind in self.fakepop.allPopulationDemes[0].individuals:
-			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
-			if ind.migrant:
-				self.migrantCount += 1
+		self.meanpvals = []
+		self.distripvals = []
+		self.allcounts = []
 		
-		stat1, pval1 = scistats.ttest_1samp([1] * self.migrantCount + [0] * (self.nIndividuals - self.migrantCount), self.fakepop.migrationRate)
-		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.migrantCount/self.nIndividuals, self.fakepop.migrationRate)
-		self.test = scistats.binom_test(self.migrantCount, self.nIndividuals, self.fakepop.migrationRate, alternative = "two-sided")
-		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.migrantCount/self.nIndividuals,self.fakepop.migrationRate)
+		for deme in self.fakepop.allPopulationDemes:
+			migrantCount = 0
+			
+			for ind in deme.individuals:
+				ind.migrate(nDemes=self.nd, migRate=self.fakepop.migrationRate)
+				if ind.migrant:
+					migrantCount += 1
+					
+			self.allcounts.append(migrantCount)
 		
-	def test_only_migrants_change_deme(self, instantiateSingleDemePopulation):
-		self.fakepop = instantiateSingleDemePopulation(2)
+			stat1, pval1 = scistats.ttest_1samp([1] * migrantCount + [0] * (self.nIndividuals - migrantCount), self.fakepop.migrationRate)
+			self.meanpvals.append(pval1)
+			
+			test = scistats.binom_test(migrantCount, self.nIndividuals, self.fakepop.migrationRate, alternative = "two-sided")
+			self.distripvals.append(test)
+			
+		assert sum([x > 0.05 for x in self.meanpvals]) >= len(self.meanpvals)-1, "T-test mean failed. Observed: {0}, Expected: {1}".format(mean(self.allcounts)/self.nIndividuals, self.fakepop.migrationRate)
+		assert sum([x > 0.05 for x in self.distripvals]) >= len(self.distripvals)-1, "Success rate = {0} when mutation rate = {1}".format(mean(self.allcounts)/self.nIndividuals, self.fakepop.migrationRate)
+		
+	def test_only_migrants_change_deme(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,1)
+		
 		self.migrantIndivTrue = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.migrantIndivFalse = self.fakepop.allPopulationDemes[0].individuals[1]
+		self.migrantIndivFalse = self.fakepop.allPopulationDemes[1].individuals[0]
 		
-		self.migrantIndivTrue.migrate(2, migRate=1)
+		self.migrantIndivTrue.migrate(self.nd, migRate=1)
 		assert self.migrantIndivTrue.migrant, "Uh-oh, looks like the individual did not migrate when it should have..."
 		assert self.migrantIndivTrue.currentDeme != self.migrantIndivTrue.destinationDeme, "Individual destination deme is the same as current even though it should migrate!"
 		
-		self.migrantIndivFalse.migrate(2, migRate=0)
+		self.migrantIndivFalse.migrate(self.nd, migRate=0)
 		assert not self.migrantIndivFalse.migrant, "Uh-oh, looks like the individual did migrate when it shouldn't have..."
-		assert self.migrantIndivTrue.currentDeme == self.migrantIndivTrue.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
+		assert self.migrantIndivFalse.currentDeme == self.migrantIndivFalse.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
 		
 		
 class TestDeme(object):
@@ -207,15 +264,14 @@ class TestDeme(object):
 	def test_deme_object_knows_other_demes(self):
 		self.fakepop = Pop()
 		self.nd = self.fakepop.numberOfDemes
-		self.alldemeslist = list(range(self.nd))
 		self.fakepop.createAndPopulateDemes(self.nd,1)
 		
 		for deme in range(self.nd):
 			focalDeme = self.fakepop.allPopulationDemes[deme]
-			otherDemes = self.alldemeslist
+			otherDemes = list(range(self.nd))
 			del otherDemes[focalDeme.id]
 			assert type(focalDeme.neighbours) is list
-			assert focalDeme.neighbours == otherDemes, "Know who your neighbours are!"
+			assert focalDeme.neighbours == otherDemes, "Neighbours of deme {0} are {1}, and not {2}!".format(deme, otherDemes, focalDeme.neighbours)
 
 class TestPopulation(object):
 	
@@ -230,6 +286,15 @@ class TestPopulation(object):
 		
 		for deme in self.pop.allPopulationDemes:
 			assert type(deme) is Dem
+			
+	def test_identify_deme_neighbours(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		for deme in range(self.nd):
+			newDemeInstance = Dem()
+			newDemeInstance.id = deme
+			assert deme in range(self.nd)
+			newDemeInstance.neighbours = self.fakepop.identifyNeighbours(self.nd, deme)
 			
 	def test_demes_are_populated(self):
 		self.pop = Pop()
