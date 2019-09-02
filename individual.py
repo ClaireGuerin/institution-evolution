@@ -24,7 +24,7 @@ class Individual(object):
 			self.mutationDeviation = [0] * n
 		
 	def migrate(self):
-		self.destinationDeme = rd.randint(2)
+		self.destinationDeme = rd.randint(100)
 	
 	def reproduce(self):
 		pass
