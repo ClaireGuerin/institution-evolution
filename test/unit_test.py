@@ -12,7 +12,9 @@ class TestIndividual(object):
 		
 	def test_individual_attributes_exist(self, objectAttributesExist):
 		self.indiv = Ind()
-		assert objectAttributesExist(self.indiv, ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"])
+		self.attributes = ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"]
+		testAttr, whichAttr = objectAttributesExist(self.indiv, self.attributes)
+		assert testAttr, "Individual is missing attribute(s) {0}".format(whichAttr)
 		
 	def test_mig_rep_mut_methods_exist_and_are_callable(self):
 		self.methods = ['mutate', 'migrate', 'reproduce']
@@ -189,7 +191,9 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		assert objectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood", "otherDemes"])
+		self.attributes = ["demeNumber", "demeSize", "publicGood", "otherDemes"]
+		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
+		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
 
 class TestPopulation(object):
 	

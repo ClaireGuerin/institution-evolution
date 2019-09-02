@@ -10,19 +10,29 @@ def instantiateSingleIndividualPopulation():
 
 @pytest.fixture
 def instantiateSingleDemePopulation():
-	def _foo(nIndivs):
+	def _foo1(nIndivs):
 		fakepop = Pop()
 		fakepop.createAndPopulateDemes(1,nIndivs)
 		return fakepop
 	
-	return _foo
+	return _foo1
 
 @pytest.fixture
 def objectAttributesExist():
-	def _foo(obj, attrs):
+	def _foo2(obj, attrs):
+		tests = []
 		for attr in attrs:
-			return hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)
+			tests.append(hasattr(obj, attr))
+		thereIsNoProblem = all(tests)
+		if thereIsNoProblem:
+			result = None
+		else:
+			problemIndices = [i for i, x in enumerate(tests) if x == False]
+			problemAttr = [attrs[a] for a in problemIndices]
+			result = problemAttr	
+		
+		return (thereIsNoProblem, result)
 	
-	return _foo
-			
+	return _foo2
+
 	
