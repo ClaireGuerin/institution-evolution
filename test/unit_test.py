@@ -147,6 +147,31 @@ class TestMigrationFunction(object):
 		assert type(self.indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(self.indiv.destinationDeme, type(self.indiv.destinationDeme))
 		assert self.indiv.destinationDeme in range(self.fakepop.numberOfDemes)
 		
+	def test_migrants_are_defined(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(1)
+		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
+		self.indiv.migrate(self.fakepop.numberOfDemes)
+		
+		assert hasattr(self.indiv, "migrant"), "Your individual does not know whether to migrate or not"
+		
+		
+#	def test_migrants_are_drawn_from_binomial(self):
+#		random.seed(30)
+#		self.nIndividuals = 1000
+#		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+		
+#		self.migrantsCount = 0
+#		for ind in self.fakepop.allPopulationDemes[0].individuals:
+#			ind.mutate(mutRate=self.fakepop.mutationRate, mutStep=0.05)
+#			if ind.migrant:
+#				self.migrantsCount += 1
+		
+#		stat1, pval1 = scistats.ttest_1samp([1] * self.mutantCount + [0] * (self.nIndividuals - self.mutantCount), self.fakepop.mutationRate)
+#		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.mutantCount/self.nIndividuals, self.fakepop.mutationRate)
+#		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
+#		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals,self.fakepop.mutationRate)
+		
+		
 class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
