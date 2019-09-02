@@ -37,10 +37,16 @@ class Population:
 			nDemes = self.numberOfDemes
 		if dSize == None:
 			dSize = self.initialDemeSize
-		
+			
+		allDemes = list(range(nDemes))
+				
 		self.allPopulationDemes = []
 		for deme in range(nDemes):
 			newDemeInstance = Dem()
+			newDemeInstance.id = deme
+			
+			newDemeInstance.neighbours = self.identifyNeighbours(allDemes, deme)
+			
 			newDemeInstance.individuals = [Ind()] * dSize
 			
 			for ind in newDemeInstance.individuals:
@@ -48,6 +54,13 @@ class Population:
 				setattr(ind, "currentDeme", deme)
 			
 			self.allPopulationDemes.append(newDemeInstance)
+			
+	def identifyNeighbours(self, demeNumber, demeID):
+		tmp = demeNumber
+		del tmp[demeID]
+		return tmp
+			
+			
 					
 	def runSimulation(self):
 		self.createAndPopulateDemes()

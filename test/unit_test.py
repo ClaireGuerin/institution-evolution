@@ -191,9 +191,31 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.attributes = ["demeNumber", "demeSize", "publicGood", "otherDemes"]
+		self.attributes = ["id", "demography", "publicGood", "neighbours"]
 		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
 		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
+		
+	def test_deme_object_knows_itself(self, instantiateSingleDemePopulation):
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes,1)
+		
+		for deme in range(self.fakepop.numberOfDemes):
+			focalDeme = self.fakepop.allPopulationDemes[deme]
+			assert type(focalDeme.id) is int
+			assert focalDeme.id == deme, "Deme number {0} has wrong id ={1}".format(deme, focalDeme.id)
+	
+	def test_deme_object_knows_other_demes(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.alldemeslist = list(range(self.nd))
+		self.fakepop.createAndPopulateDemes(self.nd,1)
+		
+		for deme in range(self.nd):
+			focalDeme = self.fakepop.allPopulationDemes[deme]
+			otherDemes = self.alldemeslist
+			del otherDemes[focalDeme.id]
+			assert type(focalDeme.neighbours) is list
+			assert focalDeme.neighbours == otherDemes, "Know who your neighbours are!"
 
 class TestPopulation(object):
 	
