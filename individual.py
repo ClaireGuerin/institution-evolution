@@ -36,6 +36,8 @@ class Individual(object):
 			self.destinationDeme = int(rd.choice(self.neighbours))
 		else:
 			self.destinationDeme = self.currentDeme
+			
+		setattr(self, "currentDeme", self.destinationDeme)
 	
 	def reproduce(self):
 		pass

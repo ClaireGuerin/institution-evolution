@@ -235,13 +235,43 @@ class TestMigrationFunction(object):
 		self.migrantIndivTrue = self.fakepop.allPopulationDemes[0].individuals[0]
 		self.migrantIndivFalse = self.fakepop.allPopulationDemes[1].individuals[0]
 		
+		self.origDemeTrue = self.migrantIndivTrue.currentDeme
 		self.migrantIndivTrue.migrate(self.nd, migRate=1)
 		assert self.migrantIndivTrue.migrant, "Uh-oh, looks like the individual did not migrate when it should have..."
-		assert self.migrantIndivTrue.currentDeme != self.migrantIndivTrue.destinationDeme, "Individual destination deme is the same as current even though it should migrate!"
+		assert self.origDemeTrue != self.migrantIndivTrue.destinationDeme, "Individual destination deme is the same as current even though it should migrate!"
 		
+		self.origDemeFalse = self.migrantIndivFalse.currentDeme
 		self.migrantIndivFalse.migrate(self.nd, migRate=0)
 		assert not self.migrantIndivFalse.migrant, "Uh-oh, looks like the individual did migrate when it shouldn't have..."
-		assert self.migrantIndivFalse.currentDeme == self.migrantIndivFalse.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
+		assert self.origDemeFalse == self.migrantIndivFalse.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
+		
+	def test_current_individuals_deme_updated_with_new(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,1)
+		
+		for deme in self.fakepop.allPopulationDemes:
+			indiv = deme.individuals[0]
+			origdeme = indiv.currentDeme
+			indiv.migrate(nDemes=self.nd, migRate=0.5)
+			assert indiv.currentDeme == indiv.destinationDeme, "Ooops, looks like your individual got it wrong: it went from deme {0} to {1} instead of {2}".format(origdeme, indiv.currentDeme, indiv.destinationDeme)
+	
+	def test_demes_collect_all_their_individuals_after_migration(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,10)
+		
+		self.newDemography = []		
+		for deme in self.fakepop.allPopulationDemes:
+			for indiv in deme.individuals:
+				indiv.migrate(nDemes=self.nd, migRate=0.3)
+				self.newDemography.append(indiv.destinationDeme)
+				
+		self.demographyKnownToDeme = []
+		for deme in self.fakepop.allPopulationDemes:
+			self.demographyKnownToDeme.append(deme.demography)
+		
+		assert all([self.newDemography.count(x) == self.demographyKnownToDeme[x] for x in range(self.nd)]), "Demes are not aware their demography has changed after migration"
 		
 		
 class TestDeme(object):
