@@ -23,8 +23,8 @@ class Individual(object):
 		else:
 			self.mutationDeviation = [0] * n
 		
-	def migrate(self):
-		self.destinationDeme = rd.randint(100)
+	def migrate(self, nDemes):
+		self.destinationDeme = rd.randint(0, high=nDemes)
 	
 	def reproduce(self):
 		pass

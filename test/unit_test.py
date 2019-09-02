@@ -131,9 +131,10 @@ class TestMutationFunction(object):
 		
 class TestMigrationFunction(object):
 	
-	def test_idividual_has_destination_deme_after_migration(self, instantiateSingleIndividualPopulation):
-		self.indiv = instantiateSingleIndividualPopulation
-		self.indiv.migrate()
+	def test_idividual_has_destination_deme_after_migration(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(1)
+		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
+		self.indiv.migrate(self.fakepop.numberOfDemes)
 		
 		assert hasattr(self.indiv, "destinationDeme"), "Your individual is going nowhere: no destination deme!"
 		
@@ -141,7 +142,7 @@ class TestMigrationFunction(object):
 		"""The migration function should return the new deme, which is an integer among all demes"""
 		self.fakepop = instantiateSingleDemePopulation(1)
 		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate()
+		self.indiv.migrate(self.fakepop.numberOfDemes)
 		
 		assert type(self.indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(self.indiv.destinationDeme, type(self.indiv.destinationDeme))
 		assert self.indiv.destinationDeme in range(self.fakepop.numberOfDemes)
