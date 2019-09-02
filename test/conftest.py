@@ -16,5 +16,13 @@ def instantiateSingleDemePopulation():
 		return fakepop
 	
 	return _foo
+
+@pytest.fixture
+def objectAttributesExist():
+	def _foo(obj, attrs):
+		for attr in attrs:
+			return hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)
+	
+	return _foo
 			
 	

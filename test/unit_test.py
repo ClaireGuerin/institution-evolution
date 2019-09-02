@@ -9,14 +9,10 @@ from statistics import mean
 import gc
 
 class TestIndividual(object):
-	
-	def assertObjectAttributesExist(self, obj, attrs):
-		for attr in attrs:
-			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)
-			
-	def test_individual_attributes_exist(self):
+		
+	def test_individual_attributes_exist(self, objectAttributesExist):
 		self.indiv = Ind()
-		self.assertObjectAttributesExist(self.indiv, ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"])
+		assert objectAttributesExist(self.indiv, ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"])
 		
 	def test_mig_rep_mut_methods_exist_and_are_callable(self):
 		self.methods = ['mutate', 'migrate', 'reproduce']
@@ -133,13 +129,18 @@ class TestMutationFunction(object):
 		self.indiv.mutate(mutRate=1, mutStep=0.05)
 		assert len(self.phen) == len(self.indiv.phenotypicValues)
 		
-class TestMigrationFunction(self):
+class TestMigrationFunction(object):
+	
+	def test_idividual_has_destination_deme_after_migration(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
+		self.indiv.migrate()
 		
-	def test_migration_returns_a_destination_deme(self, instantiateSingleDemePopulation):
+		assert hasattr(self.indiv, "destinationDeme"), "Your individual is going nowhere: no destination deme!"
+		
+	def test_migration_returns_a_destination_deme_of_correct_format(self, instantiateSingleDemePopulation):
 		"""The migration function should return the new deme, which is an integer among all demes"""
 		self.fakepop = instantiateSingleDemePopulation(1)
-		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]claire
-		
+		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
 		self.indiv.migrate()
 		
 		assert type(self.destinationDeme) is integer, "{0} is {1} instead of integer".format(self.destinationDeme, type(self.destinationDeme))
@@ -147,13 +148,9 @@ class TestMigrationFunction(self):
 		
 class TestDeme(object):
 	
-	def assertObjectAttributesExist(self, obj, attrs):
-		for attr in attrs:
-			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)
-	
-	def test_deme_attributes(self):
+	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.assertObjectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood"])
+		assert objectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood"])
 
 class TestPopulation(object):
 	
