@@ -134,7 +134,7 @@ class TestMigrationFunction(object):
 	def test_idividual_has_destination_deme_after_migration(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(1)
 		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(self.fakepop.numberOfDemes)
+		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 		
 		assert hasattr(self.indiv, "destinationDeme"), "Your individual is going nowhere: no destination deme!"
 		
@@ -142,34 +142,34 @@ class TestMigrationFunction(object):
 		"""The migration function should return the new deme, which is an integer among all demes"""
 		self.fakepop = instantiateSingleDemePopulation(1)
 		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(self.fakepop.numberOfDemes)
+		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 		
 		assert type(self.indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(self.indiv.destinationDeme, type(self.indiv.destinationDeme))
 		assert self.indiv.destinationDeme in range(self.fakepop.numberOfDemes)
 		
-	def test_migrants_are_defined(self, instantiateSingleDemePopulation):
+	def test_migrants_are_defined_properly(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(1)
 		self.indiv = self.fakepop.allPopulationDemes[0].individuals[0]
-		self.indiv.migrate(self.fakepop.numberOfDemes)
+		self.indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 		
 		assert hasattr(self.indiv, "migrant"), "Your individual does not know whether to migrate or not"
+		assert type(self.indiv.migrant) is bool, "Migrant must be a boolean"		
 		
+	def test_migrants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
+		random.seed(30)
+		self.nIndividuals = 1000
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
 		
-#	def test_migrants_are_drawn_from_binomial(self):
-#		random.seed(30)
-#		self.nIndividuals = 1000
-#		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+		self.migrantCount = 0
+		for ind in self.fakepop.allPopulationDemes[0].individuals:
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+			if ind.migrant:
+				self.migrantCount += 1
 		
-#		self.migrantsCount = 0
-#		for ind in self.fakepop.allPopulationDemes[0].individuals:
-#			ind.mutate(mutRate=self.fakepop.mutationRate, mutStep=0.05)
-#			if ind.migrant:
-#				self.migrantsCount += 1
-		
-#		stat1, pval1 = scistats.ttest_1samp([1] * self.mutantCount + [0] * (self.nIndividuals - self.mutantCount), self.fakepop.mutationRate)
-#		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.mutantCount/self.nIndividuals, self.fakepop.mutationRate)
-#		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
-#		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals,self.fakepop.mutationRate)
+		stat1, pval1 = scistats.ttest_1samp([1] * self.migrantCount + [0] * (self.nIndividuals - self.migrantCount), self.fakepop.migrationRate)
+		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.migrantCount/self.nIndividuals, self.fakepop.migrationRate)
+		self.test = scistats.binom_test(self.migrantCount, self.nIndividuals, self.fakepop.migrationRate, alternative = "two-sided")
+		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.migrantCount/self.nIndividuals,self.fakepop.migrationRate)
 		
 		
 class TestDeme(object):
