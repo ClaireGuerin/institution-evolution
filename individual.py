@@ -24,9 +24,12 @@ class Individual(object):
 			self.mutationDeviation = [0] * n
 		
 	def migrate(self, nDemes, migRate):
-		self.migrant = True
+		self.migrant = bool(rd.binomial(1, migRate))
 		
-		self.destinationDeme = rd.randint(0, high=nDemes)
+		if self.migrant:
+			self.destinationDeme = int(rd.choice(range(nDemes)))
+		else:
+			self.destinationDeme = int(rd.choice(range(nDemes)))
 	
 	def reproduce(self):
 		pass

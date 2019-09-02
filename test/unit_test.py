@@ -171,12 +171,25 @@ class TestMigrationFunction(object):
 		self.test = scistats.binom_test(self.migrantCount, self.nIndividuals, self.fakepop.migrationRate, alternative = "two-sided")
 		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.migrantCount/self.nIndividuals,self.fakepop.migrationRate)
 		
+	def test_only_migrants_change_deme(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(2)
+		self.migrantIndivTrue = self.fakepop.allPopulationDemes[0].individuals[0]
+		self.migrantIndivFalse = self.fakepop.allPopulationDemes[0].individuals[1]
+		
+		self.migrantIndivTrue.migrate(2, migRate=1)
+		assert self.migrantIndivTrue.migrant, "Uh-oh, looks like the individual did not migrate when it should have..."
+		assert self.migrantIndivTrue.currentDeme != self.migrantIndivTrue.destinationDeme, "Individual destination deme is the same as current even though it should migrate!"
+		
+		self.migrantIndivFalse.migrate(2, migRate=0)
+		assert not self.migrantIndivFalse.migrant, "Uh-oh, looks like the individual did migrate when it shouldn't have..."
+		assert self.migrantIndivTrue.currentDeme == self.migrantIndivTrue.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
+		
 		
 class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		assert objectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood"])
+		assert objectAttributesExist(self.deme, ["demeNumber", "demeSize", "publicGood", "otherDemes"])
 
 class TestPopulation(object):
 	
