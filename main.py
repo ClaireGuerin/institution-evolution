@@ -59,6 +59,10 @@ class Population:
 		del tmp[demeID]
 		return tmp
 					
+	def populationMigration(self):
+		pass
+		
+	
 	def runSimulation(self):
 		self.createAndPopulateDemes()
 		

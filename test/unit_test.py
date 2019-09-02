@@ -266,12 +266,22 @@ class TestMigrationFunction(object):
 			for indiv in deme.individuals:
 				indiv.migrate(nDemes=self.nd, migRate=0.3)
 				self.newDemography.append(indiv.destinationDeme)
-				
+		
+		self.fakepop.populationMigration()
+		
 		self.demographyKnownToDeme = []
 		for deme in self.fakepop.allPopulationDemes:
 			self.demographyKnownToDeme.append(deme.demography)
 		
-		assert all([self.newDemography.count(x) == self.demographyKnownToDeme[x] for x in range(self.nd)]), "Demes are not aware their demography has changed after migration"
+		assert all([self.newDemography.count(x) == self.demographyKnownToDeme[x] for x in range(self.nd)]), "Demes are not aware their demography has changed after migration"	
+		
+	def test_migration_is_ran_at_the_population_level(self):
+		self.fakepop = Pop()
+		self.nd = self.fakepop.numberOfDemes
+		self.fakepop.createAndPopulateDemes(self.nd,10)
+		
+		assert hasattr(self.fakepop, "populationMigration"), "Migration cannot be ran at the population level"
+		assert callable(self.fakepop.populationMigration)
 		
 		
 class TestDeme(object):
