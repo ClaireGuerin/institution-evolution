@@ -57,7 +57,10 @@ class Population:
 			
 	def identifyNeighbours(self, demeNumber, demeID):
 		tmp = demeNumber
-		del tmp[demeID]
+		try:
+			del tmp[demeID]
+		except:
+			"list {0} does not have an item at index {1}".format(tmp, demeID)
 		return tmp
 			
 			
