@@ -144,7 +144,7 @@ class TestMigrationFunction(object):
 		self.indiv.migrate()
 		
 		assert type(self.indiv.destinationDeme) is int, "{0} is {1} instead of integer".format(self.indiv.destinationDeme, type(self.indiv.destinationDeme))
-		assert self.indiv.destinationDeme in range(self.fakepop.demeNumber)
+		assert self.indiv.destinationDeme in range(self.fakepop.numberOfDemes)
 		
 class TestDeme(object):
 	
