@@ -6,7 +6,7 @@ from individual import Individual as Ind
 def instantiateSingleIndividualPopulation():
 		fakepop = Pop()
 		fakepop.createAndPopulateDemes(1,1)
-		return fakepop.allPopulationDemes[0].individuals[0]
+		return fakepop.individuals[0]
 
 @pytest.fixture
 def instantiateSingleDemePopulation():
