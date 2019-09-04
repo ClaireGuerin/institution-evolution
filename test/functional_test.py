@@ -50,11 +50,15 @@ class TestSimpleRun(object):
 	def test_simulations_only_run_on_structured_populations(self):
 		self.population = Pop()
 		try:
-			setattr(population, "numberOfDemes", 1)
+			setattr(self.population, "numberOfDemes", 1)
 			self.population.runSimulation()
-			assert False, "You cannot run simulations on well-mixed populations (only 1 deme)!"
+			errorDetected = False
+			message = True
 		except BaseException as e:
-			assert str(e) == "This program runs simulations on well-mixed populations only. 'numberOfDemes' in initialisation.txt must be > 1"
+			errorDetected = True
+			message = str(e) == "This program runs simulations on well-mixed populations only. 'numberOfDemes' in initialisation.txt must be > 1"
+		assert errorDetected, "You cannot let people run simulations on well-mixed populations (only 1 deme)!"
+		assert message, "Explain why the program fails!"
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):

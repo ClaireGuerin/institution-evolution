@@ -51,7 +51,7 @@ def objectAttributesValues():
 		tests = []
 		values = []
 		for attr,val in zip(attrs, vals):
-			test.append(getattr(obj, attr) == val)
+			tests.append(getattr(obj, attr) == val)
 			values.append(getattr(obj, attr))
 		thereIsNoProblem = all(tests)
 		if thereIsNoProblem:
