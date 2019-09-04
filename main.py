@@ -82,9 +82,9 @@ class Population:
 		with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
 			for gen in range(self.numberOfGenerations):
 				phenotypes = []
+				self.populationMigration()
 				for ind in self.individuals:
 					ind.mutate(self.mutationRate, self.mutationStep)
-					ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
 					ind.reproduce()
 						
 					phenotypes.append(ind.phenotypicValues[0])
