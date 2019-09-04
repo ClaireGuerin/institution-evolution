@@ -32,6 +32,9 @@ class Population:
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
+		if hasattr(self, "individualResources") == False:
+			setattr(self, "individualResources", 1)
+			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
 			nDemes = self.numberOfDemes
@@ -53,6 +56,7 @@ class Population:
 				setattr(indiv, "phenotypicValues", self.initialPhenotypes)
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
+				setattr(indiv, "resourcesAmount", self.individualResources)
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
