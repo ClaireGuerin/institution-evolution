@@ -10,16 +10,26 @@ def instantiateSingleIndividualPopulation():
 
 @pytest.fixture
 def instantiateSingleDemePopulation():
-	def _foo1(nIndivs):
+	def _foo(nIndivs):
 		fakepop = Pop()
 		fakepop.createAndPopulateDemes(1,nIndivs)
 		return fakepop
 	
-	return _foo1
+	return _foo
+
+@pytest.fixture
+def instantiateSingleIndividualsDemes():
+	def _foo():
+		fakepop = Pop()
+		fakepop.createAndPopulateDemes(fakepop.numberOfDemes, 1)
+		return fakepop
+	
+	return _foo
+		
 
 @pytest.fixture
 def objectAttributesExist():
-	def _foo2(obj, attrs):
+	def _foo(obj, attrs):
 		tests = []
 		for attr in attrs:
 			tests.append(hasattr(obj, attr))
@@ -33,6 +43,45 @@ def objectAttributesExist():
 		
 		return (thereIsNoProblem, result)
 	
-	return _foo2
+	return _foo
 
+@pytest.fixture
+def objectAttributesValues():
+	def _foo(obj, attrs, vals):
+		tests = []
+		values = []
+		for attr,val in zip(attrs, vals):
+			test.append(getattr(obj, attr) == val)
+			values.append(getattr(obj, attr))
+		thereIsNoProblem = all(tests)
+		if thereIsNoProblem:
+			attributes = None
+			expected = None
+			observed = None
+		else:
+			indices = [i for i, x in enumerate(tests) if x == False]
+			attributes = [attrs[a] for a in problemIndices]
+			expected = [vals[a] for a in problemIndices]
+			observed = [values[a] for a in problemIndices]
+		
+		return (thereIsNoProblem, attributes, expected, observed)
+	
+	return _foo
+
+@pytest.fixture
+def objectAttributesAreNotNone():
+	def _foo(obj, attrs):
+		tests = []
+		for attr in attrs:
+			tests.append(getattr(obj, attr) is not None)
+		thereIsNoProblem = all(tests)
+		if thereIsNoProblem:
+			attributes = None
+		else:
+			indices = [i for i, x in enumerate(tests) if x == False]
+			attributes = [attrs[a] for a in problemIndices]
+		
+		return (thereIsNoProblem, attributes)
+	
+	return _foo
 	

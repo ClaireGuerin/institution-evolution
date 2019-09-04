@@ -6,14 +6,6 @@ from main import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, O
 
 class TestSimpleRun(object):
 	
-	def assertObjectAttributesExist(self, obj, attrs):
-		for attr in attrs:
-			assert hasattr(obj, attr), "object {0} has no attribute {1}".format(obj, attr)	
-			
-	def assertObjectAttributeValues(self, obj, attrs, vals):
-		for attr,val in zip(attrs, vals):
-			assert getattr(obj, attr) == val, "{0} has {1}={2} instead of {3}".format(obj, attr, getattr(obj, attr), val)
-	
 	def test_initialisation_file_exists(self):
 		# Claire wants to model the evolution of a structured population.
 		# She provides the initial conditions for the run: number of demes, initial deme size, number of generations in a file called initialisation.txt
@@ -54,15 +46,17 @@ class TestSimpleRun(object):
 				assert 0 <= line <= 1
 		
 		# She runs the program:
-	def test_population_is_initialised_with_right_values(self):
+	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
 		# First, the population is initialised according to the initialisation settings
 		self.pathToFile = fman.getPathToFile(INITIALISATION_FILE)
 		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
 		self.population = Pop()
 		
-		self.assertObjectAttributesExist(self.population, self.attributeNames)
-		self.assertObjectAttributeValues(self.population, self.attributeNames, self.attributeValues)
+		testAttr, whichAttr = objectAttributesExist(self.population, self.attributeNames)
+		assert testAttr, "Population does not have attribute(s) {0}".format(whichAttr)
+		testVal, attributes, expected, observed = objectAttributesValues(self.population, self.attributeNames, self.attributeValues)
+		assert testVal, "Population has {1}={2} instead of {3}".format(attributes, expected, observed)
 		
 	def test_program_writes_output_for_x_generations(self):
 		# Second, the population evolves over x generations following the iteration function

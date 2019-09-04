@@ -178,10 +178,8 @@ class TestMutationFunction(object):
 		
 class TestMigrationFunction(object):
 	
-	def test_individual_has_destination_deme_after_migration(self):
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+	def test_individual_has_destination_deme_after_migration(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -189,11 +187,9 @@ class TestMigrationFunction(object):
 			
 		gc.collect()
 		
-	def test_migration_returns_a_destination_deme_of_correct_format(self, instantiateSingleDemePopulation):
+	def test_migration_returns_a_destination_deme_of_correct_format(self, instantiateSingleIndividualsDemes):
 		"""The migration function should return the new deme, which is an integer among all demes"""
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -203,10 +199,8 @@ class TestMigrationFunction(object):
 			
 		gc.collect()
 		
-	def test_migrants_are_defined_properly(self, instantiateSingleDemePopulation):
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+	def test_migrants_are_defined_properly(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -250,34 +244,30 @@ class TestMigrationFunction(object):
 		
 		gc.collect()
 		
-	def test_only_migrants_change_deme(self):
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		self.migrantIndivTrue = self.fakepop.individuals[0]
 		self.migrantIndivFalse = self.fakepop.individuals[0]
 		
 		self.origDemeTrue = self.migrantIndivTrue.currentDeme
-		self.migrantIndivTrue.migrate(self.nd, migRate=1)
+		self.migrantIndivTrue.migrate(self.fakepop.numberOfDemes, migRate=1)
 		assert self.migrantIndivTrue.migrant, "Uh-oh, looks like the individual did not migrate when it should have..."
 		assert self.origDemeTrue != self.migrantIndivTrue.destinationDeme, "Individual destination deme is the same as current even though it should migrate!"
 		
 		self.origDemeFalse = self.migrantIndivFalse.currentDeme
-		self.migrantIndivFalse.migrate(self.nd, migRate=0)
+		self.migrantIndivFalse.migrate(self.fakepop.numberOfDemes, migRate=0)
 		assert not self.migrantIndivFalse.migrant, "Uh-oh, looks like the individual did migrate when it shouldn't have..."
 		assert self.origDemeFalse == self.migrantIndivFalse.destinationDeme, "Individual destination deme is different from current even though it does not migrate!"
 		
 		gc.collect()
 		
-	def test_current_individuals_deme_updated_with_new(self):
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+	def test_current_individuals_deme_updated_with_new(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		for ind in self.fakepop.individuals:
 			originalDeme = ind.currentDeme
-			ind.migrate(nDemes=self.nd, migRate=0.5)
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=0.5)
 			assert ind.currentDeme == ind.destinationDeme, "Ooops, looks like your individual got it wrong: it went from deme {0} to {1} instead of {2}".format(originalDeme, ind.currentDeme, ind.destinationDeme)
 			
 		gc.collect()
@@ -322,9 +312,8 @@ class TestDeme(object):
 		
 		gc.collect()
 		
-	def test_deme_object_knows_itself(self, instantiateSingleDemePopulation):
-		self.fakepop = Pop()
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes,1)
+	def test_deme_object_knows_itself(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]
@@ -333,14 +322,12 @@ class TestDeme(object):
 			
 		gc.collect()
 	
-	def test_deme_object_knows_other_demes(self):
-		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd,1)
+	def test_deme_object_knows_other_demes(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes()
 		
-		for deme in range(self.nd):
+		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]
-			otherDemes = list(range(self.nd))
+			otherDemes = list(range(self.fakepop.numberOfDemes))
 			del otherDemes[focalDeme.id]
 			assert type(focalDeme.neighbours) is list
 			assert focalDeme.neighbours == otherDemes, "Neighbours of deme {0} are {1}, and not {2}!".format(deme, otherDemes, focalDeme.neighbours)
@@ -348,10 +335,6 @@ class TestDeme(object):
 		gc.collect()
 
 class TestPopulation(object):
-	
-	def assertObjectAttributesAreNotNone(self, obj, attrs):
-		for attr in attrs:
-			assert getattr(obj, attr) is not None, "object {0} has attribute {1} set to None".format(obj, attr)
 	
 	def test_population_contains_demes(self):
 		self.pop = Pop()
@@ -385,12 +368,13 @@ class TestPopulation(object):
 			
 		gc.collect()
 				
-	def test_individual_attributes_are_non_empty(self):
+	def test_individual_attributes_are_non_empty(self, objectAttributesAreNotNone):
 		self.pop = Pop()
 		self.pop.createAndPopulateDemes()
 		for ind in self.pop.individuals:
-				self.assertObjectAttributesAreNotNone(ind, ["phenotypicValues", "currentDeme"])
-				
+			testObj, attrObj = objectAttributesAreNotNone(ind, ["phenotypicValues", "currentDeme"])
+			assert testObj, "Individual {0} has attribute(s) {1} set to None".format(ind, attrObj)
+			
 		gc.collect()
 		
 	def test_population_has_the_right_size(self):
