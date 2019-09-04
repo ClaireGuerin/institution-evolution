@@ -44,6 +44,17 @@ class TestSimpleRun(object):
 			for line in lines: 
 				assert type(line) is float 
 				assert 0 <= line <= 1
+				
+	# Unfortunately, it would seem that she created a a well-mixed population, i.e. the population is not structured in demes / number of demes = 1. 
+	# This program is not meant for well-mixed populations, and tells Claire so.
+	def test_simulations_only_run_on_structured_populations(self):
+		self.population = Pop()
+		try:
+			setattr(population, "numberOfDemes", 1)
+			self.population.runSimulation()
+			assert False, "You cannot run simulations on well-mixed populations (only 1 deme)!"
+		except BaseException as e:
+			assert str(e) == "This program runs simulations on well-mixed populations only. 'numberOfDemes' in initialisation.txt must be > 1"
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
