@@ -11,20 +11,33 @@ class Individual(object):
 		self.offspringNumber = None
 
 	def mutate(self, mutRate, mutStep):
-		self.mutant = bool(rd.binomial(1,mutRate))
+		self.mutant = bool(rd.binomial(1, mutRate))
 		self.deviate(mutStep, len(self.phenotypicValues))
-		
-		tmpPhenotypicValues = list(map(add, self.phenotypicValues, self.mutationDeviation))
-		self.phenotypicValues = list(map(lambda x: min(max(x,float(0)),float(1)), tmpPhenotypicValues))
+		self.applyMutation(self.mutationDeviation)
 	
-	def deviate(self, mutStep, n):
+	def deviate(self, ms, n):
 		if self.mutant:
-			self.mutationDeviation = rd.normal(0,mutStep,n).tolist()
+			dev = rd.normal(0,ms,n).tolist()
 		else:
-			self.mutationDeviation = [0] * n
+			dev = [0] * n
+		self.mutationDeviation = dev
 		
-	def migrate(self):
-		pass
+	def applyMutation(self, dev):
+		phen = self.phenotypicValues
+		unboundedphen = list(map(add, phen, dev))
+		boundedphen = list(map(lambda x: min(max(x,float(0)),float(1)), unboundedphen))
+		self.unboundedPhenotypicValues = unboundedphen
+		setattr(self, "phenotypicValues", boundedphen)
+		
+	def migrate(self, nDemes, migRate):
+		self.migrant = bool(rd.binomial(1, migRate))
+		
+		if self.migrant:
+			self.destinationDeme = int(rd.choice(self.neighbours))
+		else:
+			self.destinationDeme = self.currentDeme
+			
+		setattr(self, "currentDeme", self.destinationDeme)
 	
 	def reproduce(self):
 		pass

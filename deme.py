@@ -1,7 +1,8 @@
 class Deme(object):
 	
 	def __init__(self):
-		self.demeNumber = None
-		self.demeSize = None
+		self.id = None
+		self.demography = None
 		self.publicGood = None
+		self.neighbours = []
 		

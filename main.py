@@ -37,18 +37,41 @@ class Population:
 			nDemes = self.numberOfDemes
 		if dSize == None:
 			dSize = self.initialDemeSize
+			
+		self.demes = []
+		self.individuals = []
 		
-		self.allPopulationDemes = []
 		for deme in range(nDemes):
 			newDemeInstance = Dem()
-			newDemeInstance.individuals = [Ind()] * dSize
+			newDemeInstance.id = deme
 			
-			for ind in newDemeInstance.individuals:
-				setattr(ind, "phenotypicValues", self.initialPhenotypes)
-				setattr(ind, "currentDeme", deme)
+			newDemeInstance.neighbours = self.identifyNeighbours(nDemes, deme)
+			newDemeInstance.demography = dSize
+						
+			for ind in range(dSize):
+				indiv = Ind()
+				setattr(indiv, "phenotypicValues", self.initialPhenotypes)
+				setattr(indiv, "currentDeme", deme)
+				setattr(indiv, "neighbours", newDemeInstance.neighbours)
+				self.individuals.append(indiv)
 			
-			self.allPopulationDemes.append(newDemeInstance)
+			self.demes.append(newDemeInstance)
+			
+	def identifyNeighbours(self, nd, demeID):
+		tmp = list(range(nd))
+		del tmp[demeID]
+		return tmp
 					
+	def populationMigration(self):
+		updateDemeSizes = [0] * self.numberOfDemes
+		for ind in self.individuals:
+			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
+			updateDemeSizes[ind.currentDeme] += 1
+			
+		for deme in range(self.numberOfDemes):
+			focalDeme = self.demes[deme]
+			focalDeme.demography = updateDemeSizes[deme]
+	
 	def runSimulation(self):
 		self.createAndPopulateDemes()
 		
@@ -58,15 +81,12 @@ class Population:
 			
 		with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
 			for gen in range(self.numberOfGenerations):
-				meanPhenDeme = []
-				for deme in self.allPopulationDemes:
-					phenDeme = []
-					for ind in deme.individuals:
-						ind.mutate(self.mutationRate, self.mutationStep)
-						ind.migrate()
-						ind.reproduce()
+				phenotypes = []
+				self.populationMigration()
+				for ind in self.individuals:
+					ind.mutate(self.mutationRate, self.mutationStep)
+					ind.reproduce()
 						
-						phenDeme.append(ind.phenotypicValues[0])
-					meanPhenDeme.append(mean(phenDeme))
-				f.write('{0}\n'.format(mean(meanPhenDeme)))
+					phenotypes.append(ind.phenotypicValues[0])
+				f.write('{0}\n'.format(mean(phenotypes)))
 			
