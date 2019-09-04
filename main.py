@@ -73,20 +73,23 @@ class Population:
 			focalDeme.demography = updateDemeSizes[deme]
 	
 	def runSimulation(self):
-		self.createAndPopulateDemes()
+		if self.numberOfDemes >= 2:
+			self.createAndPopulateDemes()
 		
-		self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
-		if not os.path.exists(self.pathToOutputFolder):
-			os.makedirs(self.pathToOutputFolder)
+			self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
+			if not os.path.exists(self.pathToOutputFolder):
+				os.makedirs(self.pathToOutputFolder)
 			
-		with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
-			for gen in range(self.numberOfGenerations):
-				phenotypes = []
-				self.populationMigration()
-				for ind in self.individuals:
-					ind.mutate(self.mutationRate, self.mutationStep)
-					ind.reproduce()
+			with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
+				for gen in range(self.numberOfGenerations):
+					phenotypes = []
+					self.populationMigration()
+					for ind in self.individuals:
+						ind.mutate(self.mutationRate, self.mutationStep)
+						ind.reproduce()
 						
-					phenotypes.append(ind.phenotypicValues[0])
-				f.write('{0}\n'.format(mean(phenotypes)))
+						phenotypes.append(ind.phenotypicValues[0])
+					f.write('{0}\n'.format(mean(phenotypes)))
+		else:
+			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
 			
