@@ -40,4 +40,7 @@ class Individual(object):
 		setattr(self, "currentDeme", self.destinationDeme)
 	
 	def reproduce(self):
-		self.fertilityValue = float(0)
+		self.fertility()
+		
+	def fertility(self):
+		self.fertilityValue = float(self.resourcesAmount)
