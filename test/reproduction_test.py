@@ -7,7 +7,7 @@ from operator import add
 import random
 from statistics import mean
 import gc
-from fitness_function import fitness as fit
+from fitness_function import fitness as w
 
 class TestReproductionFunction(object):
 	
@@ -52,4 +52,22 @@ class TestReproductionFunction(object):
 			indiv = self.fakepop.individuals[ind]
 			setattr(indiv, "resourcesAmount", 1 + 9 * ind)
 			indiv.fertility()
-			assert indiv.fertilityValue == fit("pgg"), "Expected fertility of {0}, got {1}".format(fit("pgg"), indiv.fertilityValue)
+			assert indiv.fertilityValue == w("pgg", indiv.resourcesAmount), "Expected fertility of {0}, got {1}".format(w("pgg", indiv.resourcesAmount), indiv.fertilityValue)
+			
+	def test_fitness_function_returns_positive_float(self):
+		assert type(w("pgg", 10)) is float
+		assert w("pgg", 10) >= 0
+		
+	def test_fitness_function_returns_right_value_for_each_function(self):
+		
+		# TESTING PGG FUNCTION
+		kwargs = {"x": 0.5,
+				  "xmean": 0.2, 
+				  "fb": 2, 
+				  "b": 0.5,
+				  "c": 0.05, 
+				  "gamma": 0.01, 
+				  "n": 10}
+		
+		for x in range(10):
+			assert w("pgg", res=10, **kwargs) == kwargs["fb"] * (1 - kwargs["c"] * kwargs["x"] ** 2 + kwargs["b"] * kwargs["xmean"]) / (1 + kwargs["gamma"] * kwargs["n"]), "Wrong pgg function"
