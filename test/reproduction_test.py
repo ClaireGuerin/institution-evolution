@@ -8,6 +8,7 @@ import random
 from statistics import mean
 import gc
 import fitness
+import numpy.random as rd
 
 class TestReproductionFunction(object):
 	
@@ -85,17 +86,28 @@ class TestReproductionFunction(object):
 		assert type(self.indiv.offspringNumber) is int, "Offspring number of wrong format: {0} instead of integer".format(type(self.indiv.offspringNumber))
 		assert self.indiv.offspringNumber >= 0, "Offspring number cannot be negative"
 			
-	#def test_reproduction_follows_a_poisson_distribution(self, pggParameters):
-		#random.seed(30)
+	def test_reproduction_follows_a_poisson_distribution(self, instantiateSingleDemePopulation, pggParameters):
+		random.seed(30)
 		
-		#self.fakepop = Pop()
-		#self.individualsPerDeme = 1000
-		#self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		self.nIndividuals = 1000
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+		self.expected = 4
+		kwargs = pggParameters
 		
-		#kwargs = pggParameters
+		observedCount = []
+		for ind in self.fakepop.individuals:
+			setattr(ind, "fertilityValue", self.expected)
+			ind.procreate()
+			observedCount.append(ind.offspringNumber)
+			
+			
 		
-		#for ind in self.fakepop.individuals:
-			#ind.reproduce(**kwargs)
+		expectedCount = rd.poisson(self.expected, self.nIndividuals)
+		chisq, pval = scistats.chisquare(observedCount, expectedCount)
+		assert pval > 0.05, "Test for goodness of fit failed"	
+
+
+			
 			
 		
 	

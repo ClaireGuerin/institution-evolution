@@ -75,6 +75,9 @@ class TestMigrationFunction(object):
 		assert sum([x > 0.05 for x in self.distripvals]) >= len(self.distripvals)-1, "Success rate = {0} when mutation rate = {1}".format(mean(self.allcounts)/self.individualsPerDeme, self.fakepop.migrationRate)
 		
 		gc.collect()
+	
+	def test_migrants_destinations_equally_likely(self):
+		assert False, "Write this test!"
 		
 	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes()

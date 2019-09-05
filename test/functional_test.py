@@ -61,7 +61,7 @@ class TestSimpleRun(object):
 	# Unfortunately, she asks the program to run a simulation with a fitness function "abracadabra", which is not yet known by the program. The programs tells her to add the function in the fitness function dictionary
 	
 	def test_program_requires_valid_fitness_function(self):
-		assert False, "Finish this test"
+		assert False, "Write this test!!"
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):

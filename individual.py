@@ -42,6 +42,10 @@ class Individual(object):
 	
 	def reproduce(self, fun_name="pgg", **kwargs):
 		self.fertility(fun_name, **kwargs)
+		self.procreate()
 		
 	def fertility(self, fun_name="pgg", **kwargs):
 		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
+		
+	def procreate(self):
+		self.offspringNumber = rd.poisson(self.fertilityValue)
