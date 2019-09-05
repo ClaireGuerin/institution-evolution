@@ -56,6 +56,12 @@ class TestSimpleRun(object):
 			assert str(e) == 'This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1', "Explain why the program fails!, not '{0}'".format(e)
 		else:
 			assert False, "You cannot let people run simulations on well-mixed populations (only {0} deme)!".format(self.population.numberOfDemes)
+			
+	# She then changes the number of demes so that the population is structured into multiple demes.
+	# Unfortunately, she asks the program to run a simulation with a fitness function "abracadabra", which is not yet known by the program. The programs tells her to add the function in the fitness function dictionary
+	
+	def test_program_requires_valid_fitness_function(self):
+		assert False, "Finish this test"
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
