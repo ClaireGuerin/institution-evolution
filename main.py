@@ -75,6 +75,10 @@ class Population:
 		for deme in range(self.numberOfDemes):
 			focalDeme = self.demes[deme]
 			focalDeme.demography = updateDemeSizes[deme]
+			
+	def reproduction(self):
+		for ind in self.individuals:
+			ind.reproduce(**kwargs)
 	
 	def runSimulation(self):
 		if self.numberOfDemes >= 2:

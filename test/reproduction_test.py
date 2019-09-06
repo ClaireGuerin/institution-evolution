@@ -123,6 +123,35 @@ class TestReproductionFunction(object):
 		assert len(expectedCount) == len(observedCount), "len obs = {0}, len exp = {1}".format(len(observedCount), len(expectedCount))
 		#assert sum(expectedCount) == sum(observedCount), "n obs = {0}, n exp = {1}".format(sum(observedCount), sum(expectedCount))
 		assert pval > 0.05, "Test for goodness of fit failed: obs = {0}, exp = {1}".format(observedCount, expectedCount)	
+		
+	def test_individual_instances_are_created_based_on_offspring_number(self, instantiateSingleDemePopulation, pggParameters):
+		self.fakepop = instantiateSingleDemePopulation(10)
+		kwargs = pggParameters
+		
+		offspringCounter = 0
+		for ind in range(len(self.fakepop.individuals)):
+			indiv = self.fakepop.individuals[ind]
+			indiv.resourcesAmount = ind
+			indiv.reproduce(**kwargs)
+			offspringCounter += indiv.offspringNumber
+		
+		assert hasattr(self.fakepop, "offspring"), "No individual instances created in the population"
+		assert len(self.fakepop.offspring) == offspringCounter, "{0} offspring generated while there should be {1}".format(len(self.fakepop.offspring), offspringCounter)
+		assert False, "Finish this test: finish defining reproduction function in main.py"
+	
+#	def test_individual_instances_have_same_deme_and_phenotypes_as_parent(self):
+#		assert False, "Write this test!"
+		
+#	def test_parent_is_removed_from_population(self):
+#		assert False, "Write this test!"
+		
+#	def test_deme_demography_is_updated(self):
+#		assert False, "Write this test!"
+		
+#	def test_population_individuals_are_changed(self):
+#		assert False, "Write this test!"
+		
+	
 
 
 			
