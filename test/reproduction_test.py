@@ -9,6 +9,9 @@ from statistics import mean
 import gc
 import fitness
 import numpy.random as rd
+from collections import Counter
+import math as m
+
 
 class TestReproductionFunction(object):
 	
@@ -87,24 +90,39 @@ class TestReproductionFunction(object):
 		assert self.indiv.offspringNumber >= 0, "Offspring number cannot be negative"
 			
 	def test_reproduction_follows_a_poisson_distribution(self, instantiateSingleDemePopulation, pggParameters):
+		#http://www2.stat-athens.aueb.gr/~exek/papers/Xekalaki-Statistician2000(355-382)ft.pdf
 		random.seed(30)
 		
 		self.nIndividuals = 1000
 		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
-		self.expected = 4
+		self.explambda = 4
 		kwargs = pggParameters
 		
-		observedCount = []
+		offspringPerInd = []
 		for ind in self.fakepop.individuals:
-			setattr(ind, "fertilityValue", self.expected)
+			setattr(ind, "fertilityValue", self.explambda)
 			ind.procreate()
-			observedCount.append(ind.offspringNumber)
-			
-			
+			offspringPerInd.append(ind.offspringNumber)
 		
-		expectedCount = rd.poisson(self.expected, self.nIndividuals)
+		d = Counter(offspringPerInd)
+		a, b = list(d.keys()), list(d.values())
+		maxCount = max(a)
+		observedCount = []
+		expectedCount = []
+		
+		for k in range(maxCount):
+			if k in a:
+				observedCount.append(d[k])
+			else:
+				observedCount.append(0)
+			
+			expProbability = m.pow(m.e, (-self.explambda)) * (m.pow(self.explambda, k)) / m.factorial(k)
+			expectedCount.append(self.nIndividuals * expProbability)
+						
 		chisq, pval = scistats.chisquare(observedCount, expectedCount)
-		assert pval > 0.05, "Test for goodness of fit failed"	
+		assert len(expectedCount) == len(observedCount), "len obs = {0}, len exp = {1}".format(len(observedCount), len(expectedCount))
+		#assert sum(expectedCount) == sum(observedCount), "n obs = {0}, n exp = {1}".format(sum(observedCount), sum(expectedCount))
+		assert pval > 0.05, "Test for goodness of fit failed: obs = {0}, exp = {1}".format(observedCount, expectedCount)	
 
 
 			
