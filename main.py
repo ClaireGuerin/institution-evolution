@@ -40,6 +40,8 @@ class Population:
 			nDemes = self.numberOfDemes
 		if dSize == None:
 			dSize = self.initialDemeSize
+		
+		self.demography = nDemes * dSize
 			
 		self.demes = []
 		self.individuals = []
@@ -76,10 +78,15 @@ class Population:
 			focalDeme = self.demes[deme]
 			focalDeme.demography = updateDemeSizes[deme]
 			
-	def reproduction(self):
+	def update(self, **kwargs):
+		self.offspring = []
 		for ind in self.individuals:
 			ind.reproduce(**kwargs)
-	
+			self.offspring += ind.offspring
+		self.individuals = self.offspring
+		self.demography = len(self.individuals)
+		
+			
 	def runSimulation(self):
 		if self.numberOfDemes >= 2:
 			self.createAndPopulateDemes()

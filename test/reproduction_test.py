@@ -128,28 +128,55 @@ class TestReproductionFunction(object):
 		self.fakepop = instantiateSingleDemePopulation(10)
 		kwargs = pggParameters
 		
-		offspringCounter = 0
 		for ind in range(len(self.fakepop.individuals)):
 			indiv = self.fakepop.individuals[ind]
 			indiv.resourcesAmount = ind
 			indiv.reproduce(**kwargs)
-			offspringCounter += indiv.offspringNumber
+			assert len(indiv.offspring) == indiv.offspringNumber, "{0} offspring generated while there should be {1}".format(len(self.fakepop.offspring), offspringCounter)
+	
+	def test_individual_instances_have_same_deme_and_phenotypes_as_parent(self, instantiateSingleDemePopulation, pggParameters):
+		self.fakepop = instantiateSingleDemePopulation(10)
+		kwargs = pggParameters
+		
+		for ind in range(len(self.fakepop.individuals)):
+			indiv = self.fakepop.individuals[ind]
+			indiv.resourcesAmount = ind
+			indiv.reproduce(**kwargs)
+			
+			for offspring in indiv.offspring:
+				assert offspring.currentDeme == indiv.currentDeme, "Offspring is not in parent's deme: {0} instead of {1}".format(offspring.currentDeme, indiv.currentDeme)
+				assert offspring.phenotypicValues == indiv.phenotypicValues, "Offspring does not inherit parent's phenotype: {0} instead of {1}".format(offspring.phenotypicValues, indiv.phenotypicValues)
+		
+	def offspring_are_added_to_the_population(self, instantiateSingleDemePopulation, pggParameters):
+		self.fakepop = instantiateSingleDemePopulation(10)
+		kwargs = pggParameters
+		
+		self.fakepop.update(**kwargs)
 		
 		assert hasattr(self.fakepop, "offspring"), "No individual instances created in the population"
-		assert len(self.fakepop.offspring) == offspringCounter, "{0} offspring generated while there should be {1}".format(len(self.fakepop.offspring), offspringCounter)
-		assert False, "Finish this test: finish defining reproduction function in main.py"
-	
-#	def test_individual_instances_have_same_deme_and_phenotypes_as_parent(self):
-#		assert False, "Write this test!"
 		
-#	def test_parent_is_removed_from_population(self):
-#		assert False, "Write this test!"
+	def test_parents_are_replaced_by_offspring_in_population(self, instantiateSingleDemePopulation, pggParameters):
+		self.fakepop = instantiateSingleDemePopulation(10)
+		kwargs = pggParameters
+		parents = self.fakepop.individuals
 		
-#	def test_deme_demography_is_updated(self):
-#		assert False, "Write this test!"
+		self.fakepop.update(**kwargs)
 		
-#	def test_population_individuals_are_changed(self):
-#		assert False, "Write this test!"
+		assert self.fakepop.individuals != parents, "Population not updated"
+		assert self.fakepop.individuals == self.fakepop.offspring, "Population not updated correctly"
+		
+	def test_deme_demography_is_updated(self, instantiateSingleDemePopulation, pggParameters):
+		self.fakepop = instantiateSingleDemePopulation(10)
+		kwargs = pggParameters
+		parents = self.fakepop.individuals
+		
+		for ind in range(len(parents)):
+			indiv = self.fakepop.individuals[ind]
+			indiv.resourcesAmount = ind * 2
+		
+		self.fakepop.update(**kwargs)
+		
+		assert self.fakepop.demography == len(self.fakepop.individuals), "Population demography not updated"
 		
 	
 
