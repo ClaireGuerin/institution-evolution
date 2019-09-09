@@ -59,3 +59,8 @@ class TestPopulation(object):
 		
 		assert len(self.pop.individuals) == self.howManyIndividualsPerDeme * self.howManyDemes, "You created a population of {0} individuals instead of {1}!".format(len(self.pop.individuals), self.howManyIndividualsPerDeme * self.howManyDemes)
 		
+	def test_population_has_fitness_method_or_pgg_parameters(self):
+		
+		assert False, "Write this test!"
+		
+		

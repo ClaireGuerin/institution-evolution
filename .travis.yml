@@ -2,6 +2,7 @@
 branches:
   except:
   - migration-feature
+  - reproduction-feature
 
 # safelist
 branches:

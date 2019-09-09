@@ -32,11 +32,16 @@ class Population:
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
+		if hasattr(self, "individualResources") == False:
+			setattr(self, "individualResources", 1)
+			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
 			nDemes = self.numberOfDemes
 		if dSize == None:
 			dSize = self.initialDemeSize
+		
+		self.demography = nDemes * dSize
 			
 		self.demes = []
 		self.individuals = []
@@ -53,6 +58,7 @@ class Population:
 				setattr(indiv, "phenotypicValues", self.initialPhenotypes)
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
+				setattr(indiv, "resourcesAmount", self.individualResources)
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
@@ -71,7 +77,16 @@ class Population:
 		for deme in range(self.numberOfDemes):
 			focalDeme = self.demes[deme]
 			focalDeme.demography = updateDemeSizes[deme]
-	
+			
+	def update(self, **kwargs):
+		self.offspring = []
+		for ind in self.individuals:
+			ind.reproduce(**kwargs)
+			self.offspring += ind.offspring
+		self.individuals = self.offspring
+		self.demography = len(self.individuals)
+		
+			
 	def runSimulation(self):
 		if self.numberOfDemes >= 2:
 			self.createAndPopulateDemes()

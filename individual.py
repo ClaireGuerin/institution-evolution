@@ -1,5 +1,6 @@
 import numpy.random as rd
 from operator import add
+import fitness
 
 class Individual(object):
 	
@@ -39,5 +40,19 @@ class Individual(object):
 			
 		setattr(self, "currentDeme", self.destinationDeme)
 	
-	def reproduce(self):
-		pass
+	def reproduce(self, fun_name="pgg", **kwargs):
+		self.fertility(fun_name, **kwargs)
+		self.procreate()
+		
+		self.offspring = []
+		for offspring in range(self.offspringNumber):
+			newOffspringInstance = Individual()
+			setattr(newOffspringInstance, "currentDeme", self.currentDeme)
+			setattr(newOffspringInstance, "phenotypicValues", self.phenotypicValues)
+			self.offspring.append(newOffspringInstance)
+		
+	def fertility(self, fun_name="pgg", **kwargs):
+		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
+		
+	def procreate(self):
+		self.offspringNumber = rd.poisson(self.fertilityValue)

@@ -84,4 +84,14 @@ def objectAttributesAreNotNone():
 		return (thereIsNoProblem, attributes)
 	
 	return _foo
+
+@pytest.fixture
+def pggParameters():
+	return {"x": 0.5,
+				  "xmean": 0.2, 
+				  "fb": 2, 
+				  "b": 0.5,
+				  "c": 0.05, 
+				  "gamma": 0.01, 
+				  "n": 10}
 	
