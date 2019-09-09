@@ -7,12 +7,13 @@ from statistics import mean
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
 INITIAL_PHENOTYPES_FILE = 'initial_phenotypes.txt'
+FITNESS_PARAMETERS_FILE = 'fitness_parameters.txt'
 OUTPUT_FOLDER = 'res'
 OUTPUT_FILE = 'output.txt'
 
 class Population:
 	
-	def __init__(self):
+	def __init__(self, fit_fun='pgg'):
 		
 		self.pathToInitFile = fman.getPathToFile(INITIALISATION_FILE)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile,0, str)
@@ -32,8 +33,18 @@ class Population:
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
+		self.pathToFitFile = fman.getPathToFile(FITNESS_PARAMETERS_FILE)		
+		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile,0, str)
+		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile,1, float)
+		
+		self.fitnessParameters = {}
+		for fitattr,fitval in zip(self.fitattrs, self.fitvals):
+			self.fitnessParameters[fitattr] = fitval
+			
 		if hasattr(self, "individualResources") == False:
 			setattr(self, "individualResources", 1)
+			
+		self.fit_fun = fit_fun
 			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
@@ -52,6 +63,7 @@ class Population:
 			
 			newDemeInstance.neighbours = self.identifyNeighbours(nDemes, deme)
 			newDemeInstance.demography = dSize
+			newDemeInstance.meanPhenotypes = self.initialPhenotypes
 						
 			for ind in range(dSize):
 				indiv = Ind()
@@ -68,26 +80,50 @@ class Population:
 		del tmp[demeID]
 		return tmp
 					
-	def populationMigration(self):
+	def migrationUpdate(self):
 		updateDemeSizes = [0] * self.numberOfDemes
 		for ind in self.individuals:
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
+			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			updateDemeSizes[ind.currentDeme] += 1
 			
 		for deme in range(self.numberOfDemes):
 			focalDeme = self.demes[deme]
 			focalDeme.demography = updateDemeSizes[deme]
-			
-	def update(self, **kwargs):
-		self.offspring = []
+	
+	def mutationUpdate(self):
+		nPhen = len(self.initialPhenotypes)
+		updateDemePhenotypes = [[[]] * nPhen] * self.numberOfDemes
+		
 		for ind in self.individuals:
-			ind.reproduce(**kwargs)
+			ind.mutate(self.mutationRate, self.mutationStep)
+			for phen in range(nPhen):
+				updateDemePhenotypes[ind.currentDeme][phen].append(ind.phenotypicValues[phen])
+		
+		for deme in range(self.numberOfDemes):
+			focalDeme = self.demes[deme]
+			focalDeme.meanPhenotypes = [self.meanWithSingleValue(updateDemePhenotypes[deme][phen]) for phen in range(nPhen)]
+			
+	def meanWithSingleValue(self, lst):
+		if len(lst) > 1:
+			tmpmean = mean(lst)
+		elif len(lst) == 1:
+			tmpmean = lst[0]
+		return tmpmean
+		
+	def reproductionUpdate(self):
+		self.offspring = []
+			
+		for ind in self.individuals:
 			self.offspring += ind.offspring
+			
 		self.individuals = self.offspring
 		self.demography = len(self.individuals)
 		
 			
 	def runSimulation(self):
+		kwargs = self.fitnessParameters
+		
 		if self.numberOfDemes >= 2:
 			self.createAndPopulateDemes()
 		
@@ -98,12 +134,18 @@ class Population:
 			with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
 				for gen in range(self.numberOfGenerations):
 					phenotypes = []
-					self.populationMigration()
+					self.migrationUpdate()
+					self.mutationUpdate()
 					for ind in self.individuals:
-						ind.mutate(self.mutationRate, self.mutationStep)
-						ind.reproduce()
+												
+						kwargs["n"] = self.demes[ind.currentDeme].demography
+						kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes[0]
+						kwargs["x"] = ind.phenotypicValues[0]
 						
-						phenotypes.append(ind.phenotypicValues[0])
+						ind.reproduce(self.fit_fun, **kwargs)
+					
+					self.reproductionUpdate()
+					phenotypes = [ind.phenotypicValues[0] for ind in self.individuals]
 					f.write('{0}\n'.format(mean(phenotypes)))
 		else:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

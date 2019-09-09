@@ -12,7 +12,7 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.attributes = ["id", "demography", "publicGood", "neighbours"]
+		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes"]
 		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
 		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
 		
@@ -39,3 +39,20 @@ class TestDeme(object):
 			assert focalDeme.neighbours == otherDemes, "Neighbours of deme {0} are {1}, and not {2}!".format(deme, otherDemes, focalDeme.neighbours)
 			
 		gc.collect()
+		
+	def test_deme_mean_phenotype_gets_calculated(self):
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(10, 2)
+		
+		for dem in self.fakepop.demes:
+			assert dem.meanPhenotypes == self.fakepop.initialPhenotypes, "Deme mean phenotype not calculated"
+			
+	def test_deme_mean_phenotype_updated_after_mutation(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(100)
+		
+		self.fakepop.mutationUpdate()
+		
+		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
+		
+		assert self.fakepop.demes[0].meanPhenotypes[0] == mean(phen), "Mean deme phenotype not updated after mutation"
+		

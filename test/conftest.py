@@ -12,7 +12,8 @@ def instantiateSingleIndividualPopulation():
 def instantiateSingleDemePopulation():
 	def _foo(nIndivs):
 		fakepop = Pop()
-		fakepop.createAndPopulateDemes(1,nIndivs)
+		fakepop.numberOfDemes = 1
+		fakepop.createAndPopulateDemes(fakepop.numberOfDemes,nIndivs)
 		return fakepop
 	
 	return _foo

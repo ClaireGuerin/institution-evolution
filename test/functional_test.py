@@ -2,7 +2,7 @@ import pytest
 import os
 import filemanip as fman
 from main import Population as Pop
-from main import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE
+from main import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE, FITNESS_PARAMETERS_FILE
 
 class TestSimpleRun(object):
 	
@@ -36,6 +36,11 @@ class TestSimpleRun(object):
 		self.dirpath = os.getcwd()
 		self.fileslist = os.listdir(self.dirpath)
 		assert INITIAL_PHENOTYPES_FILE in self.fileslist, "Initial phenotypes file not found in {0}".format(self.dirpath) 
+	
+	def test_fitness_parameters_file_exists(self):
+		self.dirpath = os.getcwd()
+		self.fileslist = os.listdir(self.dirpath)
+		assert FITNESS_PARAMETERS_FILE in self.fileslist, "Fitness parameter file not found in {0}".format(self.dirpath) 
 		
 	def test_initial_phenotypes_format(self):
 		self.pathToFile = fman.getPathToFile(INITIAL_PHENOTYPES_FILE)

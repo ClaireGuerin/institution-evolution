@@ -5,4 +5,5 @@ class Deme(object):
 		self.demography = None
 		self.publicGood = None
 		self.neighbours = []
+		self.meanPhenotypes = None
 		

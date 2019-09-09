@@ -59,8 +59,14 @@ class TestPopulation(object):
 		
 		assert len(self.pop.individuals) == self.howManyIndividualsPerDeme * self.howManyDemes, "You created a population of {0} individuals instead of {1}!".format(len(self.pop.individuals), self.howManyIndividualsPerDeme * self.howManyDemes)
 		
-	def test_population_has_fitness_method_or_pgg_parameters(self):
+	def test_population_has_fitness_method_or_pgg_parameters(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(1)
 		
-		assert False, "Write this test!"
+		assert hasattr(self.fakepop, "fitnessparameters"), "Provide fitness parameters"
+		
+		if not hasattr(self.fakepop, "fitnessMethod"):
+			 for key in ["fb", "b", "c", "gamma"]:
+					assert key in self.fakepop.fitnessparameters, "PGG parameter {0} not provided".format(key)
+			
 		
 		

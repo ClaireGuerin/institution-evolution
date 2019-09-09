@@ -49,6 +49,8 @@ class Individual(object):
 			newOffspringInstance = Individual()
 			setattr(newOffspringInstance, "currentDeme", self.currentDeme)
 			setattr(newOffspringInstance, "phenotypicValues", self.phenotypicValues)
+			setattr(newOffspringInstance, "resourcesAmount", self.resourcesAmount)
+			setattr(newOffspringInstance, "neighbours", self.neighbours)
 			self.offspring.append(newOffspringInstance)
 		
 	def fertility(self, fun_name="pgg", **kwargs):
