@@ -1,3 +1,15 @@
+# blocklist
+branches:
+  except:
+  - migration-feature
+  - reproduction-feature
+
+# safelist
+branches:
+  only:
+  - master
+  - develop
+  
 ## INSTALL ##
 dist: xenial # required for Python >= 3.7
 
