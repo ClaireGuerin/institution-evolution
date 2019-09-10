@@ -3,6 +3,7 @@ import filemanip as fman
 from deme import Deme as Dem
 from individual import Individual as Ind
 from statistics import mean
+import fitness
 
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
@@ -124,7 +125,7 @@ class Population:
 	def runSimulation(self):
 		kwargs = self.fitnessParameters
 		
-		if self.numberOfDemes >= 2:
+		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
 		
 			self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
@@ -147,6 +148,11 @@ class Population:
 					self.reproductionUpdate()
 					phenotypes = [ind.phenotypicValues[0] for ind in self.individuals]
 					f.write('{0}\n'.format(mean(phenotypes)))
+		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
+			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
+		elif self.numberOfDemes >= 2 and self.fit_fun not in fitness.functions:
+			raise KeyError(str('Fitness function "{0}" unknown. Add it to the functions in fitness.py').format(self.fit_fun))
 		else:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
+			raise KeyError('Fitness function "{0}" unknown. Add it to the functions in fitness.py'.format(self.fit_fun))
 			
