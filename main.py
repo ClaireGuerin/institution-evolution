@@ -140,18 +140,25 @@ class Population:
 					for ind in self.individuals:
 												
 						kwargs["n"] = self.demes[ind.currentDeme].demography
-						kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes[0]
-						kwargs["x"] = ind.phenotypicValues[0]
+						kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+						kwargs["x"] = ind.phenotypicValues
 						
 						ind.reproduce(self.fit_fun, **kwargs)
 					
 					self.reproductionUpdate()
-					phenotypes = [ind.phenotypicValues[0] for ind in self.individuals]
-					f.write('{0}\n'.format(mean(phenotypes)))
+					
+					for phen in range(len(self.initialPhenotypes)):
+						tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
+						tmpMean = mean(tmpPhenotypes)
+						f.write('{0},'.format(tmpMean))
+					f.write('\n'.rstrip(','))
+					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
+			
 		elif self.numberOfDemes >= 2 and self.fit_fun not in fitness.functions:
 			raise KeyError(str('Fitness function "{0}" unknown. Add it to the functions in fitness.py').format(self.fit_fun))
+			
 		else:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
 			raise KeyError('Fitness function "{0}" unknown. Add it to the functions in fitness.py'.format(self.fit_fun))

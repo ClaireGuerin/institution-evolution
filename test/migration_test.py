@@ -77,6 +77,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 	
 	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, instantiateSingleIndividualsDemes):
+		random.seed(30)
 		self.fakepop = Pop()
 		self.numberOfDemes = 10
 		self.initialDemeSize = 100
@@ -91,7 +92,8 @@ class TestMigrationFunction(object):
 		test, pval = scistats.kstest(destinations, scistats.randint.cdf, args=(0, self.numberOfDemes - 1))
 		assert pval > 0.05, "Migrants destinations are not equally likely (distribution non uniform)"
 		
-		
+		gc.collect()
+			
 	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes()
 		

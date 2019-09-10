@@ -67,7 +67,7 @@ class TestReproductionFunction(object):
 		kwargs = pggParameters
 		
 		for x in range(10):
-			assert fitness.functions["pgg"](res=x, **kwargs) == kwargs["fb"] * (x - kwargs["c"] * kwargs["x"] ** 2 + kwargs["b"] * kwargs["xmean"]) / (1 + kwargs["gamma"] * kwargs["n"]), "Wrong pgg function"
+			assert fitness.functions["pgg"](res=x, **kwargs) == kwargs["fb"] * (x - kwargs["c"] * kwargs["x"][0] ** 2 + kwargs["b"] * kwargs["xmean"][0]) / (1 + kwargs["gamma"] * kwargs["n"]), "Wrong pgg function"
 			
 	def test_fertility_function_uses_fitness_function(self, instantiateSingleDemePopulation, pggParameters):
 		self.fakepop = instantiateSingleDemePopulation(10)
