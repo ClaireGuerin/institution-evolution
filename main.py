@@ -17,8 +17,8 @@ class Population:
 	def __init__(self, fit_fun='pgg'):
 		
 		self.pathToInitFile = fman.getPathToFile(INITIALISATION_FILE)		
-		self.attrs = fman.extractColumnFromFile(self.pathToInitFile,0, str)
-		self.vals = fman.extractColumnFromFile(self.pathToInitFile,1, int)
+		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
+		self.vals = fman.extractColumnFromFile(self.pathToInitFile, 1, int)
 		
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
@@ -28,15 +28,15 @@ class Population:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 			
 		self.pathToParFile = fman.getPathToFile(PARAMETER_FILE)		
-		self.parattrs = fman.extractColumnFromFile(self.pathToParFile,0, str)
-		self.parvals = fman.extractColumnFromFile(self.pathToParFile,1, float)
+		self.parattrs = fman.extractColumnFromFile(self.pathToParFile, 0, str)
+		self.parvals = fman.extractColumnFromFile(self.pathToParFile, 1, float)
 		
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
 		self.pathToFitFile = fman.getPathToFile(FITNESS_PARAMETERS_FILE)		
-		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile,0, str)
-		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile,1, float)
+		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile, 0, str)
+		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile, 1, float)
 		
 		self.fitnessParameters = {}
 		for fitattr,fitval in zip(self.fitattrs, self.fitvals):
