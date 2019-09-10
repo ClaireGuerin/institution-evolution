@@ -76,14 +76,27 @@ class TestMigrationFunction(object):
 		
 		gc.collect()
 	
-	def test_migrants_destinations_equally_likely(self):
-		assert False, "Write this test!"
+	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, instantiateSingleIndividualsDemes):
+		self.fakepop = Pop()
+		self.numberOfDemes = 10
+		self.initialDemeSize = 100
+		self.fakepop.createAndPopulateDemes()
+		
+		destinations = []
+		
+		for ind in self.fakepop.individuals:
+			ind.migrate(self.fakepop.numberOfDemes, migRate=1)
+			destinations.append(ind.destinationDeme)
+			
+		test, pval = scistats.kstest(destinations, scistats.randint.cdf, args=(0, self.numberOfDemes - 1))
+		assert pval > 0.05, "Migrants destinations are not equally likely (distribution non uniform)"
+		
 		
 	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes()
 		
 		self.migrantIndivTrue = self.fakepop.individuals[0]
-		self.migrantIndivFalse = self.fakepop.individuals[0]
+		self.migrantIndivFalse = self.fakepop.individuals[1]
 		
 		self.origDemeTrue = self.migrantIndivTrue.currentDeme
 		self.migrantIndivTrue.migrate(self.fakepop.numberOfDemes, migRate=1)
@@ -113,7 +126,7 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
-		self.fakepop.populationMigration()
+		self.fakepop.migrationUpdate()
 		
 		self.newDemography = []		
 		for ind in self.fakepop.individuals:
@@ -131,7 +144,7 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd,10)
 		
-		assert hasattr(self.fakepop, "populationMigration"), "Migration cannot be ran at the population level"
-		assert callable(self.fakepop.populationMigration)
+		assert hasattr(self.fakepop, "migrationUpdate"), "Migration cannot be ran at the population level"
+		assert callable(self.fakepop.migrationUpdate)
 		
 		gc.collect()
