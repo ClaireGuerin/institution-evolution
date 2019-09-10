@@ -147,34 +147,19 @@ class TestReproductionFunction(object):
 				assert offspring.currentDeme == indiv.currentDeme, "Offspring is not in parent's deme: {0} instead of {1}".format(offspring.currentDeme, indiv.currentDeme)
 				assert offspring.phenotypicValues == indiv.phenotypicValues, "Offspring does not inherit parent's phenotype: {0} instead of {1}".format(offspring.phenotypicValues, indiv.phenotypicValues)
 		
-	def offspring_are_added_to_the_population(self, instantiateSingleDemePopulation, pggParameters):
-		self.fakepop = instantiateSingleDemePopulation(10)
-		kwargs = pggParameters
-		
-		self.fakepop.update(**kwargs)
+	def test_offspring_are_added_to_the_population(self, makePopulationReproduce):
+		self.fakepop, self.parents = makePopulationReproduce
 		
 		assert hasattr(self.fakepop, "offspring"), "No individual instances created in the population"
 		
-	def test_parents_are_replaced_by_offspring_in_population(self, instantiateSingleDemePopulation, pggParameters):
-		self.fakepop = instantiateSingleDemePopulation(10)
-		kwargs = pggParameters
-		parents = self.fakepop.individuals
+	def test_parents_are_replaced_by_offspring_in_population(self, makePopulationReproduce):
+		self.fakepop, self.parents = makePopulationReproduce
 		
-		self.fakepop.update(**kwargs)
-		
-		assert self.fakepop.individuals != parents, "Population not updated"
+		assert self.fakepop.individuals != self.parents, "Population not updated"
 		assert self.fakepop.individuals == self.fakepop.offspring, "Population not updated correctly"
 		
-	def test_deme_demography_is_updated(self, instantiateSingleDemePopulation, pggParameters):
-		self.fakepop = instantiateSingleDemePopulation(10)
-		kwargs = pggParameters
-		parents = self.fakepop.individuals
-		
-		for ind in range(len(parents)):
-			indiv = self.fakepop.individuals[ind]
-			indiv.resourcesAmount = ind * 2
-		
-		self.fakepop.update(**kwargs)
+	def test_deme_demography_is_updated(self, makePopulationReproduce):
+		self.fakepop, self.parents = makePopulationReproduce
 		
 		assert self.fakepop.demography == len(self.fakepop.individuals), "Population demography not updated"
 		

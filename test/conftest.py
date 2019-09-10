@@ -2,6 +2,14 @@ import pytest
 from main import Population as Pop
 from individual import Individual as Ind
 
+fitpardict = {"x": 0.5,
+			  "xmean": 0.2, 
+			  "fb": 2, 
+			  "b": 0.5,
+			  "c": 0.05, 
+			  "gamma": 0.01,
+			  "n": 10}
+
 @pytest.fixture
 def instantiateSingleIndividualPopulation():
 		fakepop = Pop()
@@ -88,11 +96,24 @@ def objectAttributesAreNotNone():
 
 @pytest.fixture
 def pggParameters():
-	return {"x": 0.5,
-				  "xmean": 0.2, 
-				  "fb": 2, 
-				  "b": 0.5,
-				  "c": 0.05, 
-				  "gamma": 0.01, 
-				  "n": 10}
+	return fitpardict
+
+@pytest.fixture
+def makePopulationReproduce():
+	fakepop = Pop(10)
+	fakepop.numberOfDemes = 1
+	fakepop.initialDemeSize = 10
+	fakepop.fitnessParameters = fitpardict
+	fakepop.fit_fun = 'pgg'
+	fakepop.createAndPopulateDemes()
+	parents = fakepop.individuals
+	
+	for ind in range(len(parents)):
+		indiv = fakepop.individuals[ind]
+		indiv.resourcesAmount = ind * 2
+		indiv.reproduce(fakepop.fit_fun, **fakepop.fitnessParameters)
+	
+	fakepop.reproductionUpdate()
+	
+	return (fakepop, parents)
 	
