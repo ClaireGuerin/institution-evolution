@@ -7,7 +7,7 @@ import institutionevolution.fitness as fitness
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 
-class Population:
+class Population(object):
 	
 	def __init__(self, fit_fun='pgg'):
 
