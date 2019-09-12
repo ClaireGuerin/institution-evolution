@@ -50,7 +50,7 @@ class TestDeme(object):
 	def test_deme_mean_phenotype_updated_after_mutation(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(100)
 		self.fakepop.migrationRate = 0
-		dsizes, dpheno = self.fakepop.populationMigrationMutation()
+		dsizes, dpheno = self.fakepop.populationMutationMigration()
 		self.fakepop.update(upSizes=dsizes, upPhenotypes=dpheno)
 		
 		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
