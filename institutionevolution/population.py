@@ -6,6 +6,7 @@ from institutionevolution.individual import Individual as Ind
 import institutionevolution.fitness as fitness
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
+import random
 
 class Population(object):
 	
@@ -105,7 +106,8 @@ class Population(object):
 	# 		tmpvar = total / samplelength
 
 
-	def populationReproduction(self, **kwargs):
+	def populationReproduction(self, seed=None, **kwargs):
+		random.seed(seed)
 		self.offspring = []
 
 		for ind in self.individuals:
@@ -119,7 +121,8 @@ class Population(object):
 		self.individuals = self.offspring
 		self.demography = len(self.offspring)
 
-	def populationMutationMigration(self):
+	def populationMutationMigration(self, seed=None):
+		random.seed(seed)
 		updateDemeSizes = [0] * self.numberOfDemes
 		updateDemePhenotypes = [[[]] * self.numberOfPhenotypes] * self.numberOfDemes
 
@@ -143,13 +146,13 @@ class Population(object):
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[deme].meanPhenotypes[phen] = self.specialmean(upPhenotypes[deme][phen])
 
-	def lifecycle(self, **kwargs):
+	def lifecycle(self, **kwargs, seed):
 		logging.info("migration and mutation")
-		dsizes, dpheno = self.populationMutationMigration()
+		dsizes, dpheno = self.populationMutationMigration(seed)
 		logging.info("updating...")
 		self.update(upSizes=dsizes, upPhenotypes=dpheno)
 		logging.info("reproduction")
-		self.populationReproduction(**kwargs)
+		self.populationReproduction(seed, **kwargs)
 		
 	def runSimulation(self, outputfile):
 		kwargs = self.fitnessParameters
