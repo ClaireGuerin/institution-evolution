@@ -118,21 +118,21 @@ class Population:
 
 		return offspring
 
-	def populationMigrationMutation(self):
+	def populationMutationMigration(self):
 		updateDemeSizes = [0] * self.numberOfDemes
 		updateDemePhenotypes = [[[]] * self.numberOfPhenotypes] * self.numberOfDemes
 
 		for ind in self.individuals:
-			# MIGRATION
-			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
-			ind.neighbours = self.demes[ind.currentDeme].neighbours
-			updateDemeSizes[ind.currentDeme] += 1
-
 			# MUTATION
 			ind.mutate(self.mutationRate, self.mutationStep)
 			for phen in range(self.numberOfPhenotypes):
 				updateDemePhenotypes[ind.currentDeme][phen].append(ind.phenotypicValues[phen])
-
+			
+			# MIGRATION
+			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
+			ind.neighbours = self.demes[ind.currentDeme].neighbours
+			updateDemeSizes[ind.currentDeme] += 1
+			
 		return (updateDemeSizes, updateDemePhenotypes)
 
 	def update(self, upSizes, upPhenotypes):
@@ -144,7 +144,7 @@ class Population:
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
-		dsizes, dpheno = self.populationMigrationMutation()
+		dsizes, dpheno = self.populationMutationMigration()
 		logging.info("updating...")
 		self.update(upSizes=dsizes, upPhenotypes=dpheno)
 		logging.info("reproduction")
