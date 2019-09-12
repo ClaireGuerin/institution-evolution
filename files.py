@@ -1,6 +1,6 @@
+PARAMETER_FOLDER = 'pars'
 INITIALISATION_FILE = 'initialisation.txt'
 PARAMETER_FILE = 'parameters.txt'
 INITIAL_PHENOTYPES_FILE = 'initial_phenotypes.txt'
 FITNESS_PARAMETERS_FILE = 'fitness_parameters.txt'
 OUTPUT_FOLDER = 'res'
-OUTPUT_FILE = 'output.txt'

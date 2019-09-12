@@ -1,11 +1,11 @@
 import os
 import logging
-import filemanip as fman
-from deme import Deme as Dem
-from individual import Individual as Ind
-import fitness
+import institutionevolution.filemanip as fman
+from institutionevolution.deme import Deme as Dem
+from institutionevolution.individual import Individual as Ind
+import institutionevolution.fitness as fitness
 from statistics import variance
-from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE, FITNESS_PARAMETERS_FILE
+from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 
 class Population:
 	
@@ -17,25 +17,25 @@ class Population:
 
 		logging.info('Creating population')
 		
-		self.pathToInitFile = fman.getPathToFile(INITIALISATION_FILE)		
+		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
 		self.vals = fman.extractColumnFromFile(self.pathToInitFile, 1, int)
 		
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
 			
-		self.pathToPhenFile = fman.getPathToFile(INITIAL_PHENOTYPES_FILE)
+		self.pathToPhenFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=PARAMETER_FOLDER)
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 			
-		self.pathToParFile = fman.getPathToFile(PARAMETER_FILE)		
+		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=PARAMETER_FOLDER)		
 		self.parattrs = fman.extractColumnFromFile(self.pathToParFile, 0, str)
 		self.parvals = fman.extractColumnFromFile(self.pathToParFile, 1, float)
 		
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
-		self.pathToFitFile = fman.getPathToFile(FITNESS_PARAMETERS_FILE)		
+		self.pathToFitFile = fman.getPathToFile(filename=FITNESS_PARAMETERS_FILE, dirname=PARAMETER_FOLDER)		
 		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile, 0, str)
 		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile, 1, float)
 		
@@ -161,7 +161,7 @@ class Population:
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder)
 			
-			with open('{}/{}'.format(self.pathToOutputFolder, outputfile), "w") as f:
+			with open('{0}/{1}'.format(self.pathToOutputFolder, outputfile), "w") as f:
 				for gen in range(self.numberOfGenerations):
 					logging.info(f'Running generation {gen}')
 					self.lifecycle(**kwargs)

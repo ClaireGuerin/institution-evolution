@@ -1,6 +1,6 @@
 import pytest
-from main import Population as Pop
-from individual import Individual as Ind
+from institutionevolution.population import Population as Pop
+from institutionevolution.individual import Individual as Ind
 
 fitpardict = {"x": [0.5],
 			  "xmean": [0.2], 
@@ -108,7 +108,8 @@ def makePopulationReproduce():
 	fakepop.mutationRate = 0
 	fakepop.migrationRate = 0
 	fakepop.createAndPopulateDemes()
-	[fakepop.individuals[i].resourcesAmount = i * 2 for i in range(fakepop.demography)]
+	for i in range(fakepop.demography):
+		fakepop.individuals[i].resourcesAmount = i * 2
 	parents = fakepop.individuals
 	
 	fakepop.lifecycle(**fakepop.fitnessParameters)

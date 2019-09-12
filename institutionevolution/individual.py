@@ -1,6 +1,6 @@
 import numpy.random as rd
 from operator import add
-import fitness
+import institutionevolution.fitness as fitness
 
 class Individual(object):
 	
