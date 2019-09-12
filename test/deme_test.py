@@ -1,7 +1,7 @@
 import pytest
-from individual import Individual as Ind
-from deme import Deme as Dem
-from main import Population as Pop
+from institutionevolution.individual import Individual as Ind
+from institutionevolution.deme import Deme as Dem
+from institutionevolution.population import Population as Pop
 import scipy.stats as scistats
 from operator import add
 import random
@@ -49,8 +49,9 @@ class TestDeme(object):
 			
 	def test_deme_mean_phenotype_updated_after_mutation(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(100)
-		
-		self.fakepop.mutationUpdate()
+		self.fakepop.migrationRate = 0
+		dsizes, dpheno = self.fakepop.populationMutationMigration()
+		self.fakepop.update(upSizes=dsizes, upPhenotypes=dpheno)
 		
 		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
 		

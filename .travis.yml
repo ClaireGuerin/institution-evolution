@@ -3,6 +3,8 @@ branches:
   except:
   - migration-feature
   - reproduction-feature
+  - automation-feature
+  - hotfix-1.0.1
 
 # safelist
 branches:

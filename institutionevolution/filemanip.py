@@ -1,7 +1,8 @@
 import os 
 
-def getPathToFile(filename):
-	return "{0}/{1}".format(os.getcwd(), filename)
+def getPathToFile(filename, dirname=""):
+	f = '{0}/{1}'.format(dirname,filename)
+	return "{0}/{1}".format(os.getcwd(), f)
 	
 def searchFile(fileToRead, string):
 	with open(fileToRead) as f:

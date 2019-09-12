@@ -1,7 +1,7 @@
 import pytest
-from individual import Individual as Ind
-from deme import Deme as Dem
-from main import Population as Pop
+from institutionevolution.individual import Individual as Ind
+from institutionevolution.deme import Deme as Dem
+from institutionevolution.population import Population as Pop
 import scipy.stats as scistats
 from operator import add
 import random
@@ -86,10 +86,10 @@ class TestMigrationFunction(object):
 		destinations = []
 		
 		for ind in self.fakepop.individuals:
-			ind.migrate(self.fakepop.numberOfDemes, migRate=1)
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1)
 			destinations.append(ind.destinationDeme)
 			
-		test, pval = scistats.kstest(destinations, scistats.randint.cdf, args=(0, self.numberOfDemes - 1))
+		test, pval = scistats.kstest(destinations, scistats.randint.cdf, args=(0, self.numberOfDemes))
 		assert pval > 0.05, "Migrants destinations are not equally likely (distribution non uniform)"
 		
 		gc.collect()
@@ -128,7 +128,8 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
-		self.fakepop.migrationUpdate()
+		updateDemeSize, updateDemePhenotype = self.fakepop.populationMutationMigration()
+		self.fakepop.update(upSizes=updateDemeSize, upPhenotypes=updateDemePhenotype)
 		
 		self.newDemography = []		
 		for ind in self.fakepop.individuals:
@@ -146,7 +147,7 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd,10)
 		
-		assert hasattr(self.fakepop, "migrationUpdate"), "Migration cannot be ran at the population level"
-		assert callable(self.fakepop.migrationUpdate)
+		assert hasattr(self.fakepop, "populationMutationMigration"), "Migration cannot be ran at the population level"
+		assert callable(self.fakepop.populationMutationMigration)
 		
 		gc.collect()
