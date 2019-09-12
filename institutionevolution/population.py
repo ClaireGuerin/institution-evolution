@@ -106,7 +106,7 @@ class Population:
 
 
 	def populationReproduction(self, **kwargs):
-		offspring = []
+		self.offspring = []
 
 		for ind in self.individuals:
 			# REPRODUCTION
@@ -114,9 +114,10 @@ class Population:
 			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			kwargs["x"] = ind.phenotypicValues
 			ind.reproduce(self.fit_fun, **kwargs)
-			offspring += ind.offspring
+			self.offspring += ind.offspring
 
-		return offspring
+		self.individuals = self.offspring
+		self.demography = len(self.offspring)
 
 	def populationMutationMigration(self):
 		updateDemeSizes = [0] * self.numberOfDemes
@@ -132,7 +133,7 @@ class Population:
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			updateDemeSizes[ind.currentDeme] += 1
-			
+
 		return (updateDemeSizes, updateDemePhenotypes)
 
 	def update(self, upSizes, upPhenotypes):
@@ -148,8 +149,7 @@ class Population:
 		logging.info("updating...")
 		self.update(upSizes=dsizes, upPhenotypes=dpheno)
 		logging.info("reproduction")
-		self.individuals = self.populationReproduction(**kwargs)
-		self.demography = len(self.individuals)
+		self.populationReproduction(**kwargs)
 		
 	def runSimulation(self, outputfile):
 		kwargs = self.fitnessParameters

@@ -112,13 +112,11 @@ def makePopulationReproduce():
 		fakepop.individuals[i].resourcesAmount = i * 2
 	parents = fakepop.individuals
 	
-	fakepop.lifecycle(**fakepop.fitnessParameters)
 	for ind in range(len(parents)):
 		indiv = fakepop.individuals[ind]
 		indiv.resourcesAmount = ind * 2
-		indiv.reproduce(fakepop.fit_fun, **fakepop.fitnessParameters)
 	
-	fakepop.reproductionUpdate()
+	fakepop.populationReproduction(**fakepop.fitnessParameters)
 	
 	return (fakepop, parents)
 	
