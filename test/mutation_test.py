@@ -1,7 +1,7 @@
 import pytest
-from individual import Individual as Ind
-from deme import Deme as Dem
-from main import Population as Pop
+from institutionevolution.individual import Individual as Ind
+from institutionevolution.deme import Deme as Dem
+from institutionevolution.population import Population as Pop
 import scipy.stats as scistats
 from operator import add
 import random
