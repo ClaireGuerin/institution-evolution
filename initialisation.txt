@@ -1,3 +1,0 @@
-numberOfDemes,1000
-initialDemeSize,2
-numberOfGenerations,2000

@@ -1,20 +1,21 @@
 import os
+import logging
 import filemanip as fman
 from deme import Deme as Dem
 from individual import Individual as Ind
-from statistics import mean
 import fitness
-
-INITIALISATION_FILE = 'initialisation.txt'
-PARAMETER_FILE = 'parameters.txt'
-INITIAL_PHENOTYPES_FILE = 'initial_phenotypes.txt'
-FITNESS_PARAMETERS_FILE = 'fitness_parameters.txt'
-OUTPUT_FOLDER = 'res'
-OUTPUT_FILE = 'output.txt'
+from statistics import variance
+from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, OUTPUT_FILE, FITNESS_PARAMETERS_FILE
 
 class Population:
 	
 	def __init__(self, fit_fun='pgg'):
+
+		logging.basicConfig(level=logging.INFO,
+							format='[%(asctime)s]::%(levelname)s  %(message)s',
+							datefmt='%Y.%m.%d - %H:%M:%S')
+
+		logging.info('Creating population')
 		
 		self.pathToInitFile = fman.getPathToFile(INITIALISATION_FILE)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
@@ -46,6 +47,8 @@ class Population:
 			setattr(self, "individualResources", 1)
 			
 		self.fit_fun = fit_fun
+
+		self.numberOfPhenotypes = len(self.initialPhenotypes)
 			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
@@ -80,49 +83,75 @@ class Population:
 		tmp = list(range(nd))
 		del tmp[demeID]
 		return tmp
-					
-	def migrationUpdate(self):
-		updateDemeSizes = [0] * self.numberOfDemes
+			
+	def specialmean(self, lst):
+		length, total = 0, 0
+		for phenotype in lst:
+			total += phenotype
+			length += 1
+		if length == 0:
+			tmpmean = None
+		else:
+			tmpmean = total / length
+		return tmpmean
+
+	# def specialvariance(self, lst, samplelength, samplemean):
+	# 	if samplelength == 0:
+	# 		tmpvar = None
+	# 	else:
+	# 		total = 0
+	# 		for phenotype in lst:
+	# 			total += (phenotype - samplemean) ** 2
+	# 		tmpvar = total / samplelength
+
+
+	def populationReproduction(self, **kwargs):
+		offspring = []
+
 		for ind in self.individuals:
+			# REPRODUCTION
+			kwargs["n"] = self.demes[ind.currentDeme].demography
+			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+			kwargs["x"] = ind.phenotypicValues
+			ind.reproduce(self.fit_fun, **kwargs)
+			offspring += ind.offspring
+
+		return offspring
+
+	def populationMigrationMutation(self):
+		updateDemeSizes = [0] * self.numberOfDemes
+		updateDemePhenotypes = [[[]] * self.numberOfPhenotypes] * self.numberOfDemes
+
+		for ind in self.individuals:
+			# MIGRATION
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			updateDemeSizes[ind.currentDeme] += 1
-			
-		for deme in range(self.numberOfDemes):
-			focalDeme = self.demes[deme]
-			focalDeme.demography = updateDemeSizes[deme]
-	
-	def mutationUpdate(self):
-		nPhen = len(self.initialPhenotypes)
-		updateDemePhenotypes = [[[]] * nPhen] * self.numberOfDemes
-		
-		for ind in self.individuals:
+
+			# MUTATION
 			ind.mutate(self.mutationRate, self.mutationStep)
-			for phen in range(nPhen):
+			for phen in range(self.numberOfPhenotypes):
 				updateDemePhenotypes[ind.currentDeme][phen].append(ind.phenotypicValues[phen])
-		
+
+		return (updateDemeSizes, updateDemePhenotypes)
+
+	def update(self, upSizes, upPhenotypes):
 		for deme in range(self.numberOfDemes):
-			focalDeme = self.demes[deme]
-			focalDeme.meanPhenotypes = [self.meanWithSingleValue(updateDemePhenotypes[deme][phen]) for phen in range(nPhen)]
-			
-	def meanWithSingleValue(self, lst):
-		if len(lst) > 1:
-			tmpmean = mean(lst)
-		elif len(lst) == 1:
-			tmpmean = lst[0]
-		return tmpmean
-		
-	def reproductionUpdate(self):
-		self.offspring = []
-			
-		for ind in self.individuals:
-			self.offspring += ind.offspring
-			
-		self.individuals = self.offspring
+			self.demes[deme].demography = upSizes[deme]
+			# self.demes[deme].meanPhenotypes = [self.specialmean(upPhenotypes[deme][phen]) for phen in range(self.numberOfPhenotypes)]
+			for phen in range(self.numberOfPhenotypes):
+				self.demes[deme].meanPhenotypes[phen] = self.specialmean(upPhenotypes[deme][phen])
+
+	def lifecycle(self, **kwargs):
+		logging.info("migration and mutation")
+		dsizes, dpheno = self.populationMigrationMutation()
+		logging.info("updating...")
+		self.update(upSizes=dsizes, upPhenotypes=dpheno)
+		logging.info("reproduction")
+		self.individuals = self.populationReproduction(**kwargs)
 		self.demography = len(self.individuals)
 		
-			
-	def runSimulation(self):
+	def runSimulation(self, outputfile):
 		kwargs = self.fitnessParameters
 		
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
@@ -132,24 +161,15 @@ class Population:
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder)
 			
-			with open('{}/{}'.format(self.pathToOutputFolder, OUTPUT_FILE), "w") as f:
+			with open('{}/{}'.format(self.pathToOutputFolder, outputfile), "w") as f:
 				for gen in range(self.numberOfGenerations):
-					phenotypes = []
-					self.migrationUpdate()
-					self.mutationUpdate()
-					for ind in self.individuals:
-												
-						kwargs["n"] = self.demes[ind.currentDeme].demography
-						kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
-						kwargs["x"] = ind.phenotypicValues
-						
-						ind.reproduce(self.fit_fun, **kwargs)
-					
-					self.reproductionUpdate()
-					
-					for phen in range(len(self.initialPhenotypes)):
+					logging.info(f'Running generation {gen}')
+					self.lifecycle(**kwargs)
+
+					for phen in range(self.numberOfPhenotypes):
 						tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
-						tmpMean = mean(tmpPhenotypes)
+						tmpMean = self.specialmean(tmpPhenotypes)
+						# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
 						f.write('{0},'.format(tmpMean))
 					f.write('\n'.rstrip(','))
 					

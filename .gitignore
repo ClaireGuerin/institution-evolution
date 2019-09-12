@@ -1,2 +1,7 @@
-__pycache__
+__pycache__/
 *.pyc
+res/
+pars/
+logos/
+log.txt
+analyticalpredictions.txt

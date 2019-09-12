@@ -105,9 +105,13 @@ def makePopulationReproduce():
 	fakepop.initialDemeSize = 10
 	fakepop.fitnessParameters = fitpardict
 	fakepop.fit_fun = 'pgg'
+	fakepop.mutationRate = 0
+	fakepop.migrationRate = 0
 	fakepop.createAndPopulateDemes()
+	[fakepop.individuals[i].resourcesAmount = i * 2 for i in range(fakepop.demography)]
 	parents = fakepop.individuals
 	
+	fakepop.lifecycle(**fakepop.fitnessParameters)
 	for ind in range(len(parents)):
 		indiv = fakepop.individuals[ind]
 		indiv.resourcesAmount = ind * 2
