@@ -4,7 +4,6 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
 import scipy.stats as scistats
 from operator import add
-import random
 from statistics import mean
 import gc
 
@@ -43,8 +42,8 @@ class TestMutationFunction(object):
 
 		assert all(mutants) or not any(mutants), "Mutant does not depend on seed: {0}".format(set(mutants))
 		
-	def test_mutants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
-		random.seed(30)
+	def test_mutants_are_drawn_from_binomial(self, pseudorandom, instantiateSingleDemePopulation):
+		pseudorandom(0)
 		self.nIndividuals = 1000
 		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
 		
@@ -111,8 +110,8 @@ class TestMutationFunction(object):
 		
 		gc.collect()
 		
-	def test_mutation_deviation_follows_normal_distribution(self, instantiateSingleDemePopulation):
-		random.seed(30)
+	def test_mutation_deviation_follows_normal_distribution(self, pseudorandom, instantiateSingleDemePopulation):
+		pseudorandom(0)
 		self.nIndividuals = 1000
 		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
 		
@@ -125,8 +124,9 @@ class TestMutationFunction(object):
 		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(mean(self.distri),0)
 		stat2, pval2 = scistats.kstest(self.distri, 'norm', args=(0,0.05), N=self.nIndividuals)
 		assert pval2 > 0.05, "Test for goodness of fit failed"
-		stat3, pval3 = scistats.shapiro(self.distri), "Test of normality failed"
-		
+		stat3, pval3 = scistats.shapiro(self.distri)
+		assert pval3 > 0.05, "Test of normality failed"
+
 		gc.collect()
  
 	def test_mutation_adds_deviation_to_phenotype(self, instantiateSingleDemePopulation):

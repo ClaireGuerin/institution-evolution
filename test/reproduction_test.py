@@ -4,7 +4,6 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
 import scipy.stats as scistats
 from operator import add
-import random
 from statistics import mean
 import gc
 import institutionevolution.fitness as fitness
@@ -104,9 +103,9 @@ class TestReproductionFunction(object):
 		assert all([x == offspring[0] for x in offspring]), "number of offspring differs with same seed, {0}".format(set(offspring))
 
 			
-	def test_reproduction_follows_a_poisson_distribution(self, instantiateSingleDemePopulation, pggParameters):
+	def test_reproduction_follows_a_poisson_distribution(self, pseudorandom, instantiateSingleDemePopulation, pggParameters):
 		#http://www2.stat-athens.aueb.gr/~exek/papers/Xekalaki-Statistician2000(355-382)ft.pdf
-		random.seed(30)
+		pseudorandom(0)
 		
 		self.nIndividuals = 1000
 		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)

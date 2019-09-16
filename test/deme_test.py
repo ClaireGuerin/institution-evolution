@@ -55,5 +55,5 @@ class TestDeme(object):
 		
 		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
 		
-		assert self.fakepop.demes[0].meanPhenotypes[0] == mean(phen), "Mean deme phenotype not updated after mutation"
+		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phen)), "Mean deme phenotype not updated after mutation"
 		

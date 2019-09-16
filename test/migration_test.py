@@ -59,40 +59,33 @@ class TestMigrationFunction(object):
 
 		gc.collect()
 
-	def test_migrants_are_drawn_from_binomial(self):
+	def test_migrants_are_drawn_from_binomial(self, pseudorandom):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
 		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
 		
-		self.meanpvals = []
-		self.distripvals = []
-		self.allcounts = []
-		self.countMigrantsInEachDeme = [0] * self.fakepop.numberOfDemes
-		
-		for ind in range(self.fakepop.demography):
-			indiv = self.fakepop.individuals[ind]
-			originalDeme = indiv.currentDeme
-			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=ind)
-			if indiv.migrant:
-				self.countMigrantsInEachDeme[originalDeme] += 1
-					
+		i = 0			
 		for deme in range(self.fakepop.numberOfDemes):
-			migrantCount = self.countMigrantsInEachDeme[deme]
+			migrantsCount = 0
+			for ind in range(self.individualsPerDeme):
+				indiv = self.fakepop.individuals[ind]
+				originalDeme = indiv.currentDeme
+				pseudorandom(0)
+				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=ind)
+				if indiv.migrant:
+					migrantsCount += 1
+				i += 1
 			
-			stat1, pval1 = scistats.ttest_1samp([1] * migrantCount + [0] * (self.individualsPerDeme - migrantCount), self.fakepop.migrationRate)
-			self.meanpvals.append(pval1)
+			stat1, pval1 = scistats.ttest_1samp([1] * migrantsCount + [0] * (self.individualsPerDeme - migrantsCount), self.fakepop.migrationRate)
+			test = scistats.binom_test(x=migrantsCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
 			
-			test = scistats.binom_test(x=migrantCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
-			self.distripvals.append(test)
-			
-			self.allcounts.append(migrantCount)
-			
-		assert sum([x > 0.05 for x in self.meanpvals]) >= len(self.meanpvals)-1, "T-test mean failed. Observed: {0}, Expected: {1}".format(mean(self.allcounts)/self.individualsPerDeme, self.fakepop.migrationRate)
-		assert sum([x > 0.05 for x in self.distripvals]) >= len(self.distripvals)-1, "Success rate = {0} when mutation rate = {1}".format(mean(self.allcounts)/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert pval1 > 0.05, "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert test > 0.05, "Success rate = {0} when mutation rate = {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 		
 		gc.collect()
 	
-	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, instantiateSingleIndividualsDemes):
+	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, pseudorandom, instantiateSingleIndividualsDemes):
+		pseudorandom(0)
 		self.fakepop = Pop()
 		self.ds = 100
 		self.nd = 10

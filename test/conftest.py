@@ -14,7 +14,7 @@ fitpardict = {"x": [0.5],
 
 @pytest.fixture
 def pseudorandom():
-	def _foo(n=0):
+	def _foo(n):
 		rd.seed(n)
 		np.seed(n)
 
