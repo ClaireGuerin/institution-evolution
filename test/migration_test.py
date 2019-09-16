@@ -41,8 +41,22 @@ class TestMigrationFunction(object):
 			assert type(ind.migrant) is bool, "Migrant must be a boolean"	
 			
 		gc.collect()
-		
-	def test_migrants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
+
+	def test_migrants_are_drawn_equally_depending_on_seed(self, pseudorandom):
+		self.individualsPerDeme = 1000
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+
+		self.migrants = []
+
+		for ind in self.fakepop.individuals:
+			pseudorandom
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
+			self.migrants.append(ind.migrant)
+
+		assert all(self.migrants) or not any(self.migrants), "Migration values differ for same seed resetting: {0}".format(set(self.migrants))
+
+	def test_migrants_are_drawn_from_binomial(self):
 		random.seed(30)
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()

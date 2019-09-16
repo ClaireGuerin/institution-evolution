@@ -1,6 +1,8 @@
 import pytest
 from institutionevolution.population import Population as Pop
 from institutionevolution.individual import Individual as Ind
+import random as rd
+import numpy.random as np
 
 fitpardict = {"x": [0.5],
 			  "xmean": [0.2], 
@@ -9,6 +11,11 @@ fitpardict = {"x": [0.5],
 			  "c": 0.05, 
 			  "gamma": 0.01,
 			  "n": 10}
+
+@pytest.fixture
+def pseudorandom():
+	rd.seed(0)
+	np.seed(0)
 
 @pytest.fixture
 def instantiateSingleIndividualPopulation():
