@@ -14,8 +14,11 @@ fitpardict = {"x": [0.5],
 
 @pytest.fixture
 def pseudorandom():
-	rd.seed(0)
-	np.seed(0)
+	def _foo(n=0):
+		rd.seed(n)
+		np.seed(n)
+
+	return _foo
 
 @pytest.fixture
 def instantiateSingleIndividualPopulation():
