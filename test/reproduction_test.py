@@ -88,6 +88,21 @@ class TestReproductionFunction(object):
 		assert self.indiv.offspringNumber != None, "No offspring number generated"
 		assert type(self.indiv.offspringNumber) is int, "Offspring number of wrong format: {0} instead of integer".format(type(self.indiv.offspringNumber))
 		assert self.indiv.offspringNumber >= 0, "Offspring number cannot be negative"
+
+	def test_reproduction_is_seed_dependent(self, pseudorandom, instantiateSingleDemePopulation):
+		self.nIndividuals = 1000
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+
+		offspring = []
+
+		for ind in self.fakepop.individuals:
+			setattr(ind, "fertilityValue", 4)
+			pseudorandom(0)
+			ind.procreate()
+			offspring.append(ind.offspringNumber)
+
+		assert all([x == offspring[0] for x in offspring]), "number of offspring differs with same seed, {0}".format(set(offspring))
+
 			
 	def test_reproduction_follows_a_poisson_distribution(self, instantiateSingleDemePopulation, pggParameters):
 		#http://www2.stat-athens.aueb.gr/~exek/papers/Xekalaki-Statistician2000(355-382)ft.pdf
