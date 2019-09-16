@@ -60,6 +60,19 @@ class TestMutationFunction(object):
 		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals, self.fakepop.mutationRate)
 		
 		gc.collect()
+
+	def test_deviation_depends_on_seed(self, pseudorandom, instantiateSingleDemePopulation):
+		self.nIndividuals = 1000
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+
+		mutationDeviations = []
+
+		for ind in self.fakepop.individuals:
+			pseudorandom(0)
+			ind.mutate(mutRate=1, mutStep=self.fakepop.mutationStep)
+			mutationDeviations.append(ind.mutationDeviation)
+
+		assert all([x == mutationDeviations[0] for x in mutationDeviations]), "Mutation deviation does not depend on seed: {0}".format(set(mutationDeviations))
 		
 	def test_deviation_function_returns_list_of_phenotype_size(self, instantiateSingleIndividualPopulation):
 		self.indiv = instantiateSingleIndividualPopulation
