@@ -29,6 +29,19 @@ class TestMutationFunction(object):
 		assert type(self.indiv.mutant) is bool
 		
 		gc.collect()
+
+	def test_mutants_depend_on_seed(self, pseudorandom, instantiateSingleDemePopulation):
+		self.nIndividuals = 1000
+		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+
+		mutants = []
+
+		for ind in self.fakepop.individuals:
+			pseudorandom(0)
+			ind.mutate(mutRate=self.fakepop.mutationRate, mutStep=self.fakepop.mutationStep)
+			mutants.append(ind.mutant)
+
+		assert all(mutants) or not any(mutants), "Mutant does not depend on seed: {0}".format(set(mutants))
 		
 	def test_mutants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
 		random.seed(30)
