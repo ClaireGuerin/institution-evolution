@@ -2,6 +2,7 @@ import pytest
 from institutionevolution.individual import Individual as Ind
 from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
+import institutionevolution.fitness as fitness
 from files import PARAMETER_FOLDER, INITIAL_PHENOTYPES_FILE, OUTPUT_FOLDER
 import os
 
@@ -50,5 +51,8 @@ class TestMultipleTraits(object):
 		os.remove('{0}/tmptest.txt'.format(OUTPUT_FOLDER))
 
 	def test_stabilizing_selection_fitness_function(self):
-		assert False, "Write this test!"
+		assert 'geom' in fitness.functions, "Did not find 'geom' method in fitness functions dictionary"
+
+
+
 
