@@ -5,6 +5,7 @@ from institutionevolution.population import Population as Pop
 import institutionevolution.fitness as fitness
 from files import PARAMETER_FOLDER, INITIAL_PHENOTYPES_FILE, OUTPUT_FOLDER
 import os
+from math import exp, sqrt
 
 class TestMultipleTraits(object):
 
@@ -50,9 +51,18 @@ class TestMultipleTraits(object):
 
 		os.remove('{0}/tmptest.txt'.format(OUTPUT_FOLDER))
 
-	def test_stabilizing_selection_fitness_function(self):
+	def test_stabilizing_selection_fitness_function_is_set(self):
 		assert 'geom' in fitness.functions, "Did not find 'geom' method in fitness functions dictionary"
+		kwargs = {"fb": 2, "x": [0.5], "gamma": 0.07, "n": 20}		
+		assert fitness.functions['geom'](1, **kwargs) is not None, "Fisher's geometric function does not return a fertility value"
+		assert type(fitness.functions['geom'](1, **kwargs)) is float, "Fisher's geometric function does not return a valid fertility value: {0}".format(type(fitness.functions['geom'](1)))
 
+	def test_stabilizing_selection_fitness_function_gives_correct_fertility_value(self, instantiateSingleIndividualPopulation):
+		self.indiv = instantiateSingleIndividualPopulation
+		self.ntraits = 4
+		self.indiv.phenotypicValues = [1] * self.ntraits
+		kwargs = {"fb": 2, "x": self.indiv.phenotypicValues, "gamma": 0.07, "n": 20}
+		expected = kwargs["fb"] * exp(-sqrt(sum([x ** 2 for x in self.indiv.phenotypicValues]))) / (1 + kwargs["gamma"] * kwargs["n"])
+		self.indiv.fertility(fun_name='geom', **kwargs)
 
-
-
+		assert self.indiv.fertilityValue == expected, "Fisher's geometric function should return a fertility of {0}, not {1}".format(expected, self.indiv.fertilityValue)
