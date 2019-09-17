@@ -11,6 +11,11 @@ Download the repository *institution-evolution* on your local machine.
 
 # Launch simulation
 
+## Requirements
+
+Scipy, Numpy, 
+Pytest to test code 
+
 ## Parameters
 
 Set parameters as desired in *pars* folder:
