@@ -166,12 +166,16 @@ class Population(object):
 					logging.info(f'Running generation {gen}')
 					self.lifecycle(**kwargs)
 
+					phenmeans = []
+
 					for phen in range(self.numberOfPhenotypes):
 						tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 						tmpMean = self.specialmean(tmpPhenotypes)
 						# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
-						f.write('{0},'.format(tmpMean))
-					f.write('\n'.rstrip(','))
+						phenmeans.append(str(tmpMean))
+
+					sep = ','
+					f.write('{0}\n'.format(sep.join(phenmeans)))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
