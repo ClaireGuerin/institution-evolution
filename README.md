@@ -22,13 +22,13 @@ Set parameters as desired in *pars* folder:
 - fitness_parameters.txt: specific to fitness function used. For now, only Public Goods Games (PGG)
 - initial_phenotypes.txt: \n for each new trait
 - parameters.txt: general parameters
--- mutation rate,
--- mutation variance,
--- migration rate
+	- mutation rate,
+	- mutation variance,
+	- migration rate
 - initialisation.txt: 
--- number of demes (i.e. sub-populations)
--- initial size of demes (number of individuals in each sub-population)
--- number of generations (iterations) to run.
+	- number of demes (i.e. sub-populations)
+	- initial size of demes (number of individuals in each sub-population)
+	- number of generations (iterations) to run.
 
 ## Command line
 python script.py
