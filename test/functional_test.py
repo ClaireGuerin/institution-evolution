@@ -56,6 +56,7 @@ class TestSimpleRun(object):
 		self.out = 'output_test.txt'
 		self.population = Pop()
 		setattr(self.population, "numberOfDemes", 1)
+		setattr(self.population, "numberOfGenerations", 10)
 		try:
 			self.population.runSimulation(self.out)
 		except ValueError as e:
@@ -68,8 +69,8 @@ class TestSimpleRun(object):
 	
 	def test_program_requires_valid_fitness_function(self):
 		self.out = 'output_test.txt'
-		self.population = Pop()
-		self.population.fit_fun = "gibberish"
+		self.population = Pop(fit_fun="gibberish")
+		setattr(self.population, "numberOfGenerations", 10)
 		try:
 			self.population.runSimulation(self.out)
 		except KeyError as e:
@@ -95,18 +96,18 @@ class TestSimpleRun(object):
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test.txt'
 		self.population = Pop()
+		setattr(self.population, "numberOfGenerations", 10)
 		self.population.runSimulation(self.out)
 		
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
 		with open(self.outputFile) as f:
 			self.lineNumber = len(f.readlines())
 			
-		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
-		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
-		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
-		self.nGen = self.attributeValues[self.attributeNames.index('numberOfGenerations')]
+		#self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
+		#self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
+		#self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int) 
 			
-		assert self.lineNumber == self.nGen
+		assert self.lineNumber == self.population.numberOfGenerations
 		
 	def test_program_writes_non_empty_output(self):
 		self.out = 'output_test.txt'

@@ -47,13 +47,24 @@ class TestDeme(object):
 		for dem in self.fakepop.demes:
 			assert dem.meanPhenotypes == self.fakepop.initialPhenotypes, "Deme mean phenotype not calculated"
 			
-	def test_deme_mean_phenotype_updated_after_mutation(self, instantiateSingleDemePopulation):
-		self.fakepop = instantiateSingleDemePopulation(100)
+	def test_deme_mean_phenotype_updated_after_mutation(self):
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 2
+		self.fakepop.initialDemeSize = 50
 		self.fakepop.migrationRate = 0
+		self.fakepop.createAndPopulateDemes()
 		dsizes, dpheno = self.fakepop.populationMutationMigration()
 		self.fakepop.update(upSizes=dsizes, upPhenotypes=dpheno)
+
+		phenDeme0 = []
+		phenDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				phenDeme0.append(ind.phenotypicValues[0])
+			elif ind.currentDeme == 1:
+				phenDeme1.append(ind.phenotypicValues[0])
 		
-		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
-		
-		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phen)), "Mean deme phenotype not updated after mutation"
-		
+		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(dpheno[0][0])), "Mean deme 0 phenotype not updated after mutation"
+		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "Mean deme 0 phenotype not updated after mutation"
+		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "Mean deme 0 phenotype not updated after mutation"		

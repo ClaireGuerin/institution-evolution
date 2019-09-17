@@ -139,7 +139,6 @@ class Population(object):
 	def update(self, upSizes, upPhenotypes):
 		for deme in range(self.numberOfDemes):
 			self.demes[deme].demography = upSizes[deme]
-			# self.demes[deme].meanPhenotypes = [self.specialmean(upPhenotypes[deme][phen]) for phen in range(self.numberOfPhenotypes)]
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[deme].meanPhenotypes[phen] = self.specialmean(upPhenotypes[deme][phen])
 

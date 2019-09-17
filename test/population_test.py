@@ -67,6 +67,43 @@ class TestPopulation(object):
 		if not hasattr(self.fakepop, "fitnessMethod"):
 			 for key in ["fb", "b", "c", "gamma"]:
 					assert key in self.fakepop.fitnessParameters, "PGG parameter {0} not provided".format(key)
+
+	def test_population_mutation_updates_individual_phenotypes(self):
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 2
+		self.fakepop.initialDemeSize = 50
+		self.fakepop.migrationRate = 0
+		self.fakepop.mutationRate = 1
+		self.fakepop.createAndPopulateDemes()
+
+		origPhenDeme0 = []
+		origPhenDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				origPhenDeme0.append(ind.phenotypicValues[0])
+			elif ind.currentDeme == 1:
+				origPhenDeme1.append(ind.phenotypicValues[0])
+
+		dsizes, dpheno = self.fakepop.populationMutationMigration()
+
+		phenDeme0 = []
+		phenDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				phenDeme0.append(ind.phenotypicValues[0])
+			elif ind.currentDeme == 1:
+				phenDeme1.append(ind.phenotypicValues[0])
+
+		assert len(origPhenDeme0) == len(phenDeme0)
+		assert len(origPhenDeme1) == len(phenDeme1)
+
+		assert any(x != y for x,y in zip(origPhenDeme0, phenDeme0))
+		assert any(x != y for x,y in zip(origPhenDeme1, phenDeme1))
+
+		assert all(x != y for x,y in zip(origPhenDeme0, phenDeme0))
+		assert all(x != y for x,y in zip(origPhenDeme1, phenDeme1))
 			
 		
 		
