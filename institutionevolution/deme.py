@@ -6,4 +6,5 @@ class Deme(object):
 		self.publicGood = None
 		self.neighbours = []
 		self.meanPhenotypes = None
+		self.totalPhenotypes = None
 		
