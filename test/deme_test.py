@@ -52,19 +52,46 @@ class TestDeme(object):
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 50
 		self.fakepop.migrationRate = 0
-		self.fakepop.createAndPopulateDemes()
+		# the two following lines are very important so that the test does not fail at the boundaries, 
+		# e.g. if phen = 0 and dev < 0, mutated phenotype will still be 0
+		self.fakepop.initialPhenotypes = [0.5] 
+		self.fakepop.numberOfPhenotypes = 1
+
+		self.fakepop.createAndPopulateDemes(nDemes=self.fakepop.numberOfDemes, dSize=self.fakepop.initialDemeSize)
+
+		origPhenDeme0 = []
+		origPhenDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				origPhenDeme0.append(ind.phenotypicValues[0])
+			elif ind.currentDeme == 1:
+				origPhenDeme1.append(ind.phenotypicValues[0])
+
 		dsizes, dpheno = self.fakepop.populationMutationMigration()
 		self.fakepop.update(upSizes=dsizes, upPhenotypes=dpheno)
 
 		phenDeme0 = []
 		phenDeme1 = []
+		i0 = 0
+		i1 = 0
 
 		for ind in self.fakepop.individuals:
+
 			if ind.currentDeme == 0:
-				phenDeme0.append(ind.phenotypicValues[0])
+				phen = ind.phenotypicValues[0]
+				phenDeme0.append(phen)
+				assert origPhenDeme0[i0] + ind.mutationDeviation[0] == phen
+				i0 += 1
+
 			elif ind.currentDeme == 1:
-				phenDeme1.append(ind.phenotypicValues[0])
+				phen = ind.phenotypicValues[0]
+				phenDeme1.append(phen)
+				assert origPhenDeme1[i1] + ind.mutationDeviation[0] == phen
+				i1 +=1
 		
-		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(dpheno[0][0])), "Mean deme 0 phenotype not updated after mutation"
-		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "Mean deme 0 phenotype not updated after mutation"
-		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "Mean deme 0 phenotype not updated after mutation"		
+		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(dpheno[0][0])), "t1, deme 0: mean returned by pop mut func not updated"
+		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(dpheno[0][0])), "t1, deme 1: mean returned by pop mut func not updated"
+		
+		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "t2, deme 0: mean returned by pop mut func not mean of all indivs in deme"
+		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "t2, deme 1: mean returned by pop mut func not mean of all indivs in deme"		

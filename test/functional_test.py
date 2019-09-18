@@ -56,7 +56,7 @@ class TestSimpleRun(object):
 		self.out = 'output_test.txt'
 		self.population = Pop()
 		setattr(self.population, "numberOfDemes", 1)
-		setattr(self.population, "numberOfGenerations", 10)
+		setattr(self.population, "numberOfGenerations", 4)
 		try:
 			self.population.runSimulation(self.out)
 		except ValueError as e:
@@ -70,7 +70,7 @@ class TestSimpleRun(object):
 	def test_program_requires_valid_fitness_function(self):
 		self.out = 'output_test.txt'
 		self.population = Pop(fit_fun="gibberish")
-		setattr(self.population, "numberOfGenerations", 10)
+		setattr(self.population, "numberOfGenerations", 4)
 		try:
 			self.population.runSimulation(self.out)
 		except KeyError as e:
@@ -96,7 +96,7 @@ class TestSimpleRun(object):
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test.txt'
 		self.population = Pop()
-		setattr(self.population, "numberOfGenerations", 10)
+		setattr(self.population, "numberOfGenerations", 4)
 		self.population.runSimulation(self.out)
 		
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
