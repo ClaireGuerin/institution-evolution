@@ -96,4 +96,19 @@ class TestPopulation(object):
 		assert self.fakepop.individuals == []
 
 	def test_update_function(self):
-		assert False, "Write this test to make sure the mean is calculated well!!"
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 2
+
+		self.fakepop.fitnessParameters["fb"] = 0.0001 # to make the population die out
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.populationMutationMigration()
+
+		demogdeme0 = self.fakepop.demes[0].demography
+		phendeme0 = self.fakepop.demes[0].totalPhenotypes[0]
+		demogdeme1 = self.fakepop.demes[1].demography
+		phendeme1 = self.fakepop.demes[1].totalPhenotypes[0]
+
+		self.fakepop.update()
+
+		assert self.fakepop.demes[0].meanPhenotypes[0] == self.fakepop.specialdivision(phendeme0, demogdeme0)
+		assert self.fakepop.demes[1].meanPhenotypes[0] == self.fakepop.specialdivision(phendeme1, demogdeme1)

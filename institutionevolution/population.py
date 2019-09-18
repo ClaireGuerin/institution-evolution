@@ -128,7 +128,7 @@ class Population(object):
 			assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
 			assert kwargs["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
 			assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, kwargs["x"])
-			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography)
+			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
 
 			ind.reproduce(self.fit_fun, **kwargs)
 			self.offspring += ind.offspring
@@ -160,9 +160,13 @@ class Population(object):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 
 	def update(self):
-		for deme in range(self.numberOfDemes):
+		for deme in self.demes:
+			meanphen = []
 			for phen in range(self.numberOfPhenotypes):
-				self.demes[deme].meanPhenotypes[phen] = self.specialdivision(self.demes[deme].totalPhenotypes[phen], self.demes[deme].demography)
+				calculateMean = self.specialdivision(deme.totalPhenotypes[phen], deme.demography)
+				meanphen.append(calculateMean) 
+
+			setattr(deme, "meanPhenotypes", meanphen)
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
