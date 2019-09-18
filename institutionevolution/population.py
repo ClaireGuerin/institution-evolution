@@ -156,14 +156,14 @@ class Population(object):
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[deme].meanPhenotypes[phen] = self.specialdivision(self.demes[deme].totalPhenotypes[phen], self.demes[deme].demography)
 
-	def lifecycle(self, **kwargs, seed):
+	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
 		self.clearDemePhenotypeAndSizeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
 		self.update()
 		logging.info("reproduction")
-		self.populationReproduction(seed, **kwargs)
+		self.populationReproduction(**kwargs)
 		
 	def runSimulation(self, outputfile):
 		kwargs = self.fitnessParameters
