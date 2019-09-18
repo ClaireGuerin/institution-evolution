@@ -67,6 +67,33 @@ class TestPopulation(object):
 		if not hasattr(self.fakepop, "fitnessMethod"):
 			 for key in ["fb", "b", "c", "gamma"]:
 					assert key in self.fakepop.fitnessParameters, "PGG parameter {0} not provided".format(key)
-			
+
+	def test_simulation_stops_if_population_extinct(self):
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.numberOfGenerations = 10
+
+		self.fakepop.fitnessParameters["fb"] = 0.0001 # to make the population die out
+
+		self.fakepop.createAndPopulateDemes()
+		assert self.fakepop.demography == self.fakepop.numberOfDemes * self.fakepop.initialDemeSize
 		
-		
+		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
+		assert self.fakepop.demography == 0
+		assert self.fakepop.individuals == []
+
+		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
+		assert self.fakepop.demography == 0
+		assert self.fakepop.individuals == []
+
+		for deme in self.fakepop.demes:
+			#assert deme.demography == 0
+			#assert deme.totalPhenotypes == []
+			assert deme.meanPhenotypes == [None]
+
+		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
+		assert self.fakepop.demography == 0
+		assert self.fakepop.individuals == []
+
+	def test_update_function(self):
+		assert False, "Write this test to make sure the mean is calculated well!!"

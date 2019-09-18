@@ -117,16 +117,25 @@ class Population(object):
 	def populationReproduction(self, seed=None, **kwargs):
 		random.seed(seed)
 		self.offspring = []
+		testdemog = 0
 
 		for ind in self.individuals:
 			# REPRODUCTION
 			kwargs["n"] = self.demes[ind.currentDeme].demography
 			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			kwargs["x"] = ind.phenotypicValues
+
+			assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
+			assert kwargs["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
+			assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, kwargs["x"])
+			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography)
+
 			ind.reproduce(self.fit_fun, **kwargs)
 			self.offspring += ind.offspring
+			testdemog += ind.offspringNumber
 
 		self.individuals = self.offspring
+		assert len(self.offspring) == testdemog
 		self.demography = len(self.offspring)
 
 	def clearDemePhenotypeAndSizeInfo(self):
@@ -135,8 +144,6 @@ class Population(object):
 			self.demes[deme].demography = 0
 
 	def populationMutationMigration(self):
-		updateDemeSizes = [0] * self.numberOfDemes
-		#updateDemePhenotypes = [[[]] * self.numberOfPhenotypes] * self.numberOfDemes
 
 		for ind in self.individuals:
 			# MUTATION
@@ -146,6 +153,7 @@ class Population(object):
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
 
 			# UPDATE
+			assert ind.currentDeme == ind.destinationDeme
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			self.demes[ind.currentDeme].demography += 1
 			for phen in range(self.numberOfPhenotypes):
