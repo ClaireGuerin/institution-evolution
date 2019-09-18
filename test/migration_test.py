@@ -145,8 +145,9 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
-		updateDemeSize, updateDemePhenotype = self.fakepop.populationMutationMigration()
-		self.fakepop.update(upSizes=updateDemeSize, upPhenotypes=updateDemePhenotype)
+		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.update()
 		
 		self.newDemography = []		
 		for ind in self.fakepop.individuals:
@@ -168,3 +169,26 @@ class TestMigrationFunction(object):
 		assert callable(self.fakepop.populationMutationMigration)
 		
 		gc.collect()
+
+	def test_migration_at_population_level_updates_phenotypes(self):
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 2
+		self.fakepop.initialDemeSize = 10
+		self.fakepop.initialPhenotypes = [0.5]
+		self.fakepop.numberOfPhenotypes = 1
+		self.fakepop.mutationRate = 0
+		self.fakepop.migrationRate = 1
+
+		self.fakepop.createAndPopulateDemes()
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				ind.phenotypicValues = [0.2]
+			else:
+				ind.phenotypicValues = [0.8]
+
+		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.populationMutationMigration()
+
+		assert self.fakepop.demes[0].totalPhenotypes[0] == pytest.approx(0.8 * self.fakepop.initialDemeSize)
+		assert self.fakepop.demes[1].totalPhenotypes[0] == pytest.approx(0.2 * self.fakepop.initialDemeSize)

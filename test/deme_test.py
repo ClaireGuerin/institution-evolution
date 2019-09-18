@@ -12,7 +12,7 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes"]
+		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes", "totalPhenotypes"]
 		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
 		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
 		
@@ -50,8 +50,9 @@ class TestDeme(object):
 	def test_deme_mean_phenotype_updated_after_mutation(self, instantiateSingleDemePopulation):
 		self.fakepop = instantiateSingleDemePopulation(100)
 		self.fakepop.migrationRate = 0
-		dsizes, dpheno = self.fakepop.populationMutationMigration()
-		self.fakepop.update(upSizes=dsizes, upPhenotypes=dpheno)
+		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.update()
 		
 		phen = [ind.phenotypicValues[0] for ind in self.fakepop.individuals]
 		
