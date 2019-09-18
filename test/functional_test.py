@@ -95,6 +95,8 @@ class TestSimpleRun(object):
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test.txt'
 		self.population = Pop()
+		self.population.nummberOfDemes = 10
+		self.population.numberOfGenerations = 10
 		self.population.runSimulation(self.out)
 		
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
@@ -106,7 +108,7 @@ class TestSimpleRun(object):
 		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
 		self.nGen = self.attributeValues[self.attributeNames.index('numberOfGenerations')]
 			
-		assert self.lineNumber == self.nGen
+		assert self.lineNumber == self.population.numberOfGenerations
 		
 	def test_program_writes_non_empty_output(self):
 		self.out = 'output_test.txt'
