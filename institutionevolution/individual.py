@@ -54,6 +54,10 @@ class Individual(object):
 			self.offspring.append(newOffspringInstance)
 		
 	def fertility(self, fun_name="pgg", **kwargs):
+		assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(self.currentDeme, kwargs["n"])
+		assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(self.currentDeme, kwargs["x"])
+		assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} is {1}".format(self.currentDeme, kwargs["xmean"])
+
 		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
 		
 	def procreate(self):
