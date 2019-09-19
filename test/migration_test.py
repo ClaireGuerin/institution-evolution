@@ -7,6 +7,7 @@ from operator import add
 import random
 from statistics import mean
 import gc
+from collections import Counter
 
 class TestMigrationFunction(object):
 	
@@ -41,57 +42,73 @@ class TestMigrationFunction(object):
 			assert type(ind.migrant) is bool, "Migrant must be a boolean"	
 			
 		gc.collect()
-		
-	def test_migrants_are_drawn_from_binomial(self, instantiateSingleDemePopulation):
-		random.seed(30)
+
+	def test_migrants_are_drawn_equally_depending_on_seed(self):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
-		self.nd = self.fakepop.numberOfDemes
-		self.fakepop.createAndPopulateDemes(self.nd, self.individualsPerDeme)
-		
-		self.meanpvals = []
-		self.distripvals = []
-		self.allcounts = []
-		self.countMigrantsInEachDeme = [0] * self.nd
-		
+		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+
+		self.migrants = []
+
 		for ind in self.fakepop.individuals:
-			originalDeme = ind.currentDeme
-			ind.migrate(nDemes=self.nd, migRate=self.fakepop.migrationRate)
-			if ind.migrant:
-				self.countMigrantsInEachDeme[originalDeme] += 1
-					
-		for deme in range(self.nd):
-			migrantCount = self.countMigrantsInEachDeme[deme]
+			# pseudorandom
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=0)
+			self.migrants.append(ind.migrant)
+
+		assert all(self.migrants) or not any(self.migrants), "Migration values differ for same seed resetting: {0}".format(set(self.migrants))
+
+		gc.collect()
+
+	def test_migrants_are_drawn_from_binomial(self, pseudorandom):
+		self.individualsPerDeme = 1000
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		
+		i = 0			
+		for deme in range(self.fakepop.numberOfDemes):
+			migrantsCount = 0
+			for ind in range(self.individualsPerDeme):
+				indiv = self.fakepop.individuals[ind]
+				originalDeme = indiv.currentDeme
+				pseudorandom(0)
+				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=ind)
+				if indiv.migrant:
+					migrantsCount += 1
+				i += 1
 			
-			stat1, pval1 = scistats.ttest_1samp([1] * migrantCount + [0] * (self.individualsPerDeme - migrantCount), self.fakepop.migrationRate)
-			self.meanpvals.append(pval1)
+			stat1, pval1 = scistats.ttest_1samp([1] * migrantsCount + [0] * (self.individualsPerDeme - migrantsCount), self.fakepop.migrationRate)
+			test = scistats.binom_test(x=migrantsCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
 			
-			test = scistats.binom_test(x=migrantCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
-			self.distripvals.append(test)
-			
-			self.allcounts.append(migrantCount)
-			
-		assert sum([x > 0.05 for x in self.meanpvals]) >= len(self.meanpvals)-1, "T-test mean failed. Observed: {0}, Expected: {1}".format(mean(self.allcounts)/self.individualsPerDeme, self.fakepop.migrationRate)
-		assert sum([x > 0.05 for x in self.distripvals]) >= len(self.distripvals)-1, "Success rate = {0} when mutation rate = {1}".format(mean(self.allcounts)/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert pval1 > 0.05, "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert test > 0.05, "Success rate = {0} when mutation rate = {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 		
 		gc.collect()
 	
-	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, instantiateSingleIndividualsDemes):
-		random.seed(30)
+	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, pseudorandom, instantiateSingleIndividualsDemes):
+		pseudorandom(0)
 		self.fakepop = Pop()
-		self.numberOfDemes = 10
-		self.initialDemeSize = 100
-		self.fakepop.createAndPopulateDemes()
+		self.ds = 100
+		self.nd = 10
+		self.fakepop.createAndPopulateDemes(nDemes=self.nd, dSize=self.ds)
 		
 		destinations = []
 		
-		for ind in self.fakepop.individuals:
-			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1)
-			destinations.append(ind.destinationDeme)
-			
-		test, pval = scistats.kstest(destinations, scistats.randint.cdf, args=(0, self.numberOfDemes))
-		assert pval > 0.05, "Migrants destinations are not equally likely (distribution non uniform)"
-		
+		for ind in range(self.fakepop.demography):
+			indiv = self.fakepop.individuals[ind]
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1, rds=10 * ind)
+			destinations.append(indiv.destinationDeme)
+
+		observedCountUnsorted = Counter(destinations)
+		observedCount = []
+		for key, val in sorted(observedCountUnsorted.items()):
+			observedCount.append(val)
+
+		expectedCount = [self.ds for i in range(self.nd)]
+
+		chisq, pval = scistats.chisquare(observedCount, expectedCount)
+		assert len(expectedCount) == len(observedCount), "len obs = {0}, len exp = {1}".format(len(observedCount), len(expectedCount))
+		assert pval > 0.05, "Test for goodness of fit failed: obs = {0}, exp = {1}".format(observedCount, expectedCount)
+				
 		gc.collect()
 			
 	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
