@@ -77,7 +77,51 @@ class TestPopulation(object):
 
 		self.fakepop.createAndPopulateDemes()
 		assert self.fakepop.demography == self.fakepop.numberOfDemes * self.fakepop.initialDemeSize
-		
+
+	def test_population_mutation_updates_individual_phenotypes(self):
+		self.fakepop = Pop()
+		self.fakepop.numberOfDemes = 2
+		self.fakepop.initialDemeSize = 50
+		self.fakepop.migrationRate = 0
+		self.fakepop.mutationRate = 1
+		# the two following lines are very important so that the test does not fail at the boundaries, 
+		# e.g. if phen = 0 and dev < 0, mutated phenotype will still be 0
+		self.fakepop.initialPhenotypes = [0.5] 
+		self.fakepop.numberOfPhenotypes = 1
+
+		self.fakepop.createAndPopulateDemes(nDemes=self.fakepop.numberOfDemes, dSize=self.fakepop.initialDemeSize)
+
+		origPhenDeme0 = []
+		origPhenDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				origPhenDeme0.append(ind.phenotypicValues[0])
+			elif ind.currentDeme == 1:
+				origPhenDeme1.append(ind.phenotypicValues[0])
+
+		dsizes, dpheno = self.fakepop.populationMutationMigration()
+
+		phenDeme0 = []
+		devDeme0 = []
+		phenDeme1 = []
+		devDeme1 = []
+
+		for ind in self.fakepop.individuals:
+			if ind.currentDeme == 0:
+				phenDeme0.append(ind.phenotypicValues[0])
+				devDeme0.append(ind.mutationDeviation[0])
+			elif ind.currentDeme == 1:
+				phenDeme1.append(ind.phenotypicValues[0])
+				devDeme1.append(ind.mutationDeviation[0])
+
+		assert len(origPhenDeme0) == len(phenDeme0), "Number of individuals in deme 0 have changed from {0} to {1} after mutation".format(len(origPhenDeme0), len(phenDeme0))
+		assert len(origPhenDeme1) == len(phenDeme1), "Number of individuals in deme 1 have changed from {0} to {1} after mutation".format(len(origPhenDeme1), len(phenDeme1))
+
+		for i in range(self.fakepop.initialDemeSize):
+			assert origPhenDeme0[i] != phenDeme0[i], "Individual {0} in deme 0 mutated from {1} to {2} when deviation was supposed to be {3}".format(i, origPhenDeme0[i], phenDeme0[i], devDeme0[i])
+			assert origPhenDeme1[i] != phenDeme1[i], "Individual {0} in deme 1 mutated from {1} to {2} when deviation was supposed to be {3}".format(i, origPhenDeme1[i], phenDeme1[i], devDeme1[i])
+			
 		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
 		assert self.fakepop.demography == 0
 		assert self.fakepop.individuals == []

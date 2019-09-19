@@ -20,7 +20,7 @@ for i in range(9):
 big_toc = perf_counter()
 print("Ran 9 simulations in {0} seconds".format(big_toc - big_tic))
 
-# THIS CODE IS TO RUN A SINGLE SIMULATION
+## THIS CODE IS TO RUN A SINGLE SIMULATION
 
 #singlerun = Pop()
 #tic = perf_counter()
