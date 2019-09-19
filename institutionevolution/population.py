@@ -6,6 +6,7 @@ from institutionevolution.individual import Individual as Ind
 import institutionevolution.fitness as fitness
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
+import random
 
 class Population(object):
 	
@@ -113,18 +114,28 @@ class Population(object):
 	# 		tmpvar = total / samplelength
 
 
-	def populationReproduction(self, **kwargs):
+	def populationReproduction(self, seed=None, **kwargs):
+		random.seed(seed)
 		self.offspring = []
+		testdemog = 0
 
 		for ind in self.individuals:
 			# REPRODUCTION
 			kwargs["n"] = self.demes[ind.currentDeme].demography
 			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			kwargs["x"] = ind.phenotypicValues
+
+			assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
+			assert kwargs["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
+			assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, kwargs["x"])
+			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
+
 			ind.reproduce(self.fit_fun, **kwargs)
 			self.offspring += ind.offspring
+			testdemog += ind.offspringNumber
 
 		self.individuals = self.offspring
+		assert len(self.offspring) == testdemog
 		self.demography = len(self.offspring)
 
 	def clearDemePhenotypeAndSizeInfo(self):
@@ -133,8 +144,6 @@ class Population(object):
 			self.demes[deme].demography = 0
 
 	def populationMutationMigration(self):
-		updateDemeSizes = [0] * self.numberOfDemes
-		#updateDemePhenotypes = [[[]] * self.numberOfPhenotypes] * self.numberOfDemes
 
 		for ind in self.individuals:
 			# MUTATION
@@ -142,15 +151,22 @@ class Population(object):
 			
 			# MIGRATION
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
+
+			# UPDATE
+			assert ind.currentDeme == ind.destinationDeme
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			self.demes[ind.currentDeme].demography += 1
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 
 	def update(self):
-		for deme in range(self.numberOfDemes):
+		for deme in self.demes:
+			meanphen = []
 			for phen in range(self.numberOfPhenotypes):
-				self.demes[deme].meanPhenotypes[phen] = self.specialdivision(self.demes[deme].totalPhenotypes[phen], self.demes[deme].demography)
+				calculateMean = self.specialdivision(deme.totalPhenotypes[phen], deme.demography)
+				meanphen.append(calculateMean) 
+
+			setattr(deme, "meanPhenotypes", meanphen)
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
