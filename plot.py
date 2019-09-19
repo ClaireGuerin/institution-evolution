@@ -6,14 +6,14 @@ import csv
 import os
 
 dirpath = os.getcwd()
-time = range(0,5000)
+time = range(0,20000)
 
 meancoop = []
 varcoop = []
 
 for i in range(9):
 	dispersal = (i + 1) / 10
-	fileslist = glob.glob('{0}/res/out-d{1}*'.format(dirpath,dispersal))
+	fileslist = glob.glob('{0}/res/test/out-d{1}*'.format(dirpath,dispersal))
 
 	fig = plt.figure(figsize=(20,10))
 	ax1 = fig.add_subplot(111)
@@ -37,8 +37,8 @@ for i in range(9):
 	plt.ylim(0,1)
 	plt.title('Simulation, dispersal={0}'.format(dispersal))
 	plt.legend()
-	plt.savefig('plot-d{0}.png'.format(dispersal), dpi=300, bbox_inches='tight')
-	plt.show()
+	plt.savefig('{0}/res/figures/test/plot-d{1}.png'.format(dirpath,dispersal), dpi=300, bbox_inches='tight')
+	#plt.show()
 
 	meancoop.append(mean(dispcoopmean))
 	varcoop.append(mean(dispcoopvar))
