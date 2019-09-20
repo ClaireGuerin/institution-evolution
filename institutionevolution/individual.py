@@ -26,7 +26,7 @@ class Individual(object):
 	def applyMutation(self, dev):
 		phen = self.phenotypicValues
 		unboundedphen = list(map(add, phen, dev))
-		boundedphen = list(map(lambda x: min(max(x,float(0)),float(1)), unboundedphen))
+		boundedphen = list(map(lambda x: min(max(x,0.0),1.0), unboundedphen))
 		self.unboundedPhenotypicValues = unboundedphen
 		setattr(self, "phenotypicValues", boundedphen)
 		
