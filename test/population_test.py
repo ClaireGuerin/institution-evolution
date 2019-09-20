@@ -122,29 +122,11 @@ class TestPopulation(object):
 		for i in range(self.fakepop.initialDemeSize):
 			assert origPhenDeme0[i] != phenDeme0[i], "Individual {0} in deme 0 mutated from {1} to {2} when deviation was supposed to be {3}".format(i, origPhenDeme0[i], phenDeme0[i], devDeme0[i])
 			assert origPhenDeme1[i] != phenDeme1[i], "Individual {0} in deme 1 mutated from {1} to {2} when deviation was supposed to be {3}".format(i, origPhenDeme1[i], phenDeme1[i], devDeme1[i])
-			
-		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
-		assert self.fakepop.demography == 0
-		assert self.fakepop.individuals == []
-
-		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
-		assert self.fakepop.demography == 0
-		assert self.fakepop.individuals == []
-
-		for deme in self.fakepop.demes:
-			#assert deme.demography == 0
-			#assert deme.totalPhenotypes == []
-			assert deme.meanPhenotypes == [None]
-
-		self.fakepop.lifecycle(**self.fakepop.fitnessParameters)
-		assert self.fakepop.demography == 0
-		assert self.fakepop.individuals == []
-
+		
 	def test_update_function(self):
 		self.fakepop = Pop()
 		self.fakepop.numberOfDemes = 2
 
-		self.fakepop.fitnessParameters["fb"] = 0.0001 # to make the population die out
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.populationMutationMigration()
 
