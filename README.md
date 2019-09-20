@@ -31,4 +31,8 @@ Set parameters as desired in *pars* folder:
 	- number of generations (iterations) to run.
 
 ## Command line
-python script.py
+### Run a single simulation
+python script_single_simulation.py
+
+### Test parameter space
+python script_parameter_space.py
