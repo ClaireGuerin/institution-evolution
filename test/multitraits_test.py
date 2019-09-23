@@ -60,8 +60,8 @@ class TestMultipleTraits(object):
 	def test_stabilizing_selection_fitness_function_gives_correct_fertility_value(self, instantiateSingleIndividualPopulation):
 		self.indiv = instantiateSingleIndividualPopulation
 		self.ntraits = 4
-		self.indiv.phenotypicValues = [1] * self.ntraits
-		kwargs = {"fb": 2, "x": self.indiv.phenotypicValues, "gamma": 0.07, "n": 20}
+		self.indiv.phenotypicValues = [1.0] * self.ntraits
+		kwargs = {"fb":2, "x":self.indiv.phenotypicValues, "xmean":[0.2] * self.ntraits, "gamma":0.07, "n":20}
 		expected = kwargs["fb"] * exp(-sqrt(sum([x ** 2 for x in self.indiv.phenotypicValues]))) / (1 + kwargs["gamma"] * kwargs["n"])
 		self.indiv.fertility(fun_name='geom', **kwargs)
 
