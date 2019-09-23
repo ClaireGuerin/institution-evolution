@@ -150,7 +150,9 @@ class TestMutationFunction(object):
 		
 		self.trueMutant.mutate(mutRate=1, mutStep=0.05)
 		assert type(self.oldPhenTrueMutant) is list and type(self.trueMutant.mutationDeviation) is list, "Check that both {0} and {1} are lists".format(self.oldPhenTrueMutant, self.trueMutant.mutationDeviation)
-		assert all([x + y == z for x, y, z in zip(self.oldPhenTrueMutant, self.trueMutant.mutationDeviation, self.trueMutant.phenotypicValues)]), "Deviation not added to mutant phenotype!"
+		
+		for i in range(len(self.oldPhenTrueMutant)):
+			assert min(1, max(0, self.oldPhenTrueMutant[i] + self.trueMutant.mutationDeviation[i])) == pytest.approx(self.trueMutant.phenotypicValues[i]), "Deviation not added to mutant phenotype no {0}: returns {1} instead of {2}!".format(i, self.trueMutant.phenotypicValues[i], self.oldPhenTrueMutant[i] + self.trueMutant.mutationDeviation[i])
 		
 		# WHEN THERE IS NO MUTATION
 		self.falseMutant = self.fakepop.individuals[1]

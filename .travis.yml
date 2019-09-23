@@ -5,6 +5,7 @@ branches:
   - reproduction-feature
   - automation-feature
   - hotfix-1.0.1
+  - multitraits-feature
 
 # safelist
 branches:
