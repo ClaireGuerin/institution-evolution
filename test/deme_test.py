@@ -92,3 +92,11 @@ class TestDeme(object):
 		
 		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "deme 0: mean returned by pop mut func not mean of all indivs in deme"
 		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"
+
+	def test_deme_public_good_calculated_from_cooperation(self):
+		self.fakepop = Pop()
+		self.fakepop.createAndPopulateDemes(10, 2)
+		
+		for dem in self.fakepop.demes:
+			assert dem.publicGood is not None, "Deme public good not calculated"
+			assert dem.publicGood == dem.demography * self.fakepop.initialPhenotypes[0] * self.fakepop.individualResources, "Deme public good has wrong value"
