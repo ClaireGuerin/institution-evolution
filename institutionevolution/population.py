@@ -144,10 +144,11 @@ class Population(object):
 		assert len(self.individuals) == testdemog
 		self.demography = len(self.offspring)
 
-	def clearDemePhenotypeAndSizeInfo(self):
+	def clearDemeInfo(self):
 		for deme in range(self.numberOfDemes):
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
+			self.demes[deme].publicGood = 0
 
 	def populationMutationMigration(self):
 
@@ -161,7 +162,11 @@ class Population(object):
 			# UPDATE
 			assert ind.currentDeme == ind.destinationDeme
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
+			## demography
 			self.demes[ind.currentDeme].demography += 1
+			## public good
+			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
+			## total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 
@@ -176,7 +181,7 @@ class Population(object):
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
-		self.clearDemePhenotypeAndSizeInfo()
+		self.clearDemeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
 		self.update()

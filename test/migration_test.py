@@ -145,7 +145,7 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 		self.fakepop.update()
 		
@@ -187,7 +187,7 @@ class TestMigrationFunction(object):
 			else:
 				ind.phenotypicValues = [0.8]
 
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 
 		assert self.fakepop.demes[0].totalPhenotypes[0] == pytest.approx(0.8 * self.fakepop.initialDemeSize)

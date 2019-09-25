@@ -100,7 +100,7 @@ class TestPopulation(object):
 			elif ind.currentDeme == 1:
 				origPhenDeme1.append(ind.phenotypicValues[0])
 
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 
 		phenDeme0 = []
