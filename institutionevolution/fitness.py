@@ -8,6 +8,10 @@ def geom(res, **kwargs):
 	f = float(kwargs["fb"] * exp(-sqrt(sum([x ** 2 for x in kwargs["x"]]))) / (1 + kwargs["gamma"] * kwargs["n"]))
 	return f
 
+def policing(res, **kwargs):
+	f = 1
+	return f
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

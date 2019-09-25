@@ -4,13 +4,18 @@ from institutionevolution.individual import Individual as Ind
 import random as rd
 import numpy.random as np
 
-fitpardict = {"x": [0.5],
+fitpardict = {'pgg': {"x": [0.5],
 			  "xmean": [0.2], 
 			  "fb": 2, 
 			  "b": 0.5,
 			  "c": 0.05, 
 			  "gamma": 0.01,
-			  "n": 10}
+			  "n": 10},
+			  'policing': {"x": [0.5, 0.2],
+			  "xmean": [0.2, 0.5],
+			  "fb": 2,
+			  "gamma": 0.01,
+			  "n": 10}}
 
 @pytest.fixture
 def pseudorandom():
@@ -106,27 +111,34 @@ def objectAttributesAreNotNone():
 
 @pytest.fixture
 def pggParameters():
-	return fitpardict
+	return fitpardict['pgg']
 
 @pytest.fixture
 def makePopulationReproduce():
-	fakepop = Pop(10)
-	fakepop.numberOfDemes = 1
-	fakepop.initialDemeSize = 10
-	fakepop.fitnessParameters = fitpardict
-	fakepop.fit_fun = 'pgg'
-	fakepop.mutationRate = 0
-	fakepop.migrationRate = 0
-	fakepop.createAndPopulateDemes()
-	for i in range(fakepop.demography):
-		fakepop.individuals[i].resourcesAmount = i * 2
-	parents = fakepop.individuals
-	
-	for ind in range(len(parents)):
-		indiv = fakepop.individuals[ind]
-		indiv.resourcesAmount = ind * 2
-	
-	fakepop.populationReproduction(**fakepop.fitnessParameters)
-	
-	return (fakepop, parents)
+	def _foo(fitfun='pgg'):
+		fakepop = Pop()
+		fakepop.numberOfDemes = 1
+		fakepop.initialDemeSize = 10
+		fakepop.fitnessParameters = fitpardict[fitfun]
+		fakepop.fit_fun = fitfun
+		fakepop.mutationRate = 0
+		fakepop.migrationRate = 0
+		fakepop.createAndPopulateDemes()
+		for i in range(fakepop.demography):
+			fakepop.individuals[i].resourcesAmount = i * 2
+		parents = fakepop.individuals
+		
+		for ind in range(len(parents)):
+			indiv = fakepop.individuals[ind]
+			indiv.resourcesAmount = ind * 2
+		
+		fakepop.populationReproduction(**fakepop.fitnessParameters)
+		return (fakepop, parents)
+	return _foo
+
+@pytest.fixture
+def getFitnessParameters():
+	def _foo(fitfun='pgg'):
+		return fitpardict[fitfun]
+	return _foo
 	

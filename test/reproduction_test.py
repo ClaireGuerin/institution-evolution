@@ -162,25 +162,33 @@ class TestReproductionFunction(object):
 				assert offspring.phenotypicValues == indiv.phenotypicValues, "Offspring does not inherit parent's phenotype: {0} instead of {1}".format(offspring.phenotypicValues, indiv.phenotypicValues)
 		
 	def test_offspring_are_added_to_the_population(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert hasattr(self.fakepop, "offspring"), "No individual instances created in the population"
 		
 	def test_parents_are_replaced_by_offspring_in_population(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert self.fakepop.individuals != self.parents, "Population not updated"
 		assert self.fakepop.individuals == self.fakepop.offspring, "Population not updated correctly"
 		
 	def test_deme_demography_is_updated(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert self.fakepop.demography == len(self.fakepop.individuals), "Population demography not updated"
 		
-	
+	#def test_technology_influences_resources(self):
+		#assert False, "Write this test!"
 
+	def test_policing_function_returns_right_value(self, getFitnessParameters):
+		pars = getFitnessParameters('policing')
+		reproductiveValue = fitness.functions['policing'](1, **pars)
 
-			
-			
-		
-	
+		assert reproductiveValue is not None, "Fitness function with policing returns None"
+
+	def test_policing(self, instantiateSingleIndividualPopulation, getFitnessParameters):
+		self.indiv = instantiateSingleIndividualPopulation
+		fitnessfunction = 'policing'
+
+		self.indiv.reproduce(fitnessfunction, **getFitnessParameters(fitnessfunction))
+
