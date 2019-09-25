@@ -80,6 +80,11 @@ class Population(object):
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
+
+	def publicGood(self):
+		for individual in self.individuals:
+			self.demes[individual.currentDeme].publicGood += individual.phenotypicValues[0] * individual.resourcesAmount
+
 			
 	def identifyNeighbours(self, nd, demeID):
 		tmp = list(range(nd))
@@ -134,8 +139,9 @@ class Population(object):
 			self.offspring += ind.offspring
 			testdemog += ind.offspringNumber
 
-		self.individuals = self.offspring
 		assert len(self.offspring) == testdemog
+		self.individuals = self.offspring
+		assert len(self.individuals) == testdemog
 		self.demography = len(self.offspring)
 
 	def clearDemePhenotypeAndSizeInfo(self):

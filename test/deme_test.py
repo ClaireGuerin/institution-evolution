@@ -91,4 +91,4 @@ class TestDeme(object):
 				i1 +=1
 		
 		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "deme 0: mean returned by pop mut func not mean of all indivs in deme"
-		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"		
+		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"

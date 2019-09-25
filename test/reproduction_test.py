@@ -180,15 +180,3 @@ class TestReproductionFunction(object):
 	#def test_technology_influences_resources(self):
 		#assert False, "Write this test!"
 
-	def test_policing_function_returns_right_value(self, getFitnessParameters):
-		pars = getFitnessParameters('policing')
-		reproductiveValue = fitness.functions['policing'](1, **pars)
-
-		assert reproductiveValue is not None, "Fitness function with policing returns None"
-
-	def test_policing(self, instantiateSingleIndividualPopulation, getFitnessParameters):
-		self.indiv = instantiateSingleIndividualPopulation
-		fitnessfunction = 'policing'
-
-		self.indiv.reproduce(fitnessfunction, **getFitnessParameters(fitnessfunction))
-

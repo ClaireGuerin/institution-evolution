@@ -9,7 +9,7 @@ def geom(res, **kwargs):
 	return f
 
 def policing(res, **kwargs):
-	f = 1
+	f = float(1)
 	return f
 
 functions = {}
