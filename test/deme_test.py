@@ -97,6 +97,11 @@ class TestDeme(object):
 		self.fakepop = Pop()
 		self.fakepop.initialDemeSize = 2
 		self.fakepop.numberOfDemes = 10
+		self.fakepop.initialPhenotypes = [0.5]
+		self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
+		self.fakepop.individualResources = 2
+		self.fakepop.mutationRate = 0
+		self.fakepop.migrationRate = 0
 		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.fakepop.initialDemeSize)
 
 		expectedPG = self.fakepop.initialDemeSize * self.fakepop.initialPhenotypes[0] * self.fakepop.individualResources
