@@ -9,7 +9,14 @@ def geom(res, **kwargs):
 	return f
 
 def policing(res, **kwargs):
-	f = float(3.5)
+	ipg = kwargs["pg"] / kwargs["n"] # individual's share of the public good
+	phen = kwargs["x"]
+	cooperationCost = (1 - phen[0]) * res
+	cooperationGain = kwargs["b"] * (1 - phen[1]) * ipg
+	policing = kwargs["c"] * phen[1] * ipg * ((1 - phen[0]) ** 2)
+	payoff =  cooperationCost + cooperationGain - policing
+	
+	f = float(kwargs["fb"] * payoff / (kwargs["gamma"] * kwargs["n"]))
 	return f
 
 functions = {}

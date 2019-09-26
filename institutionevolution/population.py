@@ -126,16 +126,17 @@ class Population(object):
 
 		for ind in self.individuals:
 			# REPRODUCTION
-			kwargs["n"] = self.demes[ind.currentDeme].demography
-			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
-			kwargs["x"] = ind.phenotypicValues
+			infoToAdd = {}
+			infoToAdd["n"] = self.demes[ind.currentDeme].demography
+			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+			infoToAdd["x"] = ind.phenotypicValues
 
-			assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
-			assert kwargs["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
-			assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, kwargs["x"])
-			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
+			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
+			assert type(infoToAdd["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, infoToAdd["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
 
-			ind.reproduce(self.fit_fun, **kwargs)
+			ind.reproduce(self.fit_fun, **{**kwargs, **infoToAdd})
 			self.offspring += ind.offspring
 			testdemog += ind.offspringNumber
 
@@ -189,7 +190,6 @@ class Population(object):
 		self.populationReproduction(**kwargs)
 		
 	def runSimulation(self, outputfile):
-		kwargs = self.fitnessParameters
 		
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
@@ -201,7 +201,7 @@ class Population(object):
 			with open('{0}/{1}'.format(self.pathToOutputFolder, outputfile), "w") as f:
 				for gen in range(self.numberOfGenerations):
 					logging.info(f'Running generation {gen}')
-					self.lifecycle(**kwargs)
+					self.lifecycle(**self.fitnessParameters)
 
 					phenmeans = []
 

@@ -128,6 +128,7 @@ class TestPopulation(object):
 		self.fakepop.numberOfDemes = 2
 
 		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 
 		demogdeme0 = self.fakepop.demes[0].demography
