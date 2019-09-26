@@ -198,8 +198,11 @@ class Population(object):
 			self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder)
+
+			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
+			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
 			
-			with open('{0}/{1}'.format(self.pathToOutputFolder, outputfile), "w") as f:
+			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd:
 				for gen in range(self.numberOfGenerations):
 					logging.info(f'Running generation {gen}')
 					self.lifecycle(**self.fitnessParameters)
@@ -213,7 +216,8 @@ class Population(object):
 						phenmeans.append(str(round(tmpMean, 3)))
 
 					sep = ','
-					f.write('{0}\n'.format(sep.join(phenmeans)))
+					fp.write('{0}\n'.format(sep.join(phenmeans)))
+					fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

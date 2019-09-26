@@ -1,5 +1,6 @@
 import pytest
 import os
+import glob
 import institutionevolution.filemanip as fman
 from institutionevolution.population import Population as Pop
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
@@ -93,42 +94,54 @@ class TestSimpleRun(object):
 		testVal, attributes, expected, observed = objectAttributesValues(self.population, self.attributeNames, self.attributeValues)
 		assert testVal, "Population has {1}={2} instead of {3}".format(attributes, expected, observed)
 		
-	def test_program_writes_output_for_x_generations(self):
+	def test_program_writes_output_for_x_generations(self, runSim):
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
-		self.out = 'output_test.txt'
-		self.population = Pop()
-		self.population.nummberOfDemes = 2
-		self.population.initialDemeSize = 1
-		self.population.numberOfGenerations = 5
-		self.population.runSimulation(self.out)
-		
+		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
-		with open(self.outputFile) as f:
-			self.lineNumber = len(f.readlines())
+		ngen = runSim(self.out)
+		
+		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
+			self.lineNumberfp = len(fp.readlines())
+			self.lineNumberfd = len(fd.readlines())
 			
 		#self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
 		#self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		#self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int) 
 			
-		assert self.lineNumber == self.population.numberOfGenerations
+		assert self.lineNumberfp == ngen
+		assert self.lineNumberfp == ngen
 
-		os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
-		
-	def test_program_writes_non_empty_output(self):
-		self.out = 'output_test.txt'
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
+
+	def test_program_writes_non_empty_output(self, runSim):
+		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
-		self.population = Pop()
-		self.population.nummberOfDemes = 2
-		self.population.initialDemeSize = 1
-		self.population.numberOfGenerations = 5
-		self.population.runSimulation(self.out)
+		runSim(self.out)
 
-		with open(self.outputFile) as f:
-			self.res = [len(line.strip()) for line in f.readlines()]
+		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
+			self.resfp = [len(line.strip()) for line in fp.readlines()]
+			self.resfd = [len(line.strip()) for line in fd.readlines()]
 			
-		assert sum(self.res) > 0
+		assert sum(self.resfp) > 0
+		assert sum(self.resfd) > 0
 
-		os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
+
+	# She goes to the output folder and sees that two files have been written by the program, one with the mean phenotypes and the other with the mean deme size
+	def test_program_writes_phenotypes_and_deme_sizes(self, runSim):
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		runSim(self.out)
+
+		allOutput = glob.glob(self.outputFile + '*.txt')
+		assert len(allOutput) == 2, f"did not find output files with pattern: {self.outputFile + '*.txt'}"
+		assert self.outputFile + '_phenotypes.txt' in allOutput, f"did not find phenotypes output file in {allOutput}"
+		assert self.outputFile + '_demography.txt' in allOutput, f"did not find demography output file in {allOutput}"
+
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
 		
 		# Satisfied, she goes to sleep.

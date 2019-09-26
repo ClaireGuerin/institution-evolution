@@ -145,3 +145,13 @@ def getFitnessParameters():
 		return fitpardict[fitfun]
 	return _foo
 	
+@pytest.fixture
+def runSim():
+	def _foo(outputfile):
+		population = Pop()
+		population.numberOfDemes = 2
+		population.initialDemeSize = 1
+		population.numberOfGenerations = 5
+		population.runSimulation(outputfile)
+		return population.numberOfGenerations
+	return _foo
