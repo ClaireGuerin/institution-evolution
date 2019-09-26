@@ -129,6 +129,7 @@ class Population(object):
 			infoToAdd = {}
 			infoToAdd["n"] = self.demes[ind.currentDeme].demography
 			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
 			infoToAdd["x"] = ind.phenotypicValues
 
 			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])

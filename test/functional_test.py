@@ -63,6 +63,7 @@ class TestSimpleRun(object):
 			assert str(e) == 'This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1', "Explain why the program fails!, not '{0}'".format(e)
 		else:
 			assert False, "You cannot let people run simulations on well-mixed populations (only {0} deme)!".format(self.population.numberOfDemes)
+			os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 			
 	# She then changes the number of demes so that the population is structured into multiple demes.
 	# Unfortunately, she asks the program to run a simulation with a 'gibberish' fitness function, which is not yet known by the program. The programs tells her to add the function in the fitness function dictionary
@@ -77,6 +78,7 @@ class TestSimpleRun(object):
 			assert str(e).replace("'", "") == 'Fitness function "gibberish" unknown. Add it to the functions in fitness.py', "Explain why the program fails!, not '{0}'".format(e)
 		else:
 			assert False, "The program should return an error message when trying to run simulations with unknown fitness function".format(self.population.numberOfDemes)
+			os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
@@ -96,8 +98,9 @@ class TestSimpleRun(object):
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test.txt'
 		self.population = Pop()
-		self.population.nummberOfDemes = 10
-		self.population.numberOfGenerations = 10
+		self.population.nummberOfDemes = 2
+		self.population.initialDemeSize = 1
+		self.population.numberOfGenerations = 5
 		self.population.runSimulation(self.out)
 		
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
@@ -109,13 +112,23 @@ class TestSimpleRun(object):
 		#self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int) 
 			
 		assert self.lineNumber == self.population.numberOfGenerations
+
+		os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 		
 	def test_program_writes_non_empty_output(self):
 		self.out = 'output_test.txt'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		self.population = Pop()
+		self.population.nummberOfDemes = 2
+		self.population.initialDemeSize = 1
+		self.population.numberOfGenerations = 5
+		self.population.runSimulation(self.out)
+
 		with open(self.outputFile) as f:
 			self.res = [len(line.strip()) for line in f.readlines()]
 			
 		assert sum(self.res) > 0
+
+		os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 		
 		# Satisfied, she goes to sleep.

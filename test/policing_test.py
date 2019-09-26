@@ -135,4 +135,17 @@ class TestPolicingFunction(object):
 
 		gc.collect()
 
+	def test_policing_function_in_population_reproduction(self):
+		self.fakepop = Pop()
+		self.fakepop.fit_fun = 'policing'
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.initialDemeSize = 3
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+
+		try:
+			self.fakepop.populationReproduction(**self.fakepop.fitnessParameters)
+		except Exception as e:
+			assert False, "something went wrong, raised {0}: {1}".format(e.__class__.__name__, str(e))
 

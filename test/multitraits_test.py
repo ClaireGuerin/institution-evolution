@@ -24,8 +24,8 @@ class TestMultipleTraits(object):
 
 		try:
 			self.fakepop.runSimulation('tmptest.txt')
-		except:
-			assert False, "Simulation does not run with multiple traits"
+		except Exception as e:
+			assert False, "Simulation does not run with multiple traits because of {0}: {1}".format(e.__class__.__name__, str(e))
 
 		os.remove('{0}/tmptest.txt'.format(OUTPUT_FOLDER))
 
