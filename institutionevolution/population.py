@@ -210,7 +210,7 @@ class Population(object):
 						tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 						tmpMean = self.specialmean(tmpPhenotypes)
 						# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
-						phenmeans.append(str(tmpMean))
+						phenmeans.append(str(round(tmpMean, 3)))
 
 					sep = ','
 					f.write('{0}\n'.format(sep.join(phenmeans)))
