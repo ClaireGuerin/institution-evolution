@@ -16,6 +16,9 @@ Download the repository *institution-evolution* on your local machine.
 Scipy, Numpy, 
 Pytest to test code 
 
+This code is written under Python 3.7.3
+
+
 ## Parameters
 
 Set parameters as desired in *pars* folder:
