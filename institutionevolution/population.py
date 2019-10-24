@@ -118,7 +118,6 @@ class Population(object):
 	# 			total += (phenotype - samplemean) ** 2
 	# 		tmpvar = total / samplelength
 
-
 	def populationReproduction(self, seed=None, **kwargs):
 		random.seed(seed)
 		self.offspring = []
