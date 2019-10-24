@@ -1,5 +1,6 @@
 import pytest
 import os
+import glob
 import institutionevolution.filemanip as fman
 from institutionevolution.population import Population as Pop
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
@@ -63,6 +64,7 @@ class TestSimpleRun(object):
 			assert str(e) == 'This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1', "Explain why the program fails!, not '{0}'".format(e)
 		else:
 			assert False, "You cannot let people run simulations on well-mixed populations (only {0} deme)!".format(self.population.numberOfDemes)
+			os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 			
 	# She then changes the number of demes so that the population is structured into multiple demes.
 	# Unfortunately, she asks the program to run a simulation with a 'gibberish' fitness function, which is not yet known by the program. The programs tells her to add the function in the fitness function dictionary
@@ -77,6 +79,7 @@ class TestSimpleRun(object):
 			assert str(e).replace("'", "") == 'Fitness function "gibberish" unknown. Add it to the functions in fitness.py', "Explain why the program fails!, not '{0}'".format(e)
 		else:
 			assert False, "The program should return an error message when trying to run simulations with unknown fitness function".format(self.population.numberOfDemes)
+			os.remove('{0}/{1}'.format(OUTPUT_FOLDER, self.out))
 		
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
@@ -91,31 +94,54 @@ class TestSimpleRun(object):
 		testVal, attributes, expected, observed = objectAttributesValues(self.population, self.attributeNames, self.attributeValues)
 		assert testVal, "Population has {1}={2} instead of {3}".format(attributes, expected, observed)
 		
-	def test_program_writes_output_for_x_generations(self):
+	def test_program_writes_output_for_x_generations(self, runSim):
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
-		self.out = 'output_test.txt'
-		self.population = Pop()
-		self.population.nummberOfDemes = 10
-		self.population.numberOfGenerations = 10
-		self.population.runSimulation(self.out)
-		
+		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
-		with open(self.outputFile) as f:
-			self.lineNumber = len(f.readlines())
+		ngen = runSim(self.out)
+		
+		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
+			self.lineNumberfp = len(fp.readlines())
+			self.lineNumberfd = len(fd.readlines())
 			
 		#self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
 		#self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		#self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int) 
 			
-		assert self.lineNumber == self.population.numberOfGenerations
-		
-	def test_program_writes_non_empty_output(self):
-		self.out = 'output_test.txt'
+		assert self.lineNumberfp == ngen
+		assert self.lineNumberfp == ngen
+
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
+
+	def test_program_writes_non_empty_output(self, runSim):
+		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
-		with open(self.outputFile) as f:
-			self.res = [len(line.strip()) for line in f.readlines()]
+		runSim(self.out)
+
+		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
+			self.resfp = [len(line.strip()) for line in fp.readlines()]
+			self.resfd = [len(line.strip()) for line in fd.readlines()]
 			
-		assert sum(self.res) > 0
+		assert sum(self.resfp) > 0
+		assert sum(self.resfd) > 0
+
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
+
+	# She goes to the output folder and sees that two files have been written by the program, one with the mean phenotypes and the other with the mean deme size
+	def test_program_writes_phenotypes_and_deme_sizes(self, runSim):
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		runSim(self.out)
+
+		allOutput = glob.glob(self.outputFile + '*.txt')
+		assert len(allOutput) == 2, f"did not find output files with pattern: {self.outputFile + '*.txt'}"
+		assert self.outputFile + '_phenotypes.txt' in allOutput, f"did not find phenotypes output file in {allOutput}"
+		assert self.outputFile + '_demography.txt' in allOutput, f"did not find demography output file in {allOutput}"
+
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
 		
 		# Satisfied, she goes to sleep.

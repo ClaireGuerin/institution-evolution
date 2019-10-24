@@ -67,7 +67,7 @@ class TestDeme(object):
 			elif ind.currentDeme == 1:
 				origPhenDeme1.append(ind.phenotypicValues[0])
 
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 		self.fakepop.update()
 
@@ -92,3 +92,22 @@ class TestDeme(object):
 		
 		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "deme 0: mean returned by pop mut func not mean of all indivs in deme"
 		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"
+
+	def test_deme_public_good_calculated_from_cooperation(self):
+		self.fakepop = Pop()
+		self.fakepop.initialDemeSize = 2
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.initialPhenotypes = [0.5]
+		self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
+		self.fakepop.individualResources = 2
+		self.fakepop.mutationRate = 0
+		self.fakepop.migrationRate = 0
+		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.fakepop.initialDemeSize)
+
+		expectedPG = self.fakepop.initialDemeSize * self.fakepop.initialPhenotypes[0] * self.fakepop.individualResources
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		
+		for dem in self.fakepop.demes:
+			assert dem.publicGood is not None, "Deme public good not calculated"
+			assert dem.publicGood == expectedPG, "Deme public good has wrong value"

@@ -126,16 +126,18 @@ class Population(object):
 
 		for ind in self.individuals:
 			# REPRODUCTION
-			kwargs["n"] = self.demes[ind.currentDeme].demography
-			kwargs["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
-			kwargs["x"] = ind.phenotypicValues
+			infoToAdd = {}
+			infoToAdd["n"] = self.demes[ind.currentDeme].demography
+			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
+			infoToAdd["x"] = ind.phenotypicValues
 
-			assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
-			assert kwargs["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, kwargs["n"])
-			assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, kwargs["x"])
-			assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, kwargs["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
+			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
+			assert type(infoToAdd["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, infoToAdd["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
 
-			ind.reproduce(self.fit_fun, **kwargs)
+			ind.reproduce(self.fit_fun, **{**kwargs, **infoToAdd})
 			self.offspring += ind.offspring
 			testdemog += ind.offspringNumber
 
@@ -144,10 +146,11 @@ class Population(object):
 		assert len(self.individuals) == testdemog
 		self.demography = len(self.offspring)
 
-	def clearDemePhenotypeAndSizeInfo(self):
+	def clearDemeInfo(self):
 		for deme in range(self.numberOfDemes):
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
+			self.demes[deme].publicGood = 0
 
 	def populationMutationMigration(self):
 
@@ -161,7 +164,11 @@ class Population(object):
 			# UPDATE
 			assert ind.currentDeme == ind.destinationDeme
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
+			## demography
 			self.demes[ind.currentDeme].demography += 1
+			## public good
+			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
+			## total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 
@@ -176,7 +183,7 @@ class Population(object):
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
-		self.clearDemePhenotypeAndSizeInfo()
+		self.clearDemeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
 		self.update()
@@ -184,7 +191,6 @@ class Population(object):
 		self.populationReproduction(**kwargs)
 		
 	def runSimulation(self, outputfile):
-		kwargs = self.fitnessParameters
 		
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
@@ -192,11 +198,14 @@ class Population(object):
 			self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder)
+
+			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
+			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
 			
-			with open('{0}/{1}'.format(self.pathToOutputFolder, outputfile), "w") as f:
+			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd:
 				for gen in range(self.numberOfGenerations):
 					logging.info(f'Running generation {gen}')
-					self.lifecycle(**kwargs)
+					self.lifecycle(**self.fitnessParameters)
 
 					phenmeans = []
 
@@ -204,10 +213,11 @@ class Population(object):
 						tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 						tmpMean = self.specialmean(tmpPhenotypes)
 						# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
-						phenmeans.append(str(tmpMean))
+						phenmeans.append(str(round(tmpMean, 3)))
 
 					sep = ','
-					f.write('{0}\n'.format(sep.join(phenmeans)))
+					fp.write('{0}\n'.format(sep.join(phenmeans)))
+					fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

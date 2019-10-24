@@ -13,7 +13,10 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "n": 10},
 			  'policing': {"x": [0.5, 0.2],
 			  "xmean": [0.2, 0.5],
-			  "fb": 2,
+			  "pg": 2,
+			  "fb": 2, 
+			  "b": 0.5,
+			  "c": 0.05,
 			  "gamma": 0.01,
 			  "n": 10}}
 
@@ -142,3 +145,13 @@ def getFitnessParameters():
 		return fitpardict[fitfun]
 	return _foo
 	
+@pytest.fixture
+def runSim():
+	def _foo(outputfile):
+		population = Pop()
+		population.numberOfDemes = 2
+		population.initialDemeSize = 1
+		population.numberOfGenerations = 5
+		population.runSimulation(outputfile)
+		return population.numberOfGenerations
+	return _foo
