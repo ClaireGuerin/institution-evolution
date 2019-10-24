@@ -7,4 +7,4 @@ class Deme(object):
 		self.neighbours = []
 		self.meanPhenotypes = None
 		self.totalPhenotypes = None
-		
+		self.technologyLevel = None
