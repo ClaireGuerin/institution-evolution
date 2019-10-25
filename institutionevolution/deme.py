@@ -8,3 +8,7 @@ class Deme(object):
 		self.meanPhenotypes = None
 		self.totalPhenotypes = None
 		self.technologyLevel = None
+
+	def technologyGrowth(self):
+		pass
+		#usablePG = (1 - deme.policingCredit) * deme.publicGood + deme.returnedGood
