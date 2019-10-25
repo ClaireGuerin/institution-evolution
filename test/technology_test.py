@@ -13,5 +13,26 @@ class TestTechnology(object):
 		except AttributeError as e:
 			assert False, "Claire stupid you, there is no function to calculate the technology in a deme!"
 
-	def test_deme_technology_not_none(self):
-		pass
+	def test_deme_technology_is_right_format(self):
+		self.fakeDeme = Dem()
+		self.fakeDeme.publicGood = 20
+		self.fakeDeme.meanPhenotypes = [0.5] * 4
+
+		assert self.fakeDeme.technologyLevel is None
+
+		self.fakeDeme.technologyGrowth()
+
+		assert self.fakeDeme.technologyLevel is not None
+		assert type(self.fakeDeme.technologyLevel) is float
+		assert self.fakeDeme.technologyLevel >= 0
+
+	def test_deme_technology_calculation_is_right(self):
+		self.fakeDeme = Dem()
+		self.fakeDeme.publicGood = 20
+		self.fakeDeme.meanPhenotypes = [0.5] * 4
+
+		assert self.fakeDeme.technologyLevel is None 
+
+		self.fakeDeme.technologyGrowth()
+
+		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood *

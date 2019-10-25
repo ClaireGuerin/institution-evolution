@@ -10,5 +10,5 @@ class Deme(object):
 		self.technologyLevel = None
 
 	def technologyGrowth(self):
-		pass
+		self.technologyLevel = 1.0
 		#usablePG = (1 - deme.policingCredit) * deme.publicGood + deme.returnedGood

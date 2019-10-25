@@ -149,3 +149,7 @@ class TestPolicingFunction(object):
 		except Exception as e:
 			assert False, "something went wrong, raised {0}: {1}".format(e.__class__.__name__, str(e))
 
+	def test_deme_has_policing_consensus(self):
+		self.fakeDeme = Dem()
+
+		assert 
