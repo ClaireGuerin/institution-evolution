@@ -8,6 +8,7 @@ class Deme(object):
 		self.meanPhenotypes = None
 		self.totalPhenotypes = None
 		self.technologyLevel = None
+		self.effectivePublicGood = None
 
 	def technologyGrowth(self):
 		self.technologyLevel = 1.0

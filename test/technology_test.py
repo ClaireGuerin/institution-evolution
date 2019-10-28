@@ -26,6 +26,22 @@ class TestTechnology(object):
 		assert type(self.fakeDeme.technologyLevel) is float
 		assert self.fakeDeme.technologyLevel >= 0
 
+	def test_deme_has_effective_public_good_after_policing(self):
+		self.fakeDeme = Dem()
+
+		try:
+			tmp = getattr(self.fakeDeme, "effectivePublicGood")
+		except AttributeError as e:
+			assert False, "where is the effective public good?"
+
+	def test_effective_public_good_of_right_format(self):
+		self.fakeDeme = Dem()
+
+		assert self.fakeDeme.effectivePublicGood is not None
+		assert self.fakeDeme.effectivePublicGood > 0
+		assert type(self.fakeDeme.effectivePublicGood) is float
+
+
 	def test_deme_technology_calculation_is_right(self):
 		self.fakeDeme = Dem()
 		self.fakeDeme.publicGood = 20
@@ -35,4 +51,4 @@ class TestTechnology(object):
 
 		self.fakeDeme.technologyGrowth()
 
-		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood *
+		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood * 
