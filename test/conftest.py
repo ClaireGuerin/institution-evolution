@@ -46,9 +46,11 @@ def instantiateSingleDemePopulation():
 
 @pytest.fixture
 def instantiateSingleIndividualsDemes():
-	def _foo():
+	def _foo(nDemes):
 		fakepop = Pop()
-		fakepop.createAndPopulateDemes(fakepop.numberOfDemes, 1)
+		fakepop.numberOfDemes = nDemes
+		fakepop.initialDemeSize = 1
+		fakepop.createAndPopulateDemes()
 		return fakepop
 	
 	return _foo

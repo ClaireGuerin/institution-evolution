@@ -34,12 +34,17 @@ class TestTechnology(object):
 		except AttributeError as e:
 			assert False, "where is the effective public good?"
 
-	def test_effective_public_good_of_right_format(self):
-		self.fakeDeme = Dem()
+	def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes(2)
+		
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
 
-		assert self.fakeDeme.effectivePublicGood is not None
-		assert self.fakeDeme.effectivePublicGood > 0
-		assert type(self.fakeDeme.effectivePublicGood) is float
+
+		for dem in self.fakepop.demes:
+			assert dem.effectivePublicGood is not None, "No value in the effective public good"
+			assert dem.effectivePublicGood > 0, "Effective public good shouldn't be negative"
+			assert type(dem.effectivePublicGood) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
 
 
 	def test_deme_technology_calculation_is_right(self):
