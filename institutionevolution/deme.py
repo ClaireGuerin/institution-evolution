@@ -9,6 +9,7 @@ class Deme(object):
 		self.totalPhenotypes = None
 		self.technologyLevel = None
 		self.policingConsensus = None
+		self.returnedGoods = None
 		self.effectivePublicGood = None
 
 	def technologyGrowth(self):

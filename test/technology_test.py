@@ -55,6 +55,28 @@ class TestTechnology(object):
 		except AttributeError as e:
 			assert False, str(e)
 
+	# def test_returned_goods_get_calculated_and_in_right_format(self, instantiateSingleIndividualsDemes):
+	# 	self.fakepop = instantiateSingleIndividualsDemes(2)
+		
+	# 	self.fakepop.clearDemeInfo()
+	# 	self.fakepop.populationMutationMigration()
+
+	# 	for dem in self.fakepop.demes:
+	# 		assert dem.returnedGoods is not None, "No value in the effective public good"
+	# 		assert dem.returnedGoods >= 0, "Effective public good shouldn't be negative"
+	# 		assert type(dem.returnedGoods) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
+
+	# 		resources = 0
+
+	# 		for ind in self.fakepop.individuals:
+	# 			if ind.currentDeme == dem:
+	# 				ind.
+
+	# 		assert dem.returnedGoods == 
+
+	def test_individual_returns_resources(self):
+		assert False, "Write this test!"
+
 	def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes(2)
 		
