@@ -150,6 +150,8 @@ class Population(object):
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
+			self.demes[deme].policingConsensus = 0
+			self.demes[deme].effectivePublicGood = 0
 
 	def populationMutationMigration(self):
 
@@ -170,6 +172,13 @@ class Population(object):
 			## total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
+			
+		for dem in self.demes:
+			# UPDATE
+			## policing consensus
+			dem.policingConsensus = dem.meanPhenotypes[1]
+			## effective public good
+			dem.effectivePublicGood = (1 - dem.policingConsensus) * dem.publicGood
 
 	def update(self):
 		for deme in self.demes:
