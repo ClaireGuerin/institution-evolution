@@ -46,13 +46,14 @@ class TestTechnology(object):
 			assert type(dem.policingConsensus) is float, "Policing consensus should be float, not {0}".format(type(dem.policingConsensus))
 			assert dem.policingConsensus == dem.meanPhenotypes[1]
 
-	def test_deme_has_effective_public_good_after_policing(self):
+	def test_policing_generates_returned_goods_and_effective_public_good(self):
 		self.fakeDeme = Dem()
 
 		try:
-			tmp = getattr(self.fakeDeme, "effectivePublicGood")
+			tmp1 = getattr(self.fakeDeme, "effectivePublicGood")
+			tmp2 = getattr(self.fakeDeme, "returnedGoods")
 		except AttributeError as e:
-			assert False, "where is the effective public good?"
+			assert False, str(e)
 
 	def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes(2)
