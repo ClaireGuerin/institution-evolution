@@ -1,6 +1,7 @@
 import pytest
 import institutionevolution.fitness as fitness
 from institutionevolution.population import Population as Pop
+from institutionevolution.deme import Deme as Dem
 import gc
 
 class TestPolicingFunction(object):
@@ -152,4 +153,4 @@ class TestPolicingFunction(object):
 	def test_deme_has_policing_consensus(self):
 		self.fakeDeme = Dem()
 
-		assert 
+		assert hasattr(self.fakeDeme, "policingConsensus")

@@ -19,7 +19,7 @@ class TestDeme(object):
 		gc.collect()
 		
 	def test_deme_object_knows_itself(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]
@@ -29,7 +29,7 @@ class TestDeme(object):
 		gc.collect()
 	
 	def test_deme_object_knows_other_demes(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]

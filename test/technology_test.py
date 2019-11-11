@@ -2,6 +2,7 @@ import pytest
 from institutionevolution.individual import Individual as Ind
 from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
+import gc
 
 class TestTechnology(object):
 
@@ -35,16 +36,22 @@ class TestTechnology(object):
 			assert False, "where is the policing consensus?"
 
 	def test_deme_policing_consensus_of_right_format(self, instantiateSingleIndividualsDemes):
+		gc.collect()
+
 		self.fakepop = instantiateSingleIndividualsDemes(2)
 		
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
+		self.fakepop.update()
 
 		for dem in self.fakepop.demes:
 			assert dem.policingConsensus is not None, "No value in the policing consensus"
 			assert dem.policingConsensus >= 0, "Policing consensus shouldn't be negative"
-			assert type(dem.policingConsensus) is float, "Policing consensus should be float, not {0}".format(type(dem.policingConsensus))
-			assert dem.policingConsensus == dem.meanPhenotypes[1]
+			assert type(dem.policingConsensus) is float, "Policing consensus should be float, not {0} ({1})".format(type(dem.policingConsensus),dem.policingConsensus)
+			if dem.demography > 0:
+				assert dem.policingConsensus == dem.meanPhenotypes[1], "Group size: {0}, phenotypes: {1}".format(dem.demography, [i.phenotypicValues for i in self.fakepop.individuals if i.currentDeme == dem.id])
+			else:
+				assert dem.policingConsensus == 0, "It would seem we have a format issue: deme mean phenotypes are {0}".format(dem.meanPhenotypes)
 
 	def test_policing_generates_returned_goods_and_effective_public_good(self):
 		self.fakeDeme = Dem()
@@ -74,14 +81,35 @@ class TestTechnology(object):
 
 	# 		assert dem.returnedGoods == 
 
-	def test_individual_returns_resources(self):
-		assert False, "Write this test!"
+	def test_individual_returns_resources(self, instantiateSingleIndividualsDemes):
+		self.nDemes = 2
+		self.fakepopNoPolicing = instantiateSingleIndividualsDemes(self.nDemes)
+		self.fakepopPolicing = instantiateSingleIndividualsDemes(self.nDemes)
+
+		self.fakepopNoPolicing.clearDemeInfo()
+		self.fakepopPolicing.clearDemeInfo()
+
+		for dem in self.fakepopNoPolicing.demes:
+			dem.policingConsensus = 0
+
+		for dem in self.fakepopPolicing.demes:
+			dem.policingConsensus = 1
+
+		self.fakepopNoPolicing.populationMutationMigration()
+		self.fakepopPolicing.populationMutationMigration()
+
+		for dem in self.fakepopNoPolicing.demes:
+			assert dem.publicGood == dem.meanPhenotypes[0] * 1
+
+		for dem in self.fakepopPolicing.demes:
+			assert dem.policingConsensus > dem.meanPhenotypes[0] * 1
 
 	def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
 		self.fakepop = instantiateSingleIndividualsDemes(2)
 		
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
+		self.fakepop.update()
 
 		for dem in self.fakepop.demes:
 			assert dem.effectivePublicGood is not None, "No value in the effective public good"

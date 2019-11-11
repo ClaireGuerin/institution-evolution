@@ -172,13 +172,6 @@ class Population(object):
 			## total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
-			
-		for dem in self.demes:
-			# UPDATE
-			## policing consensus
-			dem.policingConsensus = dem.meanPhenotypes[1]
-			## effective public good
-			dem.effectivePublicGood = (1 - dem.policingConsensus) * dem.publicGood
 
 	def update(self):
 		for deme in self.demes:
@@ -188,6 +181,18 @@ class Population(object):
 				meanphen.append(calculateMean) 
 
 			setattr(deme, "meanPhenotypes", meanphen)
+
+			try:
+				#assert deme.meanPhenotypes[1] is not None, "Deme size: {0}, Phenotypes {1}".format(deme.demography, [i.phenotypicValues for i in self.individuals if i.currentDeme == deme.id])
+				tmpmean = deme.meanPhenotypes[1]
+				if tmpmean is not None:
+					setattr(deme, "policingConsensus", tmpmean)
+				else:
+					setattr(deme, "policingConsensus", 0.0)
+			except IndexError as e:
+				setattr(deme, "policingConsensus", 0.0)
+			## effective public good
+			setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
