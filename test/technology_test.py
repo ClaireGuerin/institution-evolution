@@ -64,13 +64,10 @@ class TestTechnology(object):
 
 	def test_individuals_return_goods(self, getFitnessParameters):
 		self.indiv = Ind()
-		assert hasattr(self.indiv, "cheater"), "Individual instance does not have an attribute indicating whether it cheated or not"
-		assert hasattr(self.indiv, "punishmentFee"), "No punishment fee assigned to individual instance"
-		assert hasattr(self.indiv, "punished"), "Individual instance does not have an attribute indicating whether it is punished or not"
 
 		self.pars = getFitnessParameters()
 		self.indiv.reproduce("technology", self.pars)
-		
+
 		assert self.indiv.punishmentFee is not None
 		assert type(self.indiv.punishmentFee) is float
 		assert self.indiv.punishmentFee >= 0

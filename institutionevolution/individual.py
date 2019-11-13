@@ -10,6 +10,9 @@ class Individual(object):
 		self.resourcesAmount = None
 		self.fertilityValue = None
 		self.offspringNumber = None
+		self.cheater = None
+		self.punished = None
+		self.punishmentFee = None
 
 	def mutate(self, mutRate, mutStep):
 		self.mutant = bool(rd.binomial(1, mutRate))
