@@ -62,24 +62,38 @@ class TestTechnology(object):
 		except AttributeError as e:
 			assert False, str(e)
 
-	# def test_returned_goods_get_calculated_and_in_right_format(self, instantiateSingleIndividualsDemes):
-	# 	self.fakepop = instantiateSingleIndividualsDemes(2)
+	def test_individuals_return_goods(self, getFitnessParameters):
+		self.indiv = Ind()
+		assert hasattr(self.indiv, "cheater"), "Individual instance does not have an attribute indicating whether it cheated or not"
+		assert hasattr(self.indiv, "punishmentFee"), "No punishment fee assigned to individual instance"
+		assert hasattr(self.indiv, "punished"), "Individual instance does not have an attribute indicating whether it is punished or not"
+
+		self.pars = getFitnessParameters()
+		self.indiv.reproduce("technology", self.pars)
 		
-	# 	self.fakepop.clearDemeInfo()
-	# 	self.fakepop.populationMutationMigration()
+		assert self.indiv.punishmentFee is not None
+		assert type(self.indiv.punishmentFee) is float
+		assert self.indiv.punishmentFee >= 0
 
-	# 	for dem in self.fakepop.demes:
-	# 		assert dem.returnedGoods is not None, "No value in the effective public good"
-	# 		assert dem.returnedGoods >= 0, "Effective public good shouldn't be negative"
-	# 		assert type(dem.returnedGoods) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
+	def test_returned_goods_get_calculated_and_in_right_format(self, instantiateSingleIndividualsDemes):
+		self.fakepop = instantiateSingleIndividualsDemes(2)
+		
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.update()
 
-	# 		resources = 0
+		for dem in self.fakepop.demes:
+			assert dem.returnedGoods is not None, "No value in the effective public good"
+			assert dem.returnedGoods >= 0, "Effective public good shouldn't be negative"
+			assert type(dem.returnedGoods) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
 
-	# 		for ind in self.fakepop.individuals:
-	# 			if ind.currentDeme == dem:
-	# 				ind.
+			# resources = 0
 
-	# 		assert dem.returnedGoods == 
+			# for ind in self.fakepop.individuals:
+			# 	if ind.currentDeme == dem:
+			# 		ind.
+
+			# assert dem.returnedGoods == 
 
 	def test_individual_returns_resources(self, instantiateSingleIndividualsDemes):
 		self.nDemes = 2
