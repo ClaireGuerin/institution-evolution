@@ -46,7 +46,9 @@ class TestMigrationFunction(object):
 	def test_migrants_are_drawn_equally_depending_on_seed(self):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		self.fakepop.initialDemeSize = self.individualsPerDeme
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.createAndPopulateDemes()
 
 		self.migrants = []
 
@@ -62,9 +64,11 @@ class TestMigrationFunction(object):
 	def test_migrants_are_drawn_from_binomial(self, pseudorandom):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		self.fakepop.initialDemeSize = self.individualsPerDeme
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.createAndPopulateDemes()
 		
-		i = 0			
+		i = 0
 		for deme in range(self.fakepop.numberOfDemes):
 			migrantsCount = 0
 			for ind in range(self.individualsPerDeme):
