@@ -12,7 +12,7 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes", "totalPhenotypes", "technologyLevel"]
+		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes", "totalPhenotypes", "technologyLevel", "effectivePublicGood", "returnedGoods"]
 		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
 		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
 		

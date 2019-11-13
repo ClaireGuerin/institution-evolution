@@ -65,8 +65,8 @@ class TestTechnology(object):
 	def test_individuals_return_goods(self, getFitnessParameters):
 		self.indiv = Ind()
 
-		self.pars = getFitnessParameters()
-		self.indiv.reproduce("technology", self.pars)
+		self.pars = getFitnessParameters("technology")
+		self.indiv.reproduce("technology", **self.pars)
 
 		assert self.indiv.punishmentFee is not None
 		assert type(self.indiv.punishmentFee) is float
