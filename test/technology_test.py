@@ -53,14 +53,14 @@ class TestTechnology(object):
 			else:
 				assert dem.policingConsensus == 0, "It would seem we have a format issue: deme mean phenotypes are {0}".format(dem.meanPhenotypes)
 
-	def test_policing_generates_returned_goods_and_effective_public_good(self):
-		self.fakeDeme = Dem()
+	def test_technology_fitness_function(self):
+		self.indiv = Ind()
 
 		try:
-			tmp1 = getattr(self.fakeDeme, "effectivePublicGood")
-			tmp2 = getattr(self.fakeDeme, "returnedGoods")
-		except AttributeError as e:
-			assert False, str(e)
+			self.pars = getFitnessParameters("technology")
+			self.indiv.reproduce("technology", **self.pars)
+		except KeyError as e:
+
 
 	def test_individuals_return_goods(self, getFitnessParameters):
 		self.indiv = Ind()
