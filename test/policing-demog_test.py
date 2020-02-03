@@ -2,6 +2,7 @@ import pytest
 import institutionevolution.fitness as fitness
 from institutionevolution.population import Population as Pop
 import gc
+import glob, os
 
 class TestPolicingDemographyFunction(object):
 
@@ -40,3 +41,41 @@ class TestPolicingDemographyFunction(object):
 		r = pars["rb"] + b / n - pars["kb"] * x - (1 - x) * d / ((1 - xmean) * n)
 
 		assert reproductiveValue == pars["phi"] * r / (1 + r * pars["th"])
+
+	# def test_simulation_does_not_run_if_pars_missing(self):
+	# 	fakepop = Pop("policingdemog")
+	# 	fakepop.fitnessParameters = {}
+
+	# 	fakepop.createAndPopulateDemes(3,3)
+	# 	try:
+	# 		fakepop.populationReproduction(**fakepop.fitnessParameters)
+	# 	except KeyError as e:
+	# 		assert str(e) == 'Missing fitness parameters for policing demography'
+	# 	else:
+	# 		assert False, "do not let simulations be called when pars are missing"
+
+	def test_function_runs_at_population_level(self):
+		fakepop = Pop("policingdemog")
+		fakepop.numberOfDemes = 1
+		fakepop.initialDemeSize = 3
+
+		fakepop.createAndPopulateDemes()
+		
+		try:
+			fakepop.populationReproduction(**fakepop.fitnessParameters)
+		except:
+			assert False, "not running"
+
+	def test_simulation_cycle(self):
+		fakepop = Pop("policingdemog")
+		fakepop.numberOfDemes = 3
+		fakepop.initialDemeSize = 10
+		fakepop.numberOfGenerations = 10
+
+		try:
+			fakepop.runSimulation(outputfile="test/out-policingdemog.txt")
+			for f in glob.glob("test/out-policingdemog*.txt"):
+				os.remove(f)
+		except:
+			assert False, "something went wrong"
+

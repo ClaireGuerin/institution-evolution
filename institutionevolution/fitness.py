@@ -22,10 +22,17 @@ def policing(res, **kwargs):
 def policingdemog(res, **kwargs):
 	phen = kwargs["x"][0]
 	groupphen = kwargs["xmean"][0]
-	resources = 0#kwargs["rb"]
-	consumption = resources
+	groupsize = kwargs["n"]
 
-	f = float(consumption)
+	gamma = ((1 - kwargs["p"]) * groupphen * groupsize) ** kwargs["gamma"]
+	eta = (kwargs["p"] * groupphen * groupsize) ** kwargs["eta"]
+	returnsOnInvestment = kwargs["alpha"] * gamma / (kwargs["beta1"] + kwargs["beta0"] * gamma)
+	costOfInvestment = kwargs["kb"] * phen
+	policingEffect = kwargs["epsilon"] * eta / (kwargs["zeta1"] + kwargs["zeta0"] * eta)
+	resources = kwargs["rb"] + returnsOnInvestment / groupsize - costOfInvestment -(1 - phen) * policingEffect / ((1 - groupphen) * groupsize)
+	consumption = resources / (1 + resources * kwargs["th"])
+
+	f = float(consumption * kwargs["phi"])
 
 	return f
 
