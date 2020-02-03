@@ -189,7 +189,7 @@ class Population(object):
 			
 			with open('{0}/{1}'.format(self.pathToOutputFolder, outputfile), "w") as f:
 				for gen in range(self.numberOfGenerations):
-					logging.info(f'Running generation {gen}')
+					logging.info('Running generation {0}'.format(gen))
 					self.lifecycle(**kwargs)
 
 					phenmeans = []
