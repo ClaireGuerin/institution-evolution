@@ -18,7 +18,23 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "b": 0.5,
 			  "c": 0.05,
 			  "gamma": 0.01,
-			  "n": 10}}
+			  "n": 10},
+			  'policingdemog':{"x": [0.5],
+			  "xmean": [0.2], 
+			  "n": 10,
+			  "phi": 1,
+			  "th": 0.1,
+			  "rb": 1, 
+			  "kb": 1.2, 
+			  "p": 0.2, 
+			  "alpha": 2, 
+			  "gamma": 0.01, 
+			  "beta0": 0, 
+			  "beta1": 1, 
+			  "epsilon": 3, 
+			  "eta": 0.001, 
+			  "zeta0": 0, 
+			  "zeta1": 1}}
 
 @pytest.fixture
 def pseudorandom():
