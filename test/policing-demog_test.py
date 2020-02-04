@@ -73,7 +73,7 @@ class TestPolicingDemographyFunction(object):
 		fakepop.numberOfGenerations = 10
 
 		try:
-			fakepop.runSimulation(outputfile="test/out-policingdemog.txt")
+			fakepop.runSimulation(outputfile="test/out-policingdemog")
 			for f in glob.glob("test/out-policingdemog*.txt"):
 				os.remove(f)
 		except:
