@@ -3,6 +3,7 @@ import institutionevolution.fitness as fitness
 from institutionevolution.population import Population as Pop
 import gc
 import glob, os
+from files import OUTPUT_FOLDER
 
 class TestPolicingDemographyFunction(object):
 
@@ -72,9 +73,11 @@ class TestPolicingDemographyFunction(object):
 		fakepop.initialDemeSize = 10
 		fakepop.numberOfGenerations = 10
 
+		self.out = 'output_test.txt'
+
 		try:
-			fakepop.runSimulation(outputfile="test/out-policingdemog")
-			for f in glob.glob("test/out-policingdemog*.txt"):
+			fakepop.runSimulation(outputfile=self.out)
+			for f in glob.glob('{0}/{1}'.format(OUTPUT_FOLDER, self.out)):
 				os.remove(f)
 		except:
 			assert False, "something went wrong"
