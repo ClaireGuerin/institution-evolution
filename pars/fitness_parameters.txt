@@ -1,4 +1,16 @@
 fb,5
 b,0.5
 c,0.05
-gamma,0.07
+phi, 1
+th, 0.01
+rb, 0.08
+kb, 1
+p, 0.2
+alpha, 1
+gamma, 0.5
+beta0, 0
+beta1, 1
+epsilon, 0.1
+eta, 0.9
+zeta0, 0
+zeta1, 1

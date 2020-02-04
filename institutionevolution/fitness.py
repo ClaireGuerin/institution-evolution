@@ -19,6 +19,23 @@ def policing(res, **kwargs):
 	f = float(kwargs["fb"] * payoff / (kwargs["gamma"] * kwargs["n"]))
 	return f
 
+def policingdemog(res, **kwargs):
+	phen = kwargs["x"][0]
+	groupphen = kwargs["xmean"][0]
+	groupsize = kwargs["n"]
+
+	gamma = ((1 - kwargs["p"]) * groupphen * groupsize) ** kwargs["gamma"]
+	eta = (kwargs["p"] * groupphen * groupsize) ** kwargs["eta"]
+	returnsOnInvestment = kwargs["alpha"] * gamma / (kwargs["beta1"] + kwargs["beta0"] * gamma)
+	costOfInvestment = kwargs["kb"] * phen
+	policingEffect = kwargs["epsilon"] * eta / (kwargs["zeta1"] + kwargs["zeta0"] * eta)
+	resources = kwargs["rb"] + returnsOnInvestment / groupsize - costOfInvestment -(1 - phen) * policingEffect / ((1 - groupphen) * groupsize)
+	consumption = resources / (1 + resources * kwargs["th"])
+
+	f = float(consumption * kwargs["phi"])
+
+	return f
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

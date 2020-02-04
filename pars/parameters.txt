@@ -1,3 +1,3 @@
 mutationRate,0.01
 mutationStep,0.02
-migrationRate,0.2
+migrationRate,1
