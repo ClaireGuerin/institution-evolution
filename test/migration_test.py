@@ -79,7 +79,7 @@ class TestMigrationFunction(object):
 			stat1, pval1 = scistats.ttest_1samp([1] * migrantsCount + [0] * (self.individualsPerDeme - migrantsCount), self.fakepop.migrationRate)
 			test = scistats.binom_test(x=migrantsCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
 			
-			assert pval1 > 0.05, "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert any([pval1 > 0.05,migrantsCount/self.individualsPerDeme==self.fakepop.migrationRate]), "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 			assert test > 0.05, "Success rate = {0} when mutation rate = {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 		
 		gc.collect()

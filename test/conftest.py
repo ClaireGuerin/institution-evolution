@@ -163,7 +163,7 @@ def getFitnessParameters():
 	
 @pytest.fixture
 def runSim():
-	def _foo(outputfile,fb=2):
+	def _foo(outputfile,fb=10):
 		population = Pop()
 		population.numberOfDemes = 2
 		population.initialDemeSize = 1

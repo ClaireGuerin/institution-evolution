@@ -209,6 +209,7 @@ class Population(object):
 
 					if self.demography == 0:
 						logging.info('Population went extinct after {0} generations'.format(gen))
+						phenmeans = [None] * self.numberOfPhenotypes
 						break
 					else:
 						phenmeans = []
@@ -220,9 +221,9 @@ class Population(object):
 
 							phenmeans.append(str(round(tmpMean, 3)))
 
-							sep = ','
-							fp.write('{0}\n'.format(sep.join(phenmeans)))
-							fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
+						sep = ','
+						fp.write('{0}\n'.format(sep.join(phenmeans)))
+						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
