@@ -52,8 +52,8 @@ class TestMultipleTraits(object):
 
 		assert len(phenotypeMeans) == self.ntraits, "Simulation returns mean of {0} phenotypes instead of {1}".format(len(phenotypeMeans), self.ntraits)
 
-		#os.remove(OUTPUT_FOLDER + '/tmptest_phenotypes.txt')
-		#os.remove(OUTPUT_FOLDER + '/tmptest_demography.txt')
+		os.remove(OUTPUT_FOLDER + '/tmptest_phenotypes.txt')
+		os.remove(OUTPUT_FOLDER + '/tmptest_demography.txt')
 
 	def test_stabilizing_selection_fitness_function_is_set(self):
 		assert 'geom' in fitness.functions, "Did not find 'geom' method in fitness functions dictionary"
