@@ -163,11 +163,15 @@ def getFitnessParameters():
 	
 @pytest.fixture
 def runSim():
-	def _foo(outputfile):
+	def _foo(outputfile,fb=2):
 		population = Pop()
 		population.numberOfDemes = 2
 		population.initialDemeSize = 1
 		population.numberOfGenerations = 5
+		# make sure fitness parameters are alright
+		population.fitnessParameters.clear()
+		population.fitnessParameters.update(fitpardict['pgg'])
+		population.fitnessParameters.update({"fb":fb})
 		population.runSimulation(outputfile)
 		return population.numberOfGenerations
 	return _foo

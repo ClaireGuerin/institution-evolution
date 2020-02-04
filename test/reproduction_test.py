@@ -225,4 +225,17 @@ class TestReproductionFunction(object):
 		else:
 			assert False, "some other error"
 
+	def test_individual_procreates_even_if_fertility_negative(self, instantiateSingleDemePopulation):
+		fakeind = Ind()
+		self.fakepop = instantiateSingleDemePopulation(1)
+
+		ind = self.fakepop.individuals[0]
+		ind.fertilityValue = -1
+
+		try:
+			ind.procreate()
+		except ValueError as e:
+			assert False, "calculate offspring number even if fertility is negative"
+
+
 

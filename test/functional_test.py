@@ -143,5 +143,18 @@ class TestSimpleRun(object):
 
 		os.remove(self.outputFile + '_phenotypes.txt')
 		os.remove(self.outputFile + '_demography.txt')
+
+	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim):
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+
+		try:
+			runSim(self.out,0)
+		except TypeError as e:
+			assert False, "The program should exit with information message when population goes extinct!"
+
+
+		os.remove(self.outputFile + '_phenotypes.txt')
+		os.remove(self.outputFile + '_demography.txt')
 		
 		# Satisfied, she goes to sleep.

@@ -63,4 +63,4 @@ class Individual(object):
 		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
 		
 	def procreate(self):
-		self.offspringNumber = rd.poisson(self.fertilityValue)
+		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
