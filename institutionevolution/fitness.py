@@ -29,7 +29,7 @@ def policingdemog(res, **kwargs):
 	returnsOnInvestment = kwargs["alpha"] * gamma / (kwargs["beta1"] + kwargs["beta0"] * gamma)
 	costOfInvestment = kwargs["kb"] * phen
 	policingEffect = kwargs["epsilon"] * eta / (kwargs["zeta1"] + kwargs["zeta0"] * eta)
-	resources = kwargs["rb"] + returnsOnInvestment / groupsize - costOfInvestment -(1 - phen) * policingEffect / ((1 - groupphen) * groupsize)
+	resources = kwargs["rb"] / groupsize + returnsOnInvestment / groupsize - costOfInvestment -(1 - phen) * policingEffect / ((1 - groupphen) * groupsize)
 	consumption = resources / (1 + resources * kwargs["th"])
 
 	f = float(consumption * kwargs["phi"])

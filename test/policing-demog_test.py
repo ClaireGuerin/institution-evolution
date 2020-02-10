@@ -1,6 +1,7 @@
 import pytest
 import institutionevolution.fitness as fitness
 from institutionevolution.population import Population as Pop
+from institutionevolution.individual import Individual as Ind
 import gc
 import glob, os
 from files import OUTPUT_FOLDER
@@ -13,7 +14,26 @@ class TestPolicingDemographyFunction(object):
 
 		assert reproductiveValue is not None, "Fitness function with policing and demography regulation returns None"
 		assert type(reproductiveValue) is float, "Fitness function with policing and demography regulation returns a {0} instead of a float".format(type(reproductiveValue))
-		assert reproductiveValue >= 0, "Fitness function with policing and demography regulation returns a negative value"
+		#assert reproductiveValue >= 0, "Fitness function with policing and demography regulation returns a negative value"
+
+	def test_individual_gets_correct_value(self, getFitnessParameters, instantiateSingleIndividualPopulation):
+		pars = getFitnessParameters('policingdemog')
+		ind = instantiateSingleIndividualPopulation
+
+		ind.fertility('policingdemog',**pars)
+		reproductiveValue = fitness.functions['policingdemog'](1, **pars)
+
+		assert reproductiveValue == ind.fertilityValue, "Individual is not assigned the correct fertility value"
+
+	def test_offspring_cannot_go_negative(self, getFitnessParameters, instantiateSingleIndividualPopulation):
+		pars = getFitnessParameters('policingdemog')
+		ind = instantiateSingleIndividualPopulation
+
+		ind.fertility('policingdemog',**pars)
+		try:
+			ind.procreate()
+		except ValueError as e:
+			assert False, "Poisson ditribution cannot draw offspring number from negative lambda value" + str(e)
 
 	def test_all_pars_provided_in_test(self, getFitnessParameters):
 		pars = getFitnessParameters('policingdemog')
@@ -39,7 +59,7 @@ class TestPolicingDemographyFunction(object):
 
 		b = pars["alpha"] * (((1 - pars["p"]) * n * xmean) ** pars["gamma"]) / (pars["beta1"] + pars["beta0"] * (((1 - pars["p"]) * n * xmean) ** pars["gamma"]))
 		d = pars["epsilon"] * ((pars["p"] * n * xmean) ** pars["eta"]) / (pars["zeta1"] + pars["zeta0"] * ((pars["p"] * n * xmean) ** pars["eta"]))
-		r = pars["rb"] + b / n - pars["kb"] * x - (1 - x) * d / ((1 - xmean) * n)
+		r = pars["rb"]/n + b / n - pars["kb"] * x - (1 - x) * d / ((1 - xmean) * n)
 
 		assert reproductiveValue == pars["phi"] * r / (1 + r * pars["th"])
 
@@ -73,7 +93,7 @@ class TestPolicingDemographyFunction(object):
 		fakepop.initialDemeSize = 10
 		fakepop.numberOfGenerations = 10
 
-		self.out = 'output_test.txt'
+		self.out = 'output_test'
 
 		try:
 			fakepop.runSimulation(outputfile=self.out)
