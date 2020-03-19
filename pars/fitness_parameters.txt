@@ -2,8 +2,19 @@ th, 0.1
 rb, 10
 c1, 0.2
 c2, 0
-Bb, 6
-Pp, 0.3
+bb, 6
+pp, 0.3
 p, 0.4
 eta, 1
 gamma, 1
+alpha, 0.9
+beta0,0
+beta1,1
+kb,1
+epsilon,2
+zeta0,0
+zeta1,1
+phi,2
+fb,2
+b,0.5
+c,0.05
