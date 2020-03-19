@@ -204,7 +204,7 @@ class Population(object):
 			
 			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd:
 				for gen in range(self.numberOfGenerations):
-					logging.info(f'Running generation {gen}')
+					logging.info('Running generation {0}'.format(gen))
 					self.lifecycle(**self.fitnessParameters)
 
 					if self.demography == 0:
