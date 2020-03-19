@@ -1,37 +1,48 @@
 from institutionevolution.population import Population as Pop
 from time import perf_counter
+from mpi4py import MPI
 
-# THIS CODE IS TO TEST DIFFERENT PARAMETER VALUES
-big_tic = perf_counter()
+nproc = MPI.COMM_WORLD.Get_size() # size of communicator
+iproc = MPI.COMM_WORLD.Get_rank() # ranks in communicator
+inode = MPI.Get_processor_name() # node where this MPI process runs
 
-for parval in range(9):
-	policing = (parval + 1) / 10
+if iproc == 0: print("This code is a test for mpi4py")
 
-	# for replicate in range(10):
-	# 	trial = Pop()
-	# 	trial.fitnessParameters.update({"p": policing})
+for i in range(0,nproc):
+	MPI.COMM_WORLD.Barrier()
+	if iproc == i:
+		print('Rank {0} out of {1}'.format(iproc, nproc))
 
-	# 	tic = perf_counter()
-	# 	trial.runSimulation(outputfile="test/out-p{0}-{1}.txt".format(policing,replicate))
-	# 	toc = perf_counter()
+MPI.Finalize()
 
-	# 	print("Ran {0} generations with {1} demes in {2} seconds".format(trial.numberOfGenerations, trial.numberOfDemes, toc - tic))
+# for parval in range(9):
+# 	policing = (parval + 1) / 10
 
-	population = Pop()
-	population.fitnessParameters.update({"p": policing})
+# 	# for replicate in range(10):
+# 	# 	trial = Pop()
+# 	# 	trial.fitnessParameters.update({"p": policing})
 
-	tic = perf_counter()
-	population.runSimulation(outputfile="out-p{0}-{1}.txt".format(policing,replicate))
-	toc = perf_counter()
+# 	# 	tic = perf_counter()
+# 	# 	trial.runSimulation(outputfile="test/out-p{0}-{1}.txt".format(policing,replicate))
+# 	# 	toc = perf_counter()
 
-big_toc = perf_counter()
-print("Ran 9 simulations in {0} seconds".format(big_toc - big_tic))
+# 	# 	print("Ran {0} generations with {1} demes in {2} seconds".format(trial.numberOfGenerations, trial.numberOfDemes, toc - tic))
 
-# # THIS CODE IS TO RUN A SINGLE SIMULATION
+# 	population = Pop()
+# 	population.fitnessParameters.update({"p": policing})
 
-# singlerun = Pop("policingdemog")
-# tic = perf_counter()
-# singlerun.runSimulation(outputfile="outputtestdemog.txt")
-# toc = perf_counter()
+# 	tic = perf_counter()
+# 	population.runSimulation(outputfile="out-p{0}-{1}.txt".format(policing,replicate))
+# 	toc = perf_counter()
 
-# print("Ran {0} generations with {1} demes in {2} seconds".format(singlerun.numberOfGenerations, singlerun.numberOfDemes, toc - tic))
+# big_toc = perf_counter()
+# print("Ran 9 simulations in {0} seconds".format(big_toc - big_tic))
+
+# # # THIS CODE IS TO RUN A SINGLE SIMULATION
+
+# # singlerun = Pop("policingdemog")
+# # tic = perf_counter()
+# # singlerun.runSimulation(outputfile="outputtestdemog.txt")
+# # toc = perf_counter()
+
+# # print("Ran {0} generations with {1} demes in {2} seconds".format(singlerun.numberOfGenerations, singlerun.numberOfDemes, toc - tic))
