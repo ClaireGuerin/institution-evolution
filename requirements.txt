@@ -1,4 +1,3 @@
 pytest
 pytest-cov
 scipy
-mpi4py
