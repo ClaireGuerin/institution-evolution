@@ -8,7 +8,7 @@ import sys
 import logging
 
 dirpath = os.getcwd()
-time = range(0,10000)
+time = range(0,20000)
 
 VARIABLES = ('phenotypes','demography')
 variableID = int(sys.argv[1])
@@ -18,7 +18,8 @@ varianceVariable = []
 
 for i in range(9):
 	parvalue = (i + 1) / 10
-	fileslist = glob.glob('{0}/res/phen0.0-gen10000/out-d{1}_{2}.txt'.format(dirpath,parvalue,VARIABLES[variableID]))
+	#fileslist = glob.glob('{0}/res/out-d{1}_{2}.txt'.format(dirpath,parvalue,VARIABLES[variableID]))
+	fileslist = glob.glob('/home/claire/Dropbox/PhD/Src/res/th0.1rb20c10c20.1bb2pp0.3p0.5eta1gamma1/out-d{0}.txt_{1}.txt'.format(parvalue,VARIABLES[variableID]))
 	
 	# FIGURE OF VARIABLE CHANGE OVER TIME FOR 1 SIMULATION RUN
 	fig = plt.figure(figsize=(20,10))
@@ -41,8 +42,8 @@ for i in range(9):
 			variable.extend([0]*ldiff)
 		
 		plt.plot(time,variable, label=simfile)
-		vmean.append(mean(variable[2500:-1]))
-		vvar.append(variance(variable[2500:-1]))
+		vmean.append(mean(variable[10000:-1]))
+		vvar.append(variance(variable[10000:-1]))
 
 	plt.xlabel('Generations')
 	plt.ylabel(VARIABLES[variableID])
