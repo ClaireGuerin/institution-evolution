@@ -19,6 +19,10 @@ def policing(res, **kwargs):
 	f = float(kwargs["fb"] * payoff / (kwargs["gamma"] * kwargs["n"]))
 	return f
 
+def technology():
+	pass
+
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

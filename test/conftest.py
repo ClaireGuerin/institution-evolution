@@ -18,6 +18,9 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "b": 0.5,
 			  "c": 0.05,
 			  "gamma": 0.01,
+			  "n": 10},
+			  'technology': {"x": [0.5, 0.2],
+			  "xmean": [0.2, 0.5],
 			  "n": 10}}
 
 @pytest.fixture
