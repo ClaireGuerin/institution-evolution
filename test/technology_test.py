@@ -138,3 +138,7 @@ class TestTechnology(object):
 		self.fakeDeme.technologyGrowth()
 
 		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood * 
+
+	def test_technology_fitness_fct_takes_args(self, instantiateSingleIndividualPopulation):
+		self.ind = instantiateSingleIndividualPopulation()
+		self.ind.
