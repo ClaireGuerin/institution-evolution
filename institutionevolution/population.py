@@ -57,7 +57,8 @@ class Population(object):
 		if dSize == None:
 			dSize = self.initialDemeSize
 		
-		self.demography = nDemes * dSize
+		self.populationStructure = [dSize] * nDemes
+		self.demography = dSize * nDemes
 			
 		self.demes = []
 		self.individuals = []
@@ -122,6 +123,7 @@ class Population(object):
 	def populationReproduction(self, seed=None, **kwargs):
 		random.seed(seed)
 		self.offspring = []
+		self.populationStructure = [0] * self.numberOfDemes
 		testdemog = 0
 
 		for ind in self.individuals:
@@ -140,6 +142,8 @@ class Population(object):
 			ind.reproduce(self.fit_fun, **{**kwargs, **infoToAdd})
 			self.offspring += ind.offspring
 			testdemog += ind.offspringNumber
+			self.populationStructure[ind.currentDeme] += ind.offspringNumber
+
 
 		assert len(self.offspring) == testdemog
 		self.individuals = self.offspring
@@ -200,9 +204,11 @@ class Population(object):
 				os.makedirs(self.pathToOutputFolder)
 
 			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
+			phenvariancefile = '{0}/{1}_pheno_var.txt'.format(self.pathToOutputFolder, outputfile)
 			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
+			demovariancefile = '{0}/{1}_demo_var.txt'.format(self.pathToOutputFolder, outputfile)
 			
-			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd:
+			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd, open(demovariancefile, "w") as vd, open(phenvariancefile, "w") as vp:
 				for gen in range(self.numberOfGenerations):
 					logging.info('Running generation {0}'.format(gen))
 					self.lifecycle(**self.fitnessParameters)
@@ -213,17 +219,23 @@ class Population(object):
 						break
 					else:
 						phenmeans = []
+						phenvars = []
 
 						for phen in range(self.numberOfPhenotypes):
 							tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 							tmpMean = self.specialmean(tmpPhenotypes)
+							tmpVar = self.specialvariance(tmpPhenotypes)
 							# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
 
 							phenmeans.append(str(round(tmpMean, 3)))
+							phenvars.append(str(round(tmpVar, 3)))
+
 
 						sep = ','
 						fp.write('{0}\n'.format(sep.join(phenmeans)))
+						vp.write('{0}\n'.format(sep.join(phenvars)))
 						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
+						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure)))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
