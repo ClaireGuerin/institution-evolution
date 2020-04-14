@@ -110,14 +110,15 @@ class Population(object):
 			tmp = x / y
 		return tmp
 
-	# def specialvariance(self, lst, samplelength, samplemean):
-	# 	if samplelength == 0:
-	# 		tmpvar = None
-	# 	else:
-	# 		total = 0
-	# 		for phenotype in lst:
-	# 			total += (phenotype - samplemean) ** 2
-	# 		tmpvar = total / samplelength
+	def specialvariance(self, lst, samplelength, samplemean):
+		if samplelength == 0:
+			tmpvar = 0
+		else:
+			total = 0
+			for phenotype in lst:
+				total += (phenotype - samplemean) ** 2
+			tmpvar = total / samplelength
+		return tmpvar
 
 
 	def populationReproduction(self, seed=None, **kwargs):
@@ -224,10 +225,10 @@ class Population(object):
 						for phen in range(self.numberOfPhenotypes):
 							tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 							tmpMean = self.specialmean(tmpPhenotypes)
-							tmpVar = self.specialvariance(tmpPhenotypes)
-							# tmpVariance = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
+							tmpVar = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
 
 							phenmeans.append(str(round(tmpMean, 3)))
+							assert type(tmpVar) is float, "phenotype variance = {0}, phenotypes = {1}".format(tmpVar, tmpPhenotypes)
 							phenvars.append(str(round(tmpVar, 3)))
 
 
@@ -235,7 +236,7 @@ class Population(object):
 						fp.write('{0}\n'.format(sep.join(phenmeans)))
 						vp.write('{0}\n'.format(sep.join(phenvars)))
 						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
-						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure)))
+						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure, len(self.populationStructure), self.demography / self.numberOfDemes)))
 					
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
