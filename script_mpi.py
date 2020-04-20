@@ -1,7 +1,8 @@
 from institutionevolution.population import Population as Pop
 import multiprocessing as mp
+import sys
 
-inst_FOLDER = ''
+inst_FOLDER = int(sys.argv[1])
 
 def single_simulation_run(migrationRateIndex):
 	migrationRate = (migrationRateIndex + 1) / 10
