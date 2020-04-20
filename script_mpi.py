@@ -1,9 +1,11 @@
 from institutionevolution.population import Population as Pop
 import multiprocessing as mp
 
+inst_FOLDER = ''
+
 def single_simulation_run(migrationRateIndex):
 	migrationRate = (migrationRateIndex + 1) / 10
-	population = Pop('policingdemog2')
+	population = Pop('policingdemog2',inst_FOLDER)
 	population.migrationRate = migrationRate
 	population.runSimulation(outputfile="out-d{0}".format(migrationRate))
 

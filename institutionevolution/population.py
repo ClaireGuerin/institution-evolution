@@ -10,33 +10,36 @@ import random
 
 class Population(object):
 	
-	def __init__(self, fit_fun='pgg'):
+	def __init__(self, fit_fun='pgg', inst=''):
 
 		logging.basicConfig(level=logging.INFO,
 							format='[%(asctime)s]::%(levelname)s  %(message)s',
 							datefmt='%Y.%m.%d - %H:%M:%S')
 
 		logging.info('Creating population')
+
+		self.pathToInputFiles = '{0}/{1}'.format(PARAMETER_FOLDER,inst)
+		self.pathToOutputFiles = '{0}/{1}'.format(OUTPUT_FOLDER,inst)
 		
-		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)		
+		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=self.pathToInputFiles)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
 		self.vals = fman.extractColumnFromFile(self.pathToInitFile, 1, int)
 		
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
 			
-		self.pathToPhenFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToPhenFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=self.pathToInputFiles)
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 			
-		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=PARAMETER_FOLDER)		
+		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=self.pathToInputFiles)		
 		self.parattrs = fman.extractColumnFromFile(self.pathToParFile, 0, str)
 		self.parvals = fman.extractColumnFromFile(self.pathToParFile, 1, float)
 		
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
-		self.pathToFitFile = fman.getPathToFile(filename=FITNESS_PARAMETERS_FILE, dirname=PARAMETER_FOLDER)		
+		self.pathToFitFile = fman.getPathToFile(filename=FITNESS_PARAMETERS_FILE, dirname=self.pathToInputFiles)		
 		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile, 0, str)
 		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile, 1, float)
 		
@@ -200,7 +203,7 @@ class Population(object):
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
 		
-			self.pathToOutputFolder = fman.getPathToFile(OUTPUT_FOLDER)
+			self.pathToOutputFolder = fman.getPathToFile(self.pathToOutputFiles)
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder)
 
@@ -237,7 +240,7 @@ class Population(object):
 						vp.write('{0}\n'.format(sep.join(phenvars)))
 						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
 						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure, len(self.populationStructure), self.demography / self.numberOfDemes)))
-					
+				
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
 			
