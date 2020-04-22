@@ -19,7 +19,7 @@ def policing(res, **kwargs):
 	f = float(kwargs["fb"] * payoff / (kwargs["gamma"] * kwargs["n"]))
 	return f
 
-def technology():
+def technology(res, **kwargs):
 	pass
 
 

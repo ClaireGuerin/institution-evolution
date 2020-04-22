@@ -139,6 +139,26 @@ class TestTechnology(object):
 
 		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood * 
 
-	def test_technology_fitness_fct_takes_args(self, instantiateSingleIndividualPopulation):
-		self.ind = instantiateSingleIndividualPopulation()
-		self.ind.
+	def test_technology_fitness_fct_returns_value(self, getFitnessParameters):
+		self.ind = Ind()
+		pars = getFitnessParameters('technology')
+		
+		try:
+			self.ind.fertility('technology',**pars)
+		except TypeError as e:
+			if str(e) == "float() argument must be a string or a number, not 'NoneType'":
+				assert False, "technology fonction returns nothing!"
+			else:
+				assert False, str(e)
+
+	def test_technology_fitness_fct_takes_args(self, getFitnessParameters):
+		self.ind = Ind()
+		pars = getFitnessParameters('technology')
+		self.ind.resourcesAmount = 1
+		
+		try:
+			self.ind.fertility('technology',**pars)
+		except TypeError as e:
+			assert False, "technology fitness function does not yet take arguments, fix this!"
+
+	
