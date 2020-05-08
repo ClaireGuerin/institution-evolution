@@ -15,8 +15,9 @@ variableID = int(sys.argv[1])
 
 meanVariable = []
 varianceVariable = []
+npoints = 6
 
-for i in range(9):
+for i in range(npoints):
 	parvalue = (i + 1) / 10
 	#fileslist = glob.glob('{0}/res/out-d{1}_{2}.txt'.format(dirpath,parvalue,VARIABLES[variableID]))
 	fileslist = glob.glob('/home/claire/Desktop/res/pars1/out-d{0}_{1}.txt'.format(parvalue,VARIABLES[variableID]))
@@ -75,9 +76,9 @@ with open('{0}/analyticalpredictions.txt'.format(dirpath),'r') as csvfile:
 xerror = [0]*len(varianceVariable)
 yerror = [sqrt(i) for i in varianceVariable]
 
-plt.plot(x[0:9],y[0:9], label='Predictions')
-plt.plot(x[0:9],meanVariable, label='Simulations')
-axG.errorbar(x[0:9],meanVariable, xerr=xerror, yerr=yerror, fmt='none')
+plt.plot(x[0:npoints],y[0:npoints], label='Predictions')
+plt.plot(x[0:npoints],meanVariable, label='Simulations')
+axG.errorbar(x[0:npoints],meanVariable, xerr=xerror, yerr=yerror, fmt='none')
 
 plt.xlabel('Dispersal')
 plt.xlim(0,1)
