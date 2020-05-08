@@ -62,35 +62,35 @@ class TestTechnology(object):
 		except KeyError as e:
 			assert False, "{0}".format(e)
 
-	def test_individuals_return_goods(self, getFitnessParameters):
-		self.indiv = Ind()
+	# def test_individuals_return_goods(self, getFitnessParameters):
+	# 	self.indiv = Ind()
 
-		self.pars = getFitnessParameters("technology")
-		self.indiv.reproduce("technology", **self.pars)
+	# 	self.pars = getFitnessParameters("technology")
+	# 	self.indiv.reproduce("technology", **self.pars)
 
-		assert self.indiv.punishmentFee is not None
-		assert type(self.indiv.punishmentFee) is float
-		assert self.indiv.punishmentFee >= 0
+	# 	assert self.indiv.punishmentFee is not None
+	# 	assert type(self.indiv.punishmentFee) is float
+	# 	assert self.indiv.punishmentFee >= 0
 
-	def test_returned_goods_get_calculated_and_in_right_format(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes(2)
+	# def test_returned_goods_get_calculated_and_in_right_format(self, instantiateSingleIndividualsDemes):
+	# 	self.fakepop = instantiateSingleIndividualsDemes(2)
 		
-		self.fakepop.clearDemeInfo()
-		self.fakepop.populationMutationMigration()
-		self.fakepop.update()
+	# 	self.fakepop.clearDemeInfo()
+	# 	self.fakepop.populationMutationMigration()
+	# 	self.fakepop.update()
 
-		for dem in self.fakepop.demes:
-			assert dem.returnedGoods is not None, "No value in the effective public good"
-			assert dem.returnedGoods >= 0, "Effective public good shouldn't be negative"
-			assert type(dem.returnedGoods) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
+	# 	for dem in self.fakepop.demes:
+	# 		assert dem.returnedGoods is not None, "No value in the effective public good"
+	# 		assert dem.returnedGoods >= 0, "Effective public good shouldn't be negative"
+	# 		assert type(dem.returnedGoods) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
 
-			# resources = 0
+	# 		# resources = 0
 
-			# for ind in self.fakepop.individuals:
-			# 	if ind.currentDeme == dem:
-			# 		ind.
+	# 		# for ind in self.fakepop.individuals:
+	# 		# 	if ind.currentDeme == dem:
+	# 		# 		ind.
 
-			# assert dem.returnedGoods == 
+	# 		# assert dem.returnedGoods == 
 
 	def test_individual_returns_resources(self, instantiateSingleIndividualsDemes):
 		self.nDemes = 2
@@ -160,5 +160,14 @@ class TestTechnology(object):
 			self.ind.fertility('technology',**pars)
 		except TypeError as e:
 			assert False, "technology fitness function does not yet take arguments, fix this!"
+
+	def test_deme_technology_level_gets_updated_with_individual_investments(self, instantiateSingleDemePopulation):
+		self.pop = instantiateSingleDemePopulation(100)
+		self.pop.fit_fun = 'technology'
+
+		demeTech = self.pop.demes[0].technologyLevel
+
+		self.pop.populationReproduction()
+		assert demeTech != self.pop.demes[0].technologyLevel, "the technology level has not changed!"
 
 	

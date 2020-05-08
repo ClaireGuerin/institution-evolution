@@ -20,7 +20,8 @@ def policing(res, **kwargs):
 	return f
 
 def technology(res, **kwargs):
-	pass
+	f = 0
+	return f
 
 
 functions = {}
