@@ -21,7 +21,9 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "n": 10},
 			  'technology': {"x": [0.5, 0.2],
 			  "xmean": [0.2, 0.5],
-			  "n": 10}}
+			  "n": 10,
+			  "atech": 0.6,
+			  "btech": 1.2}}
 
 @pytest.fixture
 def pseudorandom():
