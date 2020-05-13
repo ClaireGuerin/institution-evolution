@@ -171,10 +171,10 @@ class TestTechnology(object):
 	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
 		self.pars = getFitnessParameters()
 		self.pop = Pop()
-		self.pop.numberOfDemes = 1
+		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
-		self.pop.initialPhenotypes = 0.5
+		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
 		demeTech = self.pop.demes[0].technologyLevel
