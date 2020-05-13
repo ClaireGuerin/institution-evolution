@@ -180,6 +180,7 @@ class TestTechnology(object):
 		demeTech = self.pop.demes[0].technologyLevel
 
 		self.pop.populationReproduction()
+		self.pop.clearDemeInfo()
 		assert demeTech != self.pop.demes[0].technologyLevel, "the technology level has not changed!"
 
 	

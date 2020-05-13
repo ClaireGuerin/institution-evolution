@@ -151,6 +151,7 @@ class Population(object):
 
 	def clearDemeInfo(self):
 		for deme in range(self.numberOfDemes):
+			self.demes[deme].technologyLevel += 1
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
