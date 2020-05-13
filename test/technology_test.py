@@ -220,3 +220,23 @@ class TestTechnology(object):
 		self.pop.populationReproduction()
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
+
+	def test_individual_has_its_groups_technical_knowledge(self):
+		pass
+
+	def test_individual_can_produce_its_own_resources(self):
+		pass
+
+	def test_individual_resources_increase_with_technology(self, instantiateSingleIndividualPopulation):
+		self.ind1 = instantiateSingleIndividualPopulation
+		self.ind1.technicalKnowledge = 2
+		self.ind1.phenotypicValues = [0.5] * 4
+		self.ind2 = instantiateSingleIndividualPopulation
+		self.ind2.technicalKnowledge = 4
+		self.ind2.phenotypicValues = self.ind1.phenotypicValues
+
+		self.ind1.produceResources()
+		self.ind2.produceResources()
+
+		assert self.ind1.resources < self.ind2.resources, "those with more knowledge get more resources, for the same phenotypes"
+
