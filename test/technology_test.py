@@ -221,11 +221,18 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
 
-	def test_individual_has_its_groups_technical_knowledge(self):
-		pass
+	def test_individual_has_access_to_its_groups_technical_knowledge(self):
+		assert False, "write this test!!!"
 
-	def test_individual_can_produce_its_own_resources(self):
-		pass
+	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
+		self.ind = instantiateSingleIndividualPopulation
+		self.ind.phenotypicValues = [0.5] * 4
+
+		assert hasattr(self.ind, "produceResources"), "put your farmers to work!"
+		self.resBEFORE = self.ind.resourcesAmount
+		self.ind.produceResources()
+		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it has less resources than before!"
+
 
 	def test_individual_resources_increase_with_technology(self, instantiateSingleIndividualPopulation):
 		self.ind1 = instantiateSingleIndividualPopulation
