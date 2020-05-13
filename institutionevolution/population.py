@@ -5,7 +5,7 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.individual import Individual as Ind
 import institutionevolution.fitness as fitness
 from statistics import variance
-from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
+from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 import random
 
 class Population(object):
@@ -28,6 +28,9 @@ class Population(object):
 		self.pathToPhenFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=PARAMETER_FOLDER)
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
+
+		self.pathToTechFile = fman.getPathToFile(filename=INITIAL_TECHNOLOGY_FILE, dirname=PARAMETER_FOLDER)
+		self.initialTechnologyLevel = fman.extractColumnFromFile(self.pathToTechFile, 0, float)[0]
 			
 		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=PARAMETER_FOLDER)		
 		self.parattrs = fman.extractColumnFromFile(self.pathToParFile, 0, str)
@@ -70,6 +73,7 @@ class Population(object):
 			newDemeInstance.demography = dSize
 			newDemeInstance.meanPhenotypes = self.initialPhenotypes
 			newDemeInstance.totalPhenotypes = [x * dSize for x in self.initialPhenotypes]
+			newDemeInstance.technologyLevel = self.initialTechnologyLevel
 						
 			for ind in range(dSize):
 				indiv = Ind()
