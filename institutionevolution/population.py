@@ -151,7 +151,9 @@ class Population(object):
 
 	def clearDemeInfo(self):
 		for deme in range(self.numberOfDemes):
-			self.demes[deme].technologyLevel += 1
+			if self.fit_fun == 'technology':
+				tmpTech = self.initialTechnologyLevel if self.demes[deme].publicGood == None else (1 + self.fitnessParameters['atech'] * self.demes[deme].publicGood) * self.demes[deme].technologyLevel / (1 + self.fitnessParameters['btech'] * self.demes[deme].technologyLevel)
+				self.demes[deme].technologyLevel = tmpTech
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0

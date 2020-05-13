@@ -2,3 +2,5 @@ fb,5
 b,0.5
 c,0.05
 gamma,0.07
+atech,0.1
+btech,1.2

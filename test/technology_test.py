@@ -168,7 +168,8 @@ class TestTechnology(object):
 		assert type(self.pop.demes[0].technologyLevel) is float, "initial technology level info missing"
 		assert self.pop.demes[0].technologyLevel > 0, "technology level cannot be null or negative" 
 
-	def test_deme_technology_level_gets_updated_with_individual_investments(self):
+	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
+		pars = getFitnessParameters()
 		self.pop = Pop()
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
@@ -178,8 +179,9 @@ class TestTechnology(object):
 
 		demeTech = self.pop.demes[0].technologyLevel
 
-		self.pop.populationReproduction()
+		self.pop.lifecycle(**pars)
 		self.pop.clearDemeInfo()
+		
 		assert demeTech != self.pop.demes[0].technologyLevel, "the technology level has not changed!"
 
 	def test_public_good_gets_updated(self):
@@ -203,17 +205,18 @@ class TestTechnology(object):
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
+		self.pop.fitnessParameters = pars
 		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
-		self.deme = self.pop.demes[0]
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		publicGood = self.deme.publicGood
-		tech = self.deme.technologyLevel
+		publicGood = self.pop.demes[0].publicGood
+		tech = self.pop.demes[0].technologyLevel
 
 		tech_new = (1 + pars['atech'] * publicGood) * tech / (1 + pars['btech'] * tech)
 
+		self.pop.update()
 		self.pop.populationReproduction()
 		self.pop.clearDemeInfo()
-		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level"
+		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
