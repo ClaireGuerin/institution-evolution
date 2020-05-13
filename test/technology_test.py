@@ -161,9 +161,21 @@ class TestTechnology(object):
 		except TypeError as e:
 			assert False, "technology fitness function does not yet take arguments, fix this!"
 
-	def test_deme_technology_level_gets_updated_with_individual_investments(self, instantiateSingleDemePopulation):
-		self.pop = instantiateSingleDemePopulation(100)
+	def test_initial_deme_technology_is_not_null(self):
+		self.pop = Pop()
+		self.pop.createAndPopulateDemes()
+
+		assert type(self.pop.demes[0].technologyLevel) is float, "initial technology level info missing"
+		assert self.pop.demes[0].technologyLevel > 0, "technology level cannot be null or negative" 
+
+	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
+		self.pars = getFitnessParameters()
+		self.pop = Pop()
+		self.pop.numberOfDemes = 1
+		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
+		self.pop.initialPhenotypes = 0.5
+		self.pop.createAndPopulateDemes()
 
 		demeTech = self.pop.demes[0].technologyLevel
 
