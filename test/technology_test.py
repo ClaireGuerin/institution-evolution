@@ -221,7 +221,17 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
 
-	def test_individual_has_access_to_its_groups_technical_knowledge(self):
+	def test_individual_has_access_to_its_groups_technical_knowledge(self, getFitnessParameters):
+		self.pop = Pop()
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 4
+		self.pop.initialTechnologyLevel = 5
+		self.pop.initialPhenotypes = [0.5] * 4
+		self.pop.createAndPopulateDemes()
+
+		pars = getFitnessParameters('technology')
+		self.pop.lifecycle(**pars)
+	
 		assert False, "write this test!!!"
 
 	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
@@ -232,7 +242,6 @@ class TestTechnology(object):
 		self.resBEFORE = self.ind.resourcesAmount
 		self.ind.produceResources()
 		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it has less resources than before!"
-
 
 	def test_individual_resources_increase_with_technology(self, instantiateSingleIndividualPopulation):
 		self.ind1 = instantiateSingleIndividualPopulation
