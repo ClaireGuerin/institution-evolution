@@ -68,3 +68,6 @@ class Individual(object):
 		
 	def procreate(self):
 		self.offspringNumber = rd.poisson(self.fertilityValue)
+
+	def produceResources(self):
+		self.resourcesAmount += self.technicalKnowledge

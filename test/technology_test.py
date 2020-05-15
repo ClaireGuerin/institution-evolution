@@ -257,14 +257,14 @@ class TestTechnology(object):
 		pars = getFitnessParameters(self.pop.fit_fun)
 		for i in range(ngens):
 			self.pop.lifecycle(**pars)
-			
+
+		assert self.pop.demography > 0, "You need to fix the fitness function so that it returns positive values. Your population went from {0} to extinct after {1} gens".format(self.pop.numberOfDemes * self.pop.initialDemeSize,
+			ngens)
+
 		for ind in self.pop.individuals:
 			assert False, "this fails as expected within the loop"
 			#assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
 			assert False, "init {0}, group {1}, indiv {2}".format(self.pop.initialTechnologyLevel, self.pop.demes[ind.currentDeme].technologyLevel,ind.technicalKnowledge)
-
-		assert False, "init pop size: {0}, pop size after {1} gens: {2}".format(self.pop.numberOfDemes * self.pop.initialDemeSize,
-			ngens, self.pop.demography)
 
 	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
 		self.ind = instantiateSingleIndividualPopulation
@@ -273,18 +273,41 @@ class TestTechnology(object):
 		assert hasattr(self.ind, "produceResources"), "put your farmers to work!"
 		self.resBEFORE = self.ind.resourcesAmount
 		self.ind.produceResources()
-		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it has less resources than before!"
+		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it didn't increase its amount of resources!"
 
-	def test_individual_resources_increase_with_technology(self, instantiateSingleIndividualPopulation):
-		self.ind1 = instantiateSingleIndividualPopulation
-		self.ind1.technicalKnowledge = 2
-		self.ind1.phenotypicValues = [0.5] * 4
-		self.ind2 = instantiateSingleIndividualPopulation
-		self.ind2.technicalKnowledge = 4
-		self.ind2.phenotypicValues = self.ind1.phenotypicValues
+	def test_individual_resources_increase_with_technology(self):
+		self.ind1 = Ind()
+		self.ind2 = Ind()
+
+		phen = [0.5] * 4
+		res = 1
+
+		setattr(self.ind1, "technicalKnowledge", 2)
+		self.ind1.phenotypicValues = phen
+		self.ind1.resourcesAmount = 0
+
+		setattr(self.ind2, "technicalKnowledge", 5)
+		self.ind2.phenotypicValues = phen
+		self.ind2.resourcesAmount = 0
+		assert self.ind1.technicalKnowledge != self.ind2.technicalKnowledge, "both individuals know {0},{1}".format(self.ind1.technicalKnowledge,self.ind2.technicalKnowledge)
 
 		self.ind1.produceResources()
 		self.ind2.produceResources()
 
-		assert self.ind1.resources < self.ind2.resources, "those with more knowledge get more resources, for the same phenotypes"
+		assert self.ind1.resourcesAmount < self.ind2.resourcesAmount, "ind1 knows {0} and gets {1}, ind2 knows {2} and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
+			self.ind1.technicalKnowledge,self.ind1.resourcesAmount,self.ind2.technicalKnowledge,self.ind2.resourcesAmount)
 
+	def test_group_total_private_time_allocation_is_calculated_and_given_to_individual_instance(self, instantiateSingleDemePopulation):
+		self.deme = instantiateSingleDemePopulation(10)
+		
+
+		assert False, "write this test!"
+
+	def test_production_increase_function(self, getFitnessParameters):
+		pars = getFitnessParameters('technology')
+		production = individualPrivateTime * (totalGroupPrivateTime ** (-pars['alphaResources'])) * groupTechnologicalLevel ** pars['alphaResources']
+
+		assert False, "finish this test!"
+
+	def test_fitness_function(self):
+		assert False, "write this test!"
