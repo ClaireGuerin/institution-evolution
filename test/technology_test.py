@@ -226,7 +226,7 @@ class TestTechnology(object):
 
 		assert hasattr(self.ind, "technicalKnowledge"), "individuals cannot learn yet: give them the ability for knowledge"
 
-	def test_individual_has_access_to_its_groups_technical_knowledge(self, getFitnessParameters):
+	def test_individual_has_access_to_its_groups_technical_knowledge_at_the_beginning(self, getFitnessParameters):
 		self.pop = Pop()
 		self.pop.fit_fun = 'technology'
 		self.pop.numberOfDemes = 3
@@ -237,16 +237,34 @@ class TestTechnology(object):
 		# WHEN THE POPULATION IS CREATED
 		self.pop.createAndPopulateDemes()
 
-		for ind in self.pop.individuals:
+		for ind in self.pop.individuals: 
+			#assert False, "this fails as expected within the loop"
 			assert ind.technicalKnowledge == self.pop.initialTechnologyLevel, "give the individual the right initial knowledge!"
 
-		# AFTER TECHNOLOGY CHANGES
-		pars = getFitnessParameters(self.pop.fit_fun)
-		for reps in range(10):
-			self.pop.lifecycle(**pars)
+	def test_individual_has_access_to_its_groups_technical_knowledge_after_a_few_generations(self, getFitnessParameters):
+		# NB: this test will only show once the fitness function returns something else than 0, 
+		# otherwise the population will go extinct after a single 
+		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 10
+		self.pop.initialTechnologyLevel = 5
+		self.pop.initialPhenotypes = [0.5] * 4
+		self.pop.createAndPopulateDemes()
 
+		# AFTER TECHNOLOGY CHANGES
+		ngens = 5
+		pars = getFitnessParameters(self.pop.fit_fun)
+		for i in range(ngens):
+			self.pop.lifecycle(**pars)
+			
 		for ind in self.pop.individuals:
-			assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
+			assert False, "this fails as expected within the loop"
+			#assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
+			assert False, "init {0}, group {1}, indiv {2}".format(self.pop.initialTechnologyLevel, self.pop.demes[ind.currentDeme].technologyLevel,ind.technicalKnowledge)
+
+		assert False, "init pop size: {0}, pop size after {1} gens: {2}".format(self.pop.numberOfDemes * self.pop.initialDemeSize,
+			ngens, self.pop.demography)
 
 	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
 		self.ind = instantiateSingleIndividualPopulation
