@@ -12,6 +12,9 @@ class Deme(object):
 		self.returnedGoods = None
 		self.effectivePublicGood = None
 		self.numberOfLeaders = None
+		self.civilianPublicTime = None
+		self.leaderPublicTime = None
+		self.labourForce = None
 
 	def technologyGrowth(self):
 		self.technologyLevel = 1.0

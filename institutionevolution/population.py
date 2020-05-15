@@ -189,6 +189,7 @@ class Population(object):
 				meanphen.append(calculateMean) 
 
 			setattr(deme, "meanPhenotypes", meanphen)
+			#setattr(deme, "labourForce", )
 
 			try:
 				#assert deme.meanPhenotypes[1] is not None, "Deme size: {0}, Phenotypes {1}".format(deme.demography, [i.phenotypicValues for i in self.individuals if i.currentDeme == deme.id])

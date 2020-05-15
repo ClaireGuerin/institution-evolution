@@ -297,13 +297,24 @@ class TestTechnology(object):
 		assert self.ind1.resourcesAmount < self.ind2.resourcesAmount, "ind1 knows {0} and gets {1}, ind2 knows {2} and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
 			self.ind1.technicalKnowledge,self.ind1.resourcesAmount,self.ind2.technicalKnowledge,self.ind2.resourcesAmount)
 
-	def test_group_total_private_time_allocation_is_calculated_and_given_to_individual_instance(self, instantiateSingleDemePopulation):
-		self.pop = instantiateSingleDemePopulation(10)
+	def test_group_total_private_time_allocation_is_calculated_and_given_to_individual_instance(self):
+		self.pop = Pop()
+		self.pop.createAndPopulateDemes()
 		self.deme = self.pop.demes[0]
 		assert hasattr(self.deme, "numberOfLeaders"), "how many leaders in deme?"
 		assert hasattr(self.deme, "civilianPublicTime"), "how much effective time does a civilian spend on the debate?"
 		assert hasattr(self.deme, "leaderPublicTime"), "how much effective time does a leader spend on the debate?"
 		assert hasattr(self.deme, "labourForce"), "need to calculate total private time in group to estimate labour force"
+
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+		self.pop.update()
+
+		self.demeAFTER = self.pop.demes[0]
+		assert self.demeAFTER.numberOfLeaders is not None
+		assert self.demeAFTER.civilianPublicTime is not None
+		assert self.demeAFTER.leaderPublicTime is not None
+		assert self.demeAFTER.labourForce is not None
 
 		# deme labour force = total private time: (demography - nleaders)(1-T1) + nleaders(1-T2)
 		# where T1 and T2 is effective time spent in debate by civilian and leader respectively
