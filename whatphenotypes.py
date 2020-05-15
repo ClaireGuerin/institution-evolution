@@ -9,26 +9,27 @@ fourth = "opinion on leadership strength (lambda). Expressed by ALL"
 
 phenlist = [first, second, third, fourth]
 
-scriptdesc = "This script gives informaiton on the order in which phenotypes are given in the full model. There are 4 different phenotypes. \n"
-globalphen = "To get the whole list of phenotypes in order, type: python whatphenotypes.py 0 \n"
-specificphen = "To get the description of the phenotype at a specific position x in [1:4], type: python whatphenotypes.py x \n"
+scriptdesc = "This script gives informaiton on the order in which phenotypes are given in the full model. There are 4 different phenotypes."
+globalphen = "To get the whole list of phenotypes in order, type: python whatphenotypes.py 0"
+specificphen = "To get the description of the phenotype at a specific position x in [1:4], type: python whatphenotypes.py x"
 
 def get_response(arguments):
 	if len(arguments) == 1:
-		response = scriptdesc+globalphen+specificphen
+		response = [scriptdesc,globalphen,specificphen]
 	elif len(arguments) == 2:
 		arg = int(arguments[1])
 		if arg <= 0:
-			response = [str(i+1)+": "+phenlist[i]+ "\n" for i in range(len(phenlist))]
+			response = [str(i+1)+": "+phenlist[i] for i in range(len(phenlist))]
 		elif arg <= 4:
-			response = phenlist[arg - 1]
+			response = [phenlist[arg - 1]]
 		else:
-			response = "phenotype rank out of range > 4"
+			response = ["phenotype rank out of range > 4"]
 	else:
-		response = "too many arguments given, only give one"
+		response = ["too many arguments given, only give one"]
 	return(response)
 
-
-print(get_response(sys.argv))
+result = get_response(sys.argv)
+for element in result:
+	print(element)
 
 

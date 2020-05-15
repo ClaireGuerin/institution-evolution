@@ -11,6 +11,7 @@ class Deme(object):
 		self.policingConsensus = None
 		self.returnedGoods = None
 		self.effectivePublicGood = None
+		self.numberOfLeaders = None
 
 	def technologyGrowth(self):
 		self.technologyLevel = 1.0
