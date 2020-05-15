@@ -221,18 +221,32 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
 
+	def test_individual_has_the_potential_for_knowledge(self):
+		self.ind = Ind()
+
+		assert hasattr(self.ind, "technicalKnowledge"), "individuals cannot learn yet: give them the ability for knowledge"
+
 	def test_individual_has_access_to_its_groups_technical_knowledge(self, getFitnessParameters):
 		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 4
 		self.pop.initialTechnologyLevel = 5
 		self.pop.initialPhenotypes = [0.5] * 4
+
+		# WHEN THE POPULATION IS CREATED
 		self.pop.createAndPopulateDemes()
 
-		pars = getFitnessParameters('technology')
-		self.pop.lifecycle(**pars)
-	
-		assert False, "write this test!!!"
+		for ind in self.pop.individuals:
+			assert ind.technicalKnowledge == self.pop.initialTechnologyLevel, "give the individual the right initial knowledge!"
+
+		# AFTER TECHNOLOGY CHANGES
+		pars = getFitnessParameters(self.pop.fit_fun)
+		for reps in range(10):
+			self.pop.lifecycle(**pars)
+
+		for ind in self.pop.individuals:
+			assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
 
 	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
 		self.ind = instantiateSingleIndividualPopulation

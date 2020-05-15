@@ -13,6 +13,7 @@ class Individual(object):
 		self.cheater = None
 		self.punished = None
 		self.punishmentFee = None
+		self.technicalKnowledge = None
 
 	def mutate(self, mutRate, mutStep):
 		self.mutant = bool(rd.binomial(1, mutRate))

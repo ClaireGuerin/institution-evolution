@@ -81,6 +81,7 @@ class Population(object):
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
 				setattr(indiv, "resourcesAmount", self.individualResources)
+				setattr(indiv, "technicalKnowledge", self.initialTechnologyLevel)
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
