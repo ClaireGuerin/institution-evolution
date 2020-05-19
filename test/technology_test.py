@@ -6,32 +6,29 @@ import gc
 
 class TestTechnology(object):
 
-	def test_technology_can_be_calculated(self, instantiateSingleDemePopulation):
-		self.fakepop = instantiateSingleDemePopulation(10)
-		
-		try:
-			self.fakepop.demes[0].technologyGrowth()
-		except AttributeError as e:
-			assert False, "Claire stupid you, there is no function to calculate the technology in a deme!"
-
 	def test_deme_technology_is_right_format(self):
-		self.fakeDeme = Dem()
-		self.fakeDeme.publicGood = 20
-		self.fakeDeme.meanPhenotypes = [0.5] * 4
+		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
+		self.pop.numberOfDemes = 2
+		self.pop.initialDemeSize = 3
+		#self.fakeDeme.publicGood = 20
+		self.pop.initialPhenotypes = [0.5] * 4
+		self.pop.createAndPopulateDemes()
 
-		assert self.fakeDeme.technologyLevel is None
+		assert self.pop.demes[0].progressValues['technologyLevel'] is self.pop.initialTechnologyLevel
 
-		self.fakeDeme.technologyGrowth()
+		self.pop.clearDemeInfo()
 
-		assert self.fakeDeme.technologyLevel is not None
-		assert type(self.fakeDeme.technologyLevel) is float
-		assert self.fakeDeme.technologyLevel >= 0
+		assert self.pop.demes[0].progressValues['technologyLevel'] is not None
+		assert type(self.pop.demes[0].progressValues['technologyLevel']) is float
+		assert self.pop.demes[0].progressValues['technologyLevel'] >= 0
 
 	def test_deme_has_consensus_policing_level(self):
 		self.fakeDeme = Dem()
 
 		try:
-			tmp = getattr(self.fakeDeme, "policingConsensus")
+			tmp = getattr(self.fakeDeme, "progressValues")
+			get = tmp['policingConsensus']
 		except AttributeError as e:
 			assert False, "where is the policing consensus?"
 
@@ -128,17 +125,6 @@ class TestTechnology(object):
 			assert type(dem.effectivePublicGood) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
 			assert dem.effectivePublicGood == (1 - dem.policingConsensus) * dem.publicGood
 
-	def test_deme_technology_calculation_is_right(self):
-		self.fakeDeme = Dem()
-		self.fakeDeme.publicGood = 20
-		self.fakeDeme.meanPhenotypes = [0.5] * 4
-
-		assert self.fakeDeme.technologyLevel is None 
-
-		self.fakeDeme.technologyGrowth()
-
-		#assert self.fakeDeme.technologyLevel == (1 - ) * self.fakeDeme.publicGood * 
-
 	def test_technology_fitness_fct_returns_value(self, getFitnessParameters):
 		self.ind = Ind()
 		pars = getFitnessParameters('technology')
@@ -165,8 +151,8 @@ class TestTechnology(object):
 		self.pop = Pop()
 		self.pop.createAndPopulateDemes()
 
-		assert type(self.pop.demes[0].technologyLevel) is float, "initial technology level info missing"
-		assert self.pop.demes[0].technologyLevel > 0, "technology level cannot be null or negative" 
+		assert type(self.pop.demes[0].progressValues['technologyLevel']) is float, "initial technology level info missing"
+		assert self.pop.demes[0].progressValues['technologyLevel'] > 0, "technology level cannot be null or negative" 
 
 	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
 		pars = getFitnessParameters()
@@ -177,12 +163,12 @@ class TestTechnology(object):
 		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
-		demeTech = self.pop.demes[0].technologyLevel
+		demeTech = self.pop.demes[0].progressValues['technologyLevel']
 
 		self.pop.lifecycle(**pars)
 		self.pop.clearDemeInfo()
 		
-		assert demeTech != self.pop.demes[0].technologyLevel, "the technology level has not changed!"
+		assert demeTech != self.pop.demes[0].progressValues['technologyLevel'], "the technology level has not changed!"
 
 	def test_public_good_gets_updated(self):
 		self.pop = Pop()
@@ -212,14 +198,14 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
 		publicGood = self.pop.demes[0].publicGood
-		tech = self.pop.demes[0].technologyLevel
+		tech = self.pop.demes[0].progressValues['technologyLevel']
 
 		tech_new = (1 + pars['atech'] * publicGood) * tech / (1 + pars['btech'] * tech)
 
 		self.pop.update()
 		self.pop.populationReproduction()
 		self.pop.clearDemeInfo()
-		assert self.pop.demes[0].technologyLevel == tech_new, "wrong value for new technology level."
+		assert self.pop.demes[0].progressValues['technologyLevel'] == tech_new, "wrong value for new technology level."
 
 	def test_individual_has_the_potential_for_knowledge(self):
 		self.ind = Ind()
@@ -297,35 +283,54 @@ class TestTechnology(object):
 		assert self.ind1.resourcesAmount < self.ind2.resourcesAmount, "ind1 knows {0} and gets {1}, ind2 knows {2} and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
 			self.ind1.technicalKnowledge,self.ind1.resourcesAmount,self.ind2.technicalKnowledge,self.ind2.resourcesAmount)
 
-	def test_group_total_private_time_allocation_is_calculated_and_given_to_individual_instance(self):
+	def test_group_labour_force_is_calculated_and_given_to_individual_instance(self):
 		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 20
 		self.pop.createAndPopulateDemes()
 		self.deme = self.pop.demes[0]
-		assert hasattr(self.deme, "numberOfLeaders"), "how many leaders in deme?"
-		assert hasattr(self.deme, "civilianPublicTime"), "how much effective time does a civilian spend on the debate?"
-		assert hasattr(self.deme, "leaderPublicTime"), "how much effective time does a leader spend on the debate?"
-		assert hasattr(self.deme, "labourForce"), "need to calculate total private time in group to estimate labour force"
+		assert hasattr(self.deme, "progressValues"), "make dict"
+		assert type(self.deme.progressValues) is dict
+		progressKeys = ["numberOfLeaders", "civilianPublicTime", "leaderPublicTime", "labourForce"]
+		for key in progressKeys:
+			assert key in self.deme.progressValues
 
+		self.pop.clearDemeInfo()
+		for pheno in self.pop.demes[0].meanPhenotypes:
+			assert pheno is not None, "none phenotypes before migration"
+		self.pop.populationMutationMigration()
+		for pheno in self.pop.demes[0].meanPhenotypes:
+			assert pheno is not None, "none phenotypes before update"
+		self.pop.update()
+
+		self.demeAFTER = self.pop.demes[0]
+		for key in progressKeys:
+			assert self.demeAFTER.progressValues[key] is not None
+		# deme labour force = total private time: (demography - nleaders)(1-T1) + nleaders(1-T2)
+		# where T1 and T2 is effective time spent in debate by civilian and leader respectively
+
+	def test_production_increase_function(self, getFitnessParameters):
+		pars = getFitnessParameters('technology')
+		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
+		self.pop.numberOfDemes = 2
+		self.pop.initialDemeSize = 5
+
+		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
 		self.pop.update()
 
-		self.demeAFTER = self.pop.demes[0]
-		assert self.demeAFTER.numberOfLeaders is not None
-		assert self.demeAFTER.civilianPublicTime is not None
-		assert self.demeAFTER.leaderPublicTime is not None
-		assert self.demeAFTER.labourForce is not None
-
-		# deme labour force = total private time: (demography - nleaders)(1-T1) + nleaders(1-T2)
-		# where T1 and T2 is effective time spent in debate by civilian and leader respectively
-
-		assert False, "finish this test!"
-
-	def test_production_increase_function(self, getFitnessParameters):
-		pars = getFitnessParameters('technology')
-		production = individualPrivateTime * (totalGroupPrivateTime ** (-pars['alphaResources'])) * groupTechnologicalLevel ** pars['alphaResources']
-
-		assert False, "finish this test!"
+		for ind in self.pop.individuals:
+			deme = self.pop.demes[ind.currentDeme]
+			pars.update(deme.progressValues)
+			assert deme.progressValues["labourForce"] is not None, "labour force is none!"
+			assert deme.progressValues["labourForce"] != 0, "labour force is null!"
+			assert deme.progressValues["technologyLevel"] is not None, "labour force is null!"
+			production = (1 - deme.progressValues["civilianPublicTime"]) * (deme.progressValues["labourForce"] ** (-pars['alphaResources'])) * deme.progressValues["technologyLevel"] ** pars['alphaResources']
+			ind.produceResources(self.pop.fit_fun, **pars)
+			assert ind.resourcesAmount == production, "ind produced {0} instead of {1}".format(ind.resourcesAmount, production)
 
 	def test_fitness_function(self):
 		assert False, "write this test!"

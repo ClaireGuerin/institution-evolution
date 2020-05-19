@@ -7,15 +7,11 @@ class Deme(object):
 		self.neighbours = []
 		self.meanPhenotypes = None
 		self.totalPhenotypes = None
-		self.technologyLevel = None
-		self.policingConsensus = None
-		self.returnedGoods = None
-		self.effectivePublicGood = None
-		self.numberOfLeaders = None
-		self.civilianPublicTime = None
-		self.leaderPublicTime = None
-		self.labourForce = None
-
-	def technologyGrowth(self):
-		self.technologyLevel = 1.0
-		#usablePG = (1 - deme.policingCredit) * deme.publicGood + deme.returnedGood
+		self.progressValues = {"technologyLevel": None,
+		"numberOfLeaders": None, 
+		"civilianPublicTime": None, 
+		"leaderPublicTime": None, 
+		"labourForce": None, 
+		"policingConsensus": None,
+		"returnedGoods": None,
+		"effectivePublicGood": None}
