@@ -252,13 +252,25 @@ class TestTechnology(object):
 			#assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
 			assert False, "init {0}, group {1}, indiv {2}".format(self.pop.initialTechnologyLevel, self.pop.demes[ind.currentDeme].technologyLevel,ind.technicalKnowledge)
 
-	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualPopulation):
-		self.ind = instantiateSingleIndividualPopulation
-		self.ind.phenotypicValues = [0.5] * 4
+	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+		self.pop = instantiateSingleIndividualsDemes(2)
+		self.pop.fit_fun = 'technology'
+		self.pop.initialPhenotypes = [0.5] * 4
+		self.pop.individualResources = 0
+
+		self.pop.createAndPopulateDemes()
+		self.ind = self.pop.individuals[0]
 
 		assert hasattr(self.ind, "produceResources"), "put your farmers to work!"
 		self.resBEFORE = self.ind.resourcesAmount
-		self.ind.produceResources()
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+		self.pop.update()
+		self.ind = self.pop.individuals[0]
+		self.deme = self.pop.demes[self.ind.currentDeme]
+		args = getFitnessParameters(self.pop.fit_fun)
+		args.update(self.deme.progressValues)
+		self.ind.produceResources('technology', **args)
 		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it didn't increase its amount of resources!"
 
 	def test_individual_resources_increase_with_technology(self):
