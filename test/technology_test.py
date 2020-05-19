@@ -273,7 +273,12 @@ class TestTechnology(object):
 		self.ind.produceResources('technology', **args)
 		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it didn't increase its amount of resources!"
 
-	def test_individual_resources_increase_with_technology(self):
+	def test_all_population_individuals_produce_resources(self):
+		assert False, "write this test!"
+
+	def test_individual_resources_increase_with_technology(self, getFitnessParameters):
+		self.parsInd = getFitnessParameters()
+		#self.parsInd2 = getFitnessParameters()
 		self.ind1 = Ind()
 		self.ind2 = Ind()
 
@@ -289,8 +294,8 @@ class TestTechnology(object):
 		self.ind2.resourcesAmount = 0
 		assert self.ind1.technicalKnowledge != self.ind2.technicalKnowledge, "both individuals know {0},{1}".format(self.ind1.technicalKnowledge,self.ind2.technicalKnowledge)
 
-		self.ind1.produceResources()
-		self.ind2.produceResources()
+		self.ind1.produceResources('technology', **self.parsInd)
+		self.ind2.produceResources('technology', **self.parsInd)
 
 		assert self.ind1.resourcesAmount < self.ind2.resourcesAmount, "ind1 knows {0} and gets {1}, ind2 knows {2} and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
 			self.ind1.technicalKnowledge,self.ind1.resourcesAmount,self.ind2.technicalKnowledge,self.ind2.resourcesAmount)
