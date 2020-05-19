@@ -48,8 +48,8 @@ class Population(object):
 		for fitattr,fitval in zip(self.fitattrs, self.fitvals):
 			self.fitnessParameters[fitattr] = fitval
 			
-		if hasattr(self, "individualResources") == False:
-			setattr(self, "individualResources", 1)
+		if hasattr(self, "individualBaseResources") == False:
+			setattr(self, "individualBaseResources", 1)
 			
 		self.fit_fun = fit_fun
 
@@ -81,7 +81,7 @@ class Population(object):
 				setattr(indiv, "phenotypicValues", self.initialPhenotypes)
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
-				setattr(indiv, "resourcesAmount", self.individualResources)
+				setattr(indiv, "resourcesAmount", 0)
 				setattr(indiv, "technicalKnowledge", self.initialTechnologyLevel)
 				self.individuals.append(indiv)
 			

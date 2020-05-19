@@ -348,5 +348,14 @@ class TestTechnology(object):
 			ind.produceResources(self.pop.fit_fun, **pars)
 			assert ind.resourcesAmount == production, "ind produced {0} instead of {1}".format(ind.resourcesAmount, production)
 
-	def test_fitness_function(self):
-		assert False, "write this test!"
+	def test_fitness_function(self, getFitnessParameters):
+		pars = getFitnessParameters('technology')
+		# civilians
+		civilian = Ind()
+		civilian.resourcesAmount = 10
+		civilian.reproduce('technology', **pars)
+		w = (pars['baseResources'] + (1 - pars['taxes']) * civilian.resourcesAmount) / (1 + pars['gammaCivilians'] + pars['n'] * (1 - pars['proportionLeaders']))
+
+		assert civilian.fertilityValue == w, "wrong fitness calculation for civilian"
+		# leaders
+		assert False, "write this test for leaders!"
