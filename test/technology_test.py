@@ -207,11 +207,6 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].progressValues['technologyLevel'] == tech_new, "wrong value for new technology level."
 
-	def test_individual_has_the_potential_for_knowledge(self):
-		self.ind = Ind()
-
-		assert hasattr(self.ind, "technicalKnowledge"), "individuals cannot learn yet: give them the ability for knowledge"
-
 	def test_individual_has_access_to_its_groups_technical_knowledge_at_the_beginning(self, getFitnessParameters):
 		self.pop = Pop()
 		self.pop.fit_fun = 'technology'
@@ -277,28 +272,32 @@ class TestTechnology(object):
 		assert False, "write this test!"
 
 	def test_individual_resources_increase_with_technology(self, getFitnessParameters):
-		self.parsInd = getFitnessParameters()
-		#self.parsInd2 = getFitnessParameters()
-		self.ind1 = Ind()
-		self.ind2 = Ind()
-
+		#up_dict = {'civilianPublicTime': 0, 'labourForce': 10}
 		phen = [0.5] * 4
-		res = 1
+		res = 0
 
-		setattr(self.ind1, "technicalKnowledge", 2)
+		# First Individual
+		self.ind1 = Ind()
+		self.pars = getFitnessParameters('technology')
+		self.pars.update({'civilianPublicTime': 0, 'labourForce': 10, 'technologyLevel': 2})
 		self.ind1.phenotypicValues = phen
-		self.ind1.resourcesAmount = 0
+		self.ind1.resourcesAmount = res
 
-		setattr(self.ind2, "technicalKnowledge", 5)
+		self.ind1.produceResources('technology', **self.pars)
+		save1 = self.ind1.resourcesAmount
+
+		# Second Individual
+		self.ind2 = Ind()
+		self.pars.update({'technologyLevel': 5})
 		self.ind2.phenotypicValues = phen
-		self.ind2.resourcesAmount = 0
-		assert self.ind1.technicalKnowledge != self.ind2.technicalKnowledge, "both individuals know {0},{1}".format(self.ind1.technicalKnowledge,self.ind2.technicalKnowledge)
+		self.ind2.resourcesAmount = res
 
-		self.ind1.produceResources('technology', **self.parsInd)
-		self.ind2.produceResources('technology', **self.parsInd)
+		self.ind2.produceResources('technology', **self.pars)
+		save2 = self.ind2.resourcesAmount
 
-		assert self.ind1.resourcesAmount < self.ind2.resourcesAmount, "ind1 knows {0} and gets {1}, ind2 knows {2} and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
-			self.ind1.technicalKnowledge,self.ind1.resourcesAmount,self.ind2.technicalKnowledge,self.ind2.resourcesAmount)
+		#assert save1[0]['technologyLevel'] < save2[0]['technologyLevel'], "somehow the technology levels are the same here"
+		assert save1 < save2, "ind1 knows 2 and gets {1}, ind2 knows 5 and gets {3}, when really those with more knowledge should get more resources, all else being equal".format(
+			save1,save2)
 
 	def test_group_labour_force_is_calculated_and_given_to_individual_instance(self):
 		self.pop = Pop()

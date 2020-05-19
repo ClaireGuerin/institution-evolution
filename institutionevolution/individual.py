@@ -13,8 +13,6 @@ class Individual(object):
 		self.cheater = None
 		self.punished = None
 		self.punishmentFee = None
-		self.technicalKnowledge = None
-		self.labourForce = None
 		self.socialStatus = None 
 
 	def mutate(self, mutRate, mutStep):
