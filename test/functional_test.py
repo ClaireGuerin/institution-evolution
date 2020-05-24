@@ -137,7 +137,7 @@ class TestSimpleRun(object):
 		runSim(self.out)
 
 		allOutput = glob.glob(self.outputFile + '*.txt')
-		assert len(allOutput) == 2, f"did not find output files with pattern: {self.outputFile + '*.txt'}"
+		assert len(allOutput) == 4, f"did not find output files with pattern: {self.outputFile + '*.txt'} in {allOutput}"
 		assert self.outputFile + '_phenotypes.txt' in allOutput, f"did not find phenotypes output file in {allOutput}"
 		assert self.outputFile + '_demography.txt' in allOutput, f"did not find demography output file in {allOutput}"
 
@@ -156,5 +156,7 @@ class TestSimpleRun(object):
 
 		os.remove(self.outputFile + '_phenotypes.txt')
 		os.remove(self.outputFile + '_demography.txt')
+		os.remove(self.outputFile + '_pheno_var.txt')
+		os.remove(self.outputFile + '_demo_var.txt')
 		
 		# Satisfied, she goes to sleep.
