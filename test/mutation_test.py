@@ -46,17 +46,18 @@ class TestMutationFunction(object):
 		pseudorandom(0)
 		self.nIndividuals = 1000
 		self.fakepop = instantiateSingleDemePopulation(self.nIndividuals)
+		self.mutationRate = 0.2
 		
 		self.mutantCount = 0
 		for ind in self.fakepop.individuals:
-			ind.mutate(mutRate=self.fakepop.mutationRate, mutStep=0.05)
+			ind.mutate(mutRate=self.mutationRate, mutStep=0.05)
 			if ind.mutant:
 				self.mutantCount += 1
 		
-		stat1, pval1 = scistats.ttest_1samp([1] * self.mutantCount + [0] * (self.nIndividuals - self.mutantCount), self.fakepop.mutationRate)
-		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.mutantCount/self.nIndividuals, self.fakepop.mutationRate)
-		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.fakepop.mutationRate, alternative = "two-sided")
-		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals, self.fakepop.mutationRate)
+		stat1, pval1 = scistats.ttest_1samp([1] * self.mutantCount + [0] * (self.nIndividuals - self.mutantCount), self.mutationRate)
+		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(self.mutantCount/self.nIndividuals, self.mutationRate)
+		self.test = scistats.binom_test(self.mutantCount, self.nIndividuals, self.mutationRate, alternative = "two-sided")
+		assert self.test > 0.05, "Success rate = {0} when mutation rate = {1}".format(self.mutantCount/self.nIndividuals, self.mutationRate)
 		
 		gc.collect()
 
