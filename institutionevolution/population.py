@@ -10,7 +10,7 @@ import random
 
 class Population(object):
 	
-	def __init__(self, fit_fun='pgg', inst=''):
+	def __init__(self, fit_fun='pgg', inst='', mutationBoundaries=True):
 
 		logging.basicConfig(level=logging.INFO,
 							format='[%(asctime)s]::%(levelname)s  %(message)s',
@@ -51,6 +51,7 @@ class Population(object):
 			setattr(self, "individualResources", 1)
 			
 		self.fit_fun = fit_fun
+		self.mutationBoundaries = mutationBoundaries
 
 		self.numberOfPhenotypes = len(self.initialPhenotypes)
 			
@@ -164,7 +165,7 @@ class Population(object):
 
 		for ind in self.individuals:
 			# MUTATION
-			ind.mutate(self.mutationRate, self.mutationStep)
+			ind.mutate(self.mutationRate, self.mutationStep, bounded=self.mutationBoundaries)
 			
 			# MIGRATION
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)

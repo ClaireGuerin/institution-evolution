@@ -186,7 +186,7 @@ class TestMutationFunction(object):
 		
 		gc.collect()
 
-	def test_mutation_can_be_unbounded(self, instantiateSingleDemePopulation):
+	def test_individual_mutation_can_be_unbounded(self, instantiateSingleDemePopulation):
 		self.pop = instantiateSingleDemePopulation(100)
 		self.pop.initialPhenotypes = [1,1,1,1]
 		self.pop.createAndPopulateDemes()
@@ -199,3 +199,25 @@ class TestMutationFunction(object):
 				collectPhenotypes.append(phen)
 
 		assert any([i > 1 for i in collectPhenotypes]), "no phenotype went over 1, even when unbounded."
+
+	def test_population_mutation_can_be_unbounded(self, instantiateSingleIndividualsDemes):
+		self.pop = Pop(mutationBoundaries = False)
+		self.pop.numberOfDemes = 10
+		self.pop.initialDemeSize = 10
+		self.pop.mutationRate = 1
+		self.pop.mutationStep = 0.5
+		self.pop.migrationRate = 0
+		self.pop.initialPhenotypes
+
+		self.pop.createAndPopulateDemes()
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+
+		collectPhenotypes = []
+
+		for ind in self.pop.individuals:
+			for phen in ind.phenotypicValues:
+				collectPhenotypes.append(phen)
+
+		assert any([i > 1 for i in collectPhenotypes]), "no phenotype went over 1, even when unbounded."
+
