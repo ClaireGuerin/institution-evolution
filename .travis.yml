@@ -8,6 +8,7 @@ branches:
   - multitraits-feature
   - policing-feature
   - policing-demog
+  - boundaries-feature
 
 # safelist
 branches:
