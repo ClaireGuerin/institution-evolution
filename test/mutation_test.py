@@ -140,7 +140,7 @@ class TestMutationFunction(object):
 		self.trueMutant.deviate(ms=0.05,n=len(self.oldPhenTrueMutant))
 		assert all(x != 0 for x in self.trueMutant.mutationDeviation), "Deviation = {0}".format(self.trueMutant.mutationDeviation)
 		
-		self.trueMutant.applyMutation(self.trueMutant.mutationDeviation)
+		self.trueMutant.applyMutation(self.trueMutant.mutationDeviation, bounded = True)
 		assert all(x != y for x, y in zip(self.trueMutant.phenotypicValues, self.oldPhenTrueMutant)), "New:{0}, Old:{1}".format(self.falseMutant.phenotypicValues, self.oldPhenFalseMutant)
 		
 		# Reset to test the whole thing together:
@@ -162,7 +162,7 @@ class TestMutationFunction(object):
 		self.falseMutant.deviate(ms=0.05, n=len(self.oldPhenFalseMutant))
 		assert self.falseMutant.mutationDeviation == [0] * len(self.oldPhenFalseMutant), "Deviation = {0}".format(self.falseMutant.mutationDeviation)
 		
-		self.falseMutant.applyMutation(self.falseMutant.mutationDeviation)
+		self.falseMutant.applyMutation(self.falseMutant.mutationDeviation, bounded = True)
 		assert self.falseMutant.phenotypicValues == self.oldPhenFalseMutant, "New:{0}, Old:{1}".format(self.falseMutant.phenotypicValues, self.oldPhenFalseMutant)
 		
 		# Reset to test the whole thing together:
@@ -184,3 +184,17 @@ class TestMutationFunction(object):
 		assert len(self.phen) == len(self.indiv.phenotypicValues)
 		
 		gc.collect()
+
+	def test_mutation_can_be_unbounded(self, instantiateSingleDemePopulation):
+		self.pop = instantiateSingleDemePopulation(100)
+		self.pop.initialPhenotypes = [1,1,1,1]
+		self.pop.createAndPopulateDemes()
+
+		collectPhenotypes = []
+
+		for ind in self.pop.individuals:
+			ind.mutate(1,0.5,bounded = False)
+			for phen in ind.phenotypicValues:
+				collectPhenotypes.append(phen)
+
+		assert any([i > 1 for i in collectPhenotypes]), "no phenotype went over 1, even when unbounded."

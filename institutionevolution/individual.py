@@ -11,10 +11,10 @@ class Individual(object):
 		self.fertilityValue = None
 		self.offspringNumber = None
 
-	def mutate(self, mutRate, mutStep):
+	def mutate(self, mutRate, mutStep, bounded = True):
 		self.mutant = bool(rd.binomial(1, mutRate))
 		self.deviate(mutStep, len(self.phenotypicValues))
-		self.applyMutation(self.mutationDeviation)
+		self.applyMutation(self.mutationDeviation, bounded)
 	
 	def deviate(self, ms, n):
 		if self.mutant:
@@ -23,12 +23,15 @@ class Individual(object):
 			dev = [0] * n
 		self.mutationDeviation = dev
 		
-	def applyMutation(self, dev):
+	def applyMutation(self, dev, bounded):
 		phen = self.phenotypicValues
 		unboundedphen = list(map(add, phen, dev))
-		boundedphen = list(map(lambda x: min(max(x,0.0),1.0), unboundedphen))
-		self.unboundedPhenotypicValues = unboundedphen
-		setattr(self, "phenotypicValues", boundedphen)
+		if bounded == False:
+			setattr(self, "phenotypicValues", unboundedphen)
+		else:
+			boundedphen = list(map(lambda x: min(max(x,0.0),1.0), unboundedphen))
+			self.unboundedPhenotypicValues = unboundedphen
+			setattr(self, "phenotypicValues", boundedphen)
 		
 	def migrate(self, nDemes, migRate, rds=None):
 		rd.seed(rds)
