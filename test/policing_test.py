@@ -54,7 +54,6 @@ class TestPolicingFunction(object):
 		self.fakepop.fitnessParameters = kwargs
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 10
-		self.fakepop.individualResources = 2
 		self.fakepop.initialPhenotypes = kwargs["x"]
 		self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
 		self.fakepop.migrationRate = 0
@@ -65,19 +64,16 @@ class TestPolicingFunction(object):
 		self.fakepop.populationMutationMigration()
 
 		for ind in self.fakepop.individuals:
-			# x = ind.phenotypicValues[0]
-			# y = ind.phenotypicValues[1]
-			# p = self.fakepop.demes[ind.currentDeme].publicGood
-			# n = self.fakepop.demes[ind.currentDeme].demography
-
-			# kwargs.update({"x":ind.phenotypicValues, "pg":p, "n":n})
-
+			assert ind.fertilityValue is None
+			ind.resourcesAmount = 2
+			ind.fertility(fitfun, **kwargs)
 			x = kwargs["x"][0]
 			y = kwargs["x"][1]
 			p = kwargs["pg"]
 			n = kwargs["n"]
-			ind.fertility(fitfun, **kwargs)
 			payoff = (1 - x) * ind.resourcesAmount + kwargs["b"] * (1 - y) * (p / n) - kwargs["c"] * y * ((1 - x) ** 2) * (p / n)
+			assert payoff == 1.11925, "pars: x={0},y={1},res={2},b={3},pg={4},n={5},c={6}".format(x,y,ind.resourcesAmount,kwargs["b"],p,n,kwargs["c"])
+			assert (kwargs["fb"] * payoff) / (kwargs["gamma"] * n) == 22.385, "pars: fb={0},p-off={1},gamma={2},n={3}".format(kwargs["fb"],payoff,kwargs["gamma"],n)
 			assert ind.fertilityValue == (kwargs["fb"] * payoff) / (kwargs["gamma"] * n), "Fitness function does not return what is expected"
 			assert ind.fertilityValue == 22.385, "python disagrees with mathematica. Payoff {0}(p) vs {1}(m). Parameters: {2}".format(payoff, 1.11925, kwargs)
 
@@ -117,12 +113,16 @@ class TestPolicingFunction(object):
 		expectedFertility = (fb * payoff) / (gamma * n)
 
 		for indiv in self.fakepop.individuals:
+			indiv.resourcesAmount = 2
 			# REPRODUCTION
 			infoToAdd = {}
 			infoToAdd["n"] = self.fakepop.demes[indiv.currentDeme].demography
+			assert infoToAdd["n"] == n, "group size changed"
 			infoToAdd["xmean"] = self.fakepop.demes[indiv.currentDeme].meanPhenotypes
-			infoToAdd["pg"] = self.fakepop.demes[indiv.currentDeme].publicGood
+			infoToAdd["pg"] = p
+			assert infoToAdd["pg"] == p, "pg changed"
 			infoToAdd["x"] = indiv.phenotypicValues
+			assert infoToAdd["x"] == [x,y], "phenotypes changed"
 
 			test = fitness.functions['policing'](r, **{**self.fakepop.fitnessParameters, **infoToAdd})
 			assert test == expectedFertility, "pars fed to function = res: {1}, {0}".format({**self.fakepop.fitnessParameters, **infoToAdd}, indiv.resourcesAmount)

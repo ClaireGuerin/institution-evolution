@@ -159,8 +159,8 @@ def getFitnessParameters():
 def runSim():
 	def _foo(outputfile):
 		population = Pop()
-		population.numberOfDemes = 2
-		population.initialDemeSize = 1
+		population.numberOfDemes = 3
+		population.initialDemeSize = 10
 		population.numberOfGenerations = 5
 		population.runSimulation(outputfile)
 		return population.numberOfGenerations
