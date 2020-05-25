@@ -20,7 +20,7 @@ def policing(res, **kwargs):
 	return f
 
 def technology(res, **kwargs):
-	f = 0
+	f = (kwargs["rb"] + res) / (1 + kwargs["gamma"] * kwargs["n"])
 	return f
 
 

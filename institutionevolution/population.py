@@ -82,7 +82,6 @@ class Population(object):
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
 				setattr(indiv, "resourcesAmount", 0)
-				setattr(indiv, "technicalKnowledge", self.initialTechnologyLevel)
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
@@ -211,9 +210,8 @@ class Population(object):
 			setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
 			
 			## progress
-			pars = self.fitnessParameters
-			pars.update({'n': deme.demography, 'phen': deme.meanPhenotypes})
-			deme.progressValues.update(progress.functions[self.fit_fun](**pars))
+			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes}
+			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")

@@ -50,8 +50,10 @@ class TestTechnology(object):
 			else:
 				assert dem.policingConsensus == 0, "It would seem we have a format issue: deme mean phenotypes are {0}".format(dem.meanPhenotypes)
 
-	def test_technology_fitness_function(self, getFitnessParameters):
+	def test_technology_fitness_function_exists(self, getFitnessParameters):
 		self.indiv = Ind()
+		self.indiv.resourcesAmount = 5
+		self.indiv.neighbours = [0,2]
 
 		try:
 			self.pars = getFitnessParameters("technology")
@@ -127,10 +129,15 @@ class TestTechnology(object):
 
 	def test_technology_fitness_fct_returns_value(self, getFitnessParameters):
 		self.ind = Ind()
+		self.ind.resourcesAmount = 5
 		pars = getFitnessParameters('technology')
+		infoToAdd = {}
+		infoToAdd['n'] = 10
+		infoToAdd['xmean'] =[0.3]
+		infoToAdd['x'] = [0.6]
 		
 		try:
-			self.ind.fertility('technology',**pars)
+			self.ind.fertility('technology',**{**pars,**infoToAdd})
 		except TypeError as e:
 			if str(e) == "float() argument must be a string or a number, not 'NoneType'":
 				assert False, "technology fonction returns nothing!"
@@ -155,7 +162,7 @@ class TestTechnology(object):
 		assert self.pop.demes[0].progressValues['technologyLevel'] > 0, "technology level cannot be null or negative" 
 
 	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
-		pars = getFitnessParameters()
+		pars = getFitnessParameters('technology')
 		self.pop = Pop()
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
@@ -184,14 +191,11 @@ class TestTechnology(object):
 		assert type(self.pop.demes[0].publicGood) is float, "publicGood must be created due to individual investments during reproduction"
 		assert self.pop.demes[0].publicGood >= 0, "public good cannot be negative"
 
-	def test_technology_updates_with_correct_number(self, getFitnessParameters):
-		pars = getFitnessParameters('technology')
-
+	def test_technology_updates_with_correct_number(self):
 		self.pop = Pop()
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
-		self.pop.fitnessParameters = pars
 		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
@@ -200,52 +204,12 @@ class TestTechnology(object):
 		publicGood = self.pop.demes[0].publicGood
 		tech = self.pop.demes[0].progressValues['technologyLevel']
 
-		tech_new = (1 + pars['atech'] * publicGood) * tech / (1 + pars['btech'] * tech)
+		tech_new = (1 + self.pop.fitnessParameters['atech'] * publicGood) * tech / (1 + self.pop.fitnessParameters['btech'] * tech)
 
 		self.pop.update()
-		self.pop.populationReproduction()
+		self.pop.populationReproduction(**self.pop.fitnessParameters)
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].progressValues['technologyLevel'] == tech_new, "wrong value for new technology level."
-
-	def test_individual_has_access_to_its_groups_technical_knowledge_at_the_beginning(self, getFitnessParameters):
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
-		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 4
-		self.pop.initialTechnologyLevel = 5
-		self.pop.initialPhenotypes = [0.5] * 4
-
-		# WHEN THE POPULATION IS CREATED
-		self.pop.createAndPopulateDemes()
-
-		for ind in self.pop.individuals: 
-			#assert False, "this fails as expected within the loop"
-			assert ind.technicalKnowledge == self.pop.initialTechnologyLevel, "give the individual the right initial knowledge!"
-
-	def test_individual_has_access_to_its_groups_technical_knowledge_after_a_few_generations(self, getFitnessParameters):
-		# NB: this test will only show once the fitness function returns something else than 0, 
-		# otherwise the population will go extinct after a single 
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
-		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 10
-		self.pop.initialTechnologyLevel = 5
-		self.pop.initialPhenotypes = [0.5] * 4
-		self.pop.createAndPopulateDemes()
-
-		# AFTER TECHNOLOGY CHANGES
-		ngens = 5
-		pars = getFitnessParameters(self.pop.fit_fun)
-		for i in range(ngens):
-			self.pop.lifecycle(**pars)
-
-		assert self.pop.demography > 0, "You need to fix the fitness function so that it returns positive values. Your population went from {0} to extinct after {1} gens".format(self.pop.numberOfDemes * self.pop.initialDemeSize,
-			ngens)
-
-		for ind in self.pop.individuals:
-			assert False, "this fails as expected within the loop"
-			#assert ind.technicalKnowledge == self.pop.demes[ind.currentDeme].technologyLevel, "update individual knowledge!"
-			assert False, "init {0}, group {1}, indiv {2}".format(self.pop.initialTechnologyLevel, self.pop.demes[ind.currentDeme].technologyLevel,ind.technicalKnowledge)
 
 	def test_individual_can_produce_its_own_resources(self, instantiateSingleIndividualsDemes, getFitnessParameters):
 		self.pop = instantiateSingleIndividualsDemes(2)
@@ -267,9 +231,6 @@ class TestTechnology(object):
 		args.update(self.deme.progressValues)
 		self.ind.produceResources('technology', **args)
 		assert self.ind.resourcesAmount > self.resBEFORE, "that one did not get the point of production: it didn't increase its amount of resources!"
-
-	def test_all_population_individuals_produce_resources(self):
-		assert False, "write this test!"
 
 	def test_individual_resources_increase_with_technology(self, getFitnessParameters):
 		#up_dict = {'civilianPublicTime': 0, 'labourForce': 10}
@@ -348,14 +309,24 @@ class TestTechnology(object):
 			ind.produceResources(self.pop.fit_fun, **pars)
 			assert ind.resourcesAmount == production, "ind produced {0} instead of {1}".format(ind.resourcesAmount, production)
 
-	def test_fitness_function(self, getFitnessParameters):
-		pars = getFitnessParameters('technology')
-		# civilians
-		civilian = Ind()
-		civilian.resourcesAmount = 10
-		civilian.reproduce('technology', **pars)
-		w = (pars['baseResources'] + (1 - pars['taxes']) * civilian.resourcesAmount) / (1 + pars['gammaCivilians'] + pars['n'] * (1 - pars['proportionLeaders']))
+	def test_fitness_function_returns_correct_value(self):
+		self.pop = Pop()
+		self.pop.fit_fun = 'technology'
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 5
+		self.pop.createAndPopulateDemes()
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+		self.pop.update()
 
-		assert civilian.fertilityValue == w, "wrong fitness calculation for civilian"
-		# leaders
-		assert False, "write this test for leaders!"
+		for ind in self.pop.individuals:
+			#assert self.pop.demes[ind.currentDeme].progressValues['technologyLevel'] > 1, "technology level too low: {0}".format(self.pop.demes[ind.currentDeme].progressValues['technologyLevel'])
+			#assert ind.resourcesAmount > 0, "not enough resources to reproduce: {0}".format(ind.resourcesAmount)
+			infoToAdd = {}
+			infoToAdd['n'] = self.pop.demes[ind.currentDeme].demography
+			infoToAdd['xmean'] = self.pop.demes[ind.currentDeme].meanPhenotypes
+			infoToAdd['x'] = ind.phenotypicValues
+			ind.reproduce('technology', **{**self.pop.fitnessParameters, **infoToAdd})
+
+			w = (self.pop.fitnessParameters['rb'] + ind.resourcesAmount) / (1 + self.pop.fitnessParameters['gamma'] * infoToAdd['n'])
+			assert ind.fertilityValue == w, "wrong fitness calculation for individual, should return {0}".format(w)
