@@ -9,6 +9,7 @@ branches:
   - policing-feature
   - policing-demog
   - boundaries-feature
+  - technology-feature
 
 # safelist
 branches:

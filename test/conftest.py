@@ -34,7 +34,15 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "epsilon": 3, 
 			  "eta": 0.001, 
 			  "zeta0": 0, 
-			  "zeta1": 1}}
+			  "zeta1": 1},
+			  'technology': {"x": [0.5, 0.2],
+			  "xmean": [0.2, 0.5],
+			  "n": 10,
+			  "atech": 0.6,
+			  "btech": 1.2,
+			  "alphaResources": 0.5,
+			  "rb": 2,
+			  "gamma": 0.1}}
 
 @pytest.fixture
 def pseudorandom():
@@ -62,9 +70,11 @@ def instantiateSingleDemePopulation():
 
 @pytest.fixture
 def instantiateSingleIndividualsDemes():
-	def _foo():
+	def _foo(nDemes):
 		fakepop = Pop()
-		fakepop.createAndPopulateDemes(fakepop.numberOfDemes, 1)
+		fakepop.numberOfDemes = nDemes
+		fakepop.initialDemeSize = 1
+		fakepop.createAndPopulateDemes()
 		return fakepop
 	
 	return _foo
@@ -165,8 +175,8 @@ def getFitnessParameters():
 def runSim():
 	def _foo(outputfile,fb=10):
 		population = Pop()
-		population.numberOfDemes = 2
-		population.initialDemeSize = 1
+		population.numberOfDemes = 3
+		population.initialDemeSize = 10
 		population.numberOfGenerations = 5
 		# make sure fitness parameters are alright
 		population.fitnessParameters.clear()

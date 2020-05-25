@@ -50,6 +50,10 @@ def policingdemog2(res, **kwargs):
 
 	return f
 
+def technology(res, **kwargs):
+	f = (kwargs["rb"] + res) / (1 + kwargs["gamma"] * kwargs["n"])
+	return f
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

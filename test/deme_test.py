@@ -12,14 +12,14 @@ class TestDeme(object):
 	
 	def test_deme_attributes(self, objectAttributesExist):
 		self.deme = Dem()
-		self.attributes = ["id", "demography", "publicGood", "neighbours", "meanPhenotypes", "totalPhenotypes"]
+		self.attributes = ["id", "demography", "neighbours", "meanPhenotypes", "totalPhenotypes", "progressValues"]
 		testAttr, whichAttr = objectAttributesExist(self.deme, self.attributes)
 		assert testAttr, "Deme is missing attribute(s) {0}".format(whichAttr)
 		
 		gc.collect()
 		
 	def test_deme_object_knows_itself(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]
@@ -29,7 +29,7 @@ class TestDeme(object):
 		gc.collect()
 	
 	def test_deme_object_knows_other_demes(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for deme in range(self.fakepop.numberOfDemes):
 			focalDeme = self.fakepop.demes[deme]
@@ -93,21 +93,22 @@ class TestDeme(object):
 		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "deme 0: mean returned by pop mut func not mean of all indivs in deme"
 		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"
 
-	def test_deme_public_good_calculated_from_cooperation(self):
-		self.fakepop = Pop()
-		self.fakepop.initialDemeSize = 2
-		self.fakepop.numberOfDemes = 10
-		self.fakepop.initialPhenotypes = [0.5]
-		self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
-		self.fakepop.individualResources = 2
-		self.fakepop.mutationRate = 0
-		self.fakepop.migrationRate = 0
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.fakepop.initialDemeSize)
+	# def test_deme_public_good_calculated_from_cooperation(self):
+	# 	self.fakepop = Pop()
+	# 	self.fakepop.initialDemeSize = 2
+	# 	self.fakepop.numberOfDemes = 10
+	# 	self.fakepop.initialPhenotypes = [0.5]
+	# 	self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
+	# 	self.fakepop.individualResources = 2
+	# 	self.fakepop.mutationRate = 0
+	# 	self.fakepop.migrationRate = 0
+	# 	self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.fakepop.initialDemeSize)
 
-		expectedPG = self.fakepop.initialDemeSize * self.fakepop.initialPhenotypes[0] * self.fakepop.individualResources
-		self.fakepop.clearDemeInfo()
-		self.fakepop.populationMutationMigration()
+	# 	expectedPG = self.fakepop.initialDemeSize * self.fakepop.initialPhenotypes[0] * self.fakepop.individualResources
+	# 	self.fakepop.clearDemeInfo()
+	# 	self.fakepop.populationMutationMigration()
+	# 	self.fakepop.update()
 		
-		for dem in self.fakepop.demes:
-			assert dem.publicGood is not None, "Deme public good not calculated"
-			assert dem.publicGood == expectedPG, "Deme public good has wrong value"
+	# 	for dem in self.fakepop.demes:
+	# 		assert dem.publicGood is not None, "Deme public good not calculated"
+	# 		assert dem.publicGood == expectedPG, "Deme public good has wrong value"

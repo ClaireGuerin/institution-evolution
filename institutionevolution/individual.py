@@ -10,6 +10,10 @@ class Individual(object):
 		self.resourcesAmount = None
 		self.fertilityValue = None
 		self.offspringNumber = None
+		self.cheater = None
+		self.punished = None
+		self.punishmentFee = None
+		self.socialStatus = None 
 
 	def mutate(self, mutRate, mutStep, bounded = True):
 		self.mutant = bool(rd.binomial(1, mutRate))
@@ -67,3 +71,7 @@ class Individual(object):
 		
 	def procreate(self):
 		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
+
+	def produceResources(self, fun_name="pgg", **kwargs):
+		if fun_name == 'technology':
+			self.resourcesAmount = (1 - kwargs['civilianPublicTime']) * (kwargs['labourForce'] ** (-kwargs['alphaResources'])) * kwargs['technologyLevel'] ** kwargs['alphaResources']
