@@ -22,6 +22,22 @@ def policing(**kwargs):
 	prog['labourForce'] = None
 	return prog
 
+def policingdemog(**kwargs):
+	prog = {}
+	prog['numberOfLeaders'] = None
+	prog['civilianPublicTime'] = None
+	prog['leaderPublicTime'] = None
+	prog['labourForce'] = None
+	return prog
+
+def policingdemog2(**kwargs):
+	prog = {}
+	prog['numberOfLeaders'] = None
+	prog['civilianPublicTime'] = None
+	prog['leaderPublicTime'] = None
+	prog['labourForce'] = None
+	return prog
+
 def technology(**kwargs):
 	prog = {}
 	phenos = [0 if p is None else p for p in kwargs['phen']]
