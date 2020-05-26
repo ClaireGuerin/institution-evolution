@@ -245,7 +245,10 @@ class Population(object):
 			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
 			demovariancefile = '{0}/{1}_demo_var.txt'.format(self.pathToOutputFolder, outputfile)
 			
-			with open(phenotypesfile, "w") as fp, open(demographyfile, "w") as fd, open(demovariancefile, "w") as vd, open(phenvariancefile, "w") as vp:
+			with open(phenotypesfile, "w", buffering=1) as fp, \
+			open(demographyfile, "w", buffering=1) as fd, \
+			open(demovariancefile, "w", buffering=1) as vd, \
+			open(phenvariancefile, "w", buffering=1) as vp:
 				for gen in range(self.numberOfGenerations):
 					logging.info('Running generation {0}'.format(gen))
 					self.lifecycle(**self.fitnessParameters)

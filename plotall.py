@@ -20,7 +20,7 @@ npoints = 6
 for i in range(npoints):
 	parvalue = (i + 1) / 10
 	#fileslist = glob.glob('{0}/res/out-d{1}_{2}.txt'.format(dirpath,parvalue,VARIABLES[variableID]))
-	fileslist = glob.glob('/home/claire/Desktop/res/pars1/out-d{0}_{1}.txt'.format(parvalue,VARIABLES[variableID]))
+	fileslist = glob.glob('/home/claire/Desktop/res/pars3/unbounded/out-d{0}_{1}.txt'.format(parvalue,VARIABLES[variableID]))
 	
 	# FIGURE OF VARIABLE CHANGE OVER TIME FOR 1 SIMULATION RUN
 	fig = plt.figure(figsize=(20,10))
