@@ -33,7 +33,7 @@ class Population(object):
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 
-		self.pathToTechFile = fman.getPathToFile(filename=INITIAL_TECHNOLOGY_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToTechFile = fman.getPathToFile(filename=INITIAL_TECHNOLOGY_FILE, dirname=self.pathToInputFiles)
 		self.initialTechnologyLevel = fman.extractColumnFromFile(self.pathToTechFile, 0, float)[0]
 			
 		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=self.pathToInputFiles)		
