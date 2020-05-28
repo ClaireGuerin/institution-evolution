@@ -102,18 +102,18 @@ class TestSimpleRun(object):
 		ngen = runSim(self.out)
 		
 		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
-			self.lineNumberfp = len(fp.readlines())
-			self.lineNumberfd = len(fd.readlines())
+			self.fplines = fp.readlines()
+			self.fdlines = fd.readlines()
 			
 		#self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
 		#self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		#self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int) 
 			
-		assert self.lineNumberfp == ngen
-		assert self.lineNumberfp == ngen
+		assert len(self.fplines) == ngen, "wrong # of generations, {0}".format(self.fplines)
+		assert len(self.fdlines) == ngen
 
-		os.remove(self.outputFile + '_phenotypes.txt')
-		os.remove(self.outputFile + '_demography.txt')
+		#os.remove(self.outputFile + '_phenotypes.txt')
+		#os.remove(self.outputFile + '_demography.txt')
 
 	def test_program_writes_non_empty_output(self, runSim):
 		self.out = 'output_test'
