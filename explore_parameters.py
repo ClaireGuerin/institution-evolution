@@ -13,16 +13,16 @@ def single_simulation_run(parameter_combination):
 		"c1": parameter_combination[1], 
 		"bb": parameter_combination[2], 
 		"pp": parameter_combination[3], 
-		"p"}: parameter_combination[4])
-	population.runSimulation(outputfile="out-d{0}".format(migrationRate))
+		"p": parameter_combination[4]})
+	population.runSimulation(outputfile="out-pars{0}".format(parameter_combination))
 
 
 
 rb = range(10,50,10)
-c1 = range(0.2,10,2)
+c1 = [x * 0.1 for x in range(2,100,20)]
 bb = range(10,100,20)
-pp = range(0.5,10,2)
-p = range(0.1,0.9,0.2)
+pp = [x * 0.1 for x in range(5,100,20)]
+p = [x * 0.1 for x in range(1,9,2)]
 
 all_parameter_combinations = prod(*[rb,c1,bb,pp,p])
 
