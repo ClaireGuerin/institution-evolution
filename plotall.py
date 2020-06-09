@@ -8,19 +8,19 @@ import sys
 import logging
 
 dirpath = os.getcwd()
-time = range(0,20000)
+time = range(0,10000)
 
 VARIABLES = ('phenotypes','demography')
 variableID = int(sys.argv[1])
 
 meanVariable = []
 varianceVariable = []
-npoints = 6
+npoints = 9
 
 for i in range(npoints):
 	parvalue = (i + 1) / 10
 	#fileslist = glob.glob('{0}/res/out-d{1}_{2}.txt'.format(dirpath,parvalue,VARIABLES[variableID]))
-	fileslist = glob.glob('/home/claire/Desktop/res/pars3/unbounded/out-d{0}_{1}.txt'.format(parvalue,VARIABLES[variableID]))
+	fileslist = glob.glob('/home/claire/Desktop/res/pars3-bign0/out-d{0}_{1}.txt'.format(parvalue,VARIABLES[variableID]))
 	
 	# FIGURE OF VARIABLE CHANGE OVER TIME FOR 1 SIMULATION RUN
 	fig = plt.figure(figsize=(20,10))
@@ -43,8 +43,8 @@ for i in range(npoints):
 			variable.extend([0]*ldiff)
 		
 		plt.plot(time,variable, label=simfile)
-		vmean.append(mean(variable[10000:-1]))
-		vvar.append(variance(variable[10000:-1]))
+		vmean.append(mean(variable[9000:-1]))
+		vvar.append(variance(variable[9000:-1]))
 
 	plt.xlabel('Generations')
 	plt.ylabel(VARIABLES[variableID])
@@ -57,6 +57,7 @@ for i in range(npoints):
 
 	meanVariable.append(mean(vmean))
 	varianceVariable.append(mean(vvar))
+	print('mean: {0}'.format(mean(vmean)))
 
 plt.close('all') # close all figures before plotting the general figure
 	
