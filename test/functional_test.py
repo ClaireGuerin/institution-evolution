@@ -127,8 +127,8 @@ class TestSimpleRun(object):
 		assert sum(self.resfp) > 0
 		assert sum(self.resfd) > 0
 
-		os.remove(self.outputFile + '_phenotypes.txt')
-		os.remove(self.outputFile + '_demography.txt')
+		#os.remove(self.outputFile + '_phenotypes.txt')
+		#os.remove(self.outputFile + '_demography.txt')
 
 	# She goes to the output folder and sees that two files have been written by the program, one with the mean phenotypes and the other with the mean deme size
 	def test_program_writes_phenotypes_and_deme_sizes(self, runSim):
@@ -141,8 +141,8 @@ class TestSimpleRun(object):
 		assert self.outputFile + '_phenotypes.txt' in allOutput, f"did not find phenotypes output file in {allOutput}"
 		assert self.outputFile + '_demography.txt' in allOutput, f"did not find demography output file in {allOutput}"
 
-		os.remove(self.outputFile + '_phenotypes.txt')
-		os.remove(self.outputFile + '_demography.txt')
+		#os.remove(self.outputFile + '_phenotypes.txt')
+		#os.remove(self.outputFile + '_demography.txt')
 
 	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim):
 		self.out = 'output_test'
@@ -154,9 +154,9 @@ class TestSimpleRun(object):
 			assert False, "The program should exit with information message when population goes extinct!"
 
 
-		os.remove(self.outputFile + '_phenotypes.txt')
-		os.remove(self.outputFile + '_demography.txt')
-		os.remove(self.outputFile + '_pheno_var.txt')
-		os.remove(self.outputFile + '_demo_var.txt')
+		#os.remove(self.outputFile + '_phenotypes.txt')
+		#os.remove(self.outputFile + '_demography.txt')
+		#os.remove(self.outputFile + '_pheno_var.txt')
+		#os.remove(self.outputFile + '_demo_var.txt')
 		
 		# Satisfied, she goes to sleep.

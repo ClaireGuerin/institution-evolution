@@ -254,6 +254,7 @@ class Population(object):
 					self.lifecycle(**self.fitnessParameters)
 
 					if self.demography == 0:
+						raise ValueError("The population went extinct after {0} generations".format(gen))
 						logging.info('Population went extinct after {0} generations'.format(gen))
 						phenmeans = [None] * self.numberOfPhenotypes
 						break
