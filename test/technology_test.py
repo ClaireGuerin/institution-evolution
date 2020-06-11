@@ -218,6 +218,7 @@ class TestTechnology(object):
 		self.pop.individualResources = 0
 
 		self.pop.createAndPopulateDemes()
+		self.pop.individuals[0].resourcesAmount = 0
 		self.ind = self.pop.individuals[0]
 
 		assert hasattr(self.ind, "produceResources"), "put your farmers to work!"
