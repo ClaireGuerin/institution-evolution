@@ -11,7 +11,7 @@ import random
 
 class Population(object):
 	
-	def __init__(self, fit_fun='pgg', inst='', mutationBoundaries=True):
+	def __init__(self, fit_fun='pgg', inst=None, mutationBoundaries=True):
 
 		logging.basicConfig(level=logging.INFO,
 							format='[%(asctime)s]::%(levelname)s  %(message)s',
@@ -19,8 +19,12 @@ class Population(object):
 
 		logging.info('Creating population')
 
-		self.pathToInputFiles = '{0}/{1}'.format(PARAMETER_FOLDER,inst)
-		self.pathToOutputFiles = '{0}/{1}'.format(OUTPUT_FOLDER,inst)
+		if inst is None:
+			self.pathToInputFiles = PARAMETER_FOLDER
+			self.pathToOutputFiles = OUTPUT_FOLDER
+		else:
+			self.pathToInputFiles = '{0}/{1}'.format(PARAMETER_FOLDER,inst)
+			self.pathToOutputFiles = '{0}/{1}'.format(OUTPUT_FOLDER,inst)
 		
 		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=self.pathToInputFiles)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
