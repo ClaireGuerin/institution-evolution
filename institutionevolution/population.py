@@ -86,7 +86,7 @@ class Population(object):
 				setattr(indiv, "phenotypicValues", self.initialPhenotypes)
 				setattr(indiv, "currentDeme", deme)
 				setattr(indiv, "neighbours", newDemeInstance.neighbours)
-				setattr(indiv, "resourcesAmount", 0)
+				setattr(indiv, "resourcesAmount", self.individualBaseResources)
 				self.individuals.append(indiv)
 			
 			self.demes.append(newDemeInstance)
@@ -254,7 +254,7 @@ class Population(object):
 					self.lifecycle(**self.fitnessParameters)
 
 					if self.demography == 0:
-						raise ValueError("The population went extinct after {0} generations".format(gen))
+						#raise ValueError("The population went extinct after {0} generations".format(gen))
 						logging.info('Population went extinct after {0} generations'.format(gen))
 						phenmeans = [None] * self.numberOfPhenotypes
 						break

@@ -174,9 +174,9 @@ def getFitnessParameters():
 @pytest.fixture
 def runSim():
 	def _foo(outputfile,fb=10):
-		population = Pop()
+		population = Pop(fit_fun='pgg')
 		population.numberOfDemes = 5
-		population.initialDemeSize = 20
+		population.initialDemeSize = 8
 		population.numberOfGenerations = 5
 		# make sure fitness parameters are alright
 		population.fitnessParameters.clear()
