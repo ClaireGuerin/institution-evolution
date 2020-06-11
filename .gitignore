@@ -1,7 +1,6 @@
 __pycache__/
 *.pyc
 res/
-pars/
 logos/
 log.txt
 analyticalpredictions*.txt
