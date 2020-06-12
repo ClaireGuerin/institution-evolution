@@ -12,7 +12,7 @@ class TestIndividual(object):
 		
 	def test_individual_attributes_exist(self, objectAttributesExist):
 		self.indiv = Ind()
-		self.attributes = ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber"]
+		self.attributes = ["phenotypicValues", "currentDeme", "resourcesAmount", "fertilityValue", "offspringNumber", "cheater", "punished", "punishmentFee"]
 		testAttr, whichAttr = objectAttributesExist(self.indiv, self.attributes)
 		assert testAttr, "Individual is missing attribute(s) {0}".format(whichAttr)
 		

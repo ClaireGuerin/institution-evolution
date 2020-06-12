@@ -6,6 +6,10 @@ branches:
   - automation-feature
   - hotfix-1.0.1
   - multitraits-feature
+  - policing-feature
+  - policing-demog
+  - boundaries-feature
+  - technology-feature
 
 # safelist
 branches:

@@ -12,7 +12,7 @@ from collections import Counter
 class TestMigrationFunction(object):
 	
 	def test_individual_has_destination_deme_after_migration(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -22,7 +22,7 @@ class TestMigrationFunction(object):
 		
 	def test_migration_returns_a_destination_deme_of_correct_format(self, instantiateSingleIndividualsDemes):
 		"""The migration function should return the new deme, which is an integer among all demes"""
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -33,7 +33,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 		
 	def test_migrants_are_defined_properly(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for ind in self.fakepop.individuals:
 			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
@@ -46,7 +46,9 @@ class TestMigrationFunction(object):
 	def test_migrants_are_drawn_equally_depending_on_seed(self):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		self.fakepop.initialDemeSize = self.individualsPerDeme
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.createAndPopulateDemes()
 
 		self.migrants = []
 
@@ -62,9 +64,11 @@ class TestMigrationFunction(object):
 	def test_migrants_are_drawn_from_binomial(self, pseudorandom):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop()
-		self.fakepop.createAndPopulateDemes(self.fakepop.numberOfDemes, self.individualsPerDeme)
+		self.fakepop.initialDemeSize = self.individualsPerDeme
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.createAndPopulateDemes()
 		
-		i = 0			
+		i = 0
 		for deme in range(self.fakepop.numberOfDemes):
 			migrantsCount = 0
 			for ind in range(self.individualsPerDeme):
@@ -79,7 +83,7 @@ class TestMigrationFunction(object):
 			stat1, pval1 = scistats.ttest_1samp([1] * migrantsCount + [0] * (self.individualsPerDeme - migrantsCount), self.fakepop.migrationRate)
 			test = scistats.binom_test(x=migrantsCount, n=self.individualsPerDeme, p=self.fakepop.migrationRate, alternative="two-sided")
 			
-			assert pval1 > 0.05, "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
+			assert any([pval1 > 0.05,migrantsCount/self.individualsPerDeme==self.fakepop.migrationRate]), "t-test mean failed. Observed: {0}, Expected: {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 			assert test > 0.05, "Success rate = {0} when mutation rate = {1}".format(migrantsCount/self.individualsPerDeme, self.fakepop.migrationRate)
 		
 		gc.collect()
@@ -112,7 +116,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 			
 	def test_only_migrants_change_deme(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		self.migrantIndivTrue = self.fakepop.individuals[0]
 		self.migrantIndivFalse = self.fakepop.individuals[1]
@@ -130,7 +134,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 		
 	def test_current_individuals_deme_updated_with_new(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes()
+		self.fakepop = instantiateSingleIndividualsDemes(10)
 		
 		for ind in self.fakepop.individuals:
 			originalDeme = ind.currentDeme
@@ -145,7 +149,7 @@ class TestMigrationFunction(object):
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 		self.fakepop.update()
 		
@@ -187,7 +191,7 @@ class TestMigrationFunction(object):
 			else:
 				ind.phenotypicValues = [0.8]
 
-		self.fakepop.clearDemePhenotypeAndSizeInfo()
+		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 
 		assert self.fakepop.demes[0].totalPhenotypes[0] == pytest.approx(0.8 * self.fakepop.initialDemeSize)

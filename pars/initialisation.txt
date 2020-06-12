@@ -1,3 +1,4 @@
 numberOfDemes,3
 initialDemeSize,2
 numberOfGenerations,10
+individualBaseResources,1

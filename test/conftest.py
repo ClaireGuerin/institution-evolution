@@ -4,13 +4,45 @@ from institutionevolution.individual import Individual as Ind
 import random as rd
 import numpy.random as np
 
-fitpardict = {"x": [0.5],
+fitpardict = {'pgg': {"x": [0.5],
 			  "xmean": [0.2], 
 			  "fb": 2, 
 			  "b": 0.5,
 			  "c": 0.05, 
 			  "gamma": 0.01,
-			  "n": 10}
+			  "n": 10},
+			  'policing': {"x": [0.5, 0.2],
+			  "xmean": [0.2, 0.5],
+			  "pg": 2,
+			  "fb": 2, 
+			  "b": 0.5,
+			  "c": 0.05,
+			  "gamma": 0.01,
+			  "n": 10},
+			  'policingdemog':{"x": [0.5],
+			  "xmean": [0.2], 
+			  "n": 10,
+			  "phi": 1,
+			  "th": 0.1,
+			  "rb": 1, 
+			  "kb": 1.2, 
+			  "p": 0.2, 
+			  "alpha": 2, 
+			  "gamma": 0.01, 
+			  "beta0": 0, 
+			  "beta1": 1, 
+			  "epsilon": 3, 
+			  "eta": 0.001, 
+			  "zeta0": 0, 
+			  "zeta1": 1},
+			  'technology': {"x": [0.5, 0.2],
+			  "xmean": [0.2, 0.5],
+			  "n": 10,
+			  "atech": 0.6,
+			  "btech": 1.2,
+			  "alphaResources": 0.5,
+			  "rb": 2,
+			  "gamma": 0.1}}
 
 @pytest.fixture
 def pseudorandom():
@@ -38,9 +70,11 @@ def instantiateSingleDemePopulation():
 
 @pytest.fixture
 def instantiateSingleIndividualsDemes():
-	def _foo():
+	def _foo(nDemes):
 		fakepop = Pop()
-		fakepop.createAndPopulateDemes(fakepop.numberOfDemes, 1)
+		fakepop.numberOfDemes = nDemes
+		fakepop.initialDemeSize = 1
+		fakepop.createAndPopulateDemes()
 		return fakepop
 	
 	return _foo
@@ -106,27 +140,48 @@ def objectAttributesAreNotNone():
 
 @pytest.fixture
 def pggParameters():
-	return fitpardict
+	return fitpardict['pgg']
 
 @pytest.fixture
 def makePopulationReproduce():
-	fakepop = Pop(10)
-	fakepop.numberOfDemes = 1
-	fakepop.initialDemeSize = 10
-	fakepop.fitnessParameters = fitpardict
-	fakepop.fit_fun = 'pgg'
-	fakepop.mutationRate = 0
-	fakepop.migrationRate = 0
-	fakepop.createAndPopulateDemes()
-	for i in range(fakepop.demography):
-		fakepop.individuals[i].resourcesAmount = i * 2
-	parents = fakepop.individuals
+	def _foo(fitfun='pgg'):
+		fakepop = Pop()
+		fakepop.numberOfDemes = 1
+		fakepop.initialDemeSize = 10
+		fakepop.fitnessParameters = fitpardict[fitfun]
+		fakepop.fit_fun = fitfun
+		fakepop.mutationRate = 0
+		fakepop.migrationRate = 0
+		fakepop.createAndPopulateDemes()
+		for i in range(fakepop.demography):
+			fakepop.individuals[i].resourcesAmount = i * 2
+		parents = fakepop.individuals
+		
+		for ind in range(len(parents)):
+			indiv = fakepop.individuals[ind]
+			indiv.resourcesAmount = ind * 2
+		
+		fakepop.populationReproduction(**fakepop.fitnessParameters)
+		return (fakepop, parents)
+	return _foo
+
+@pytest.fixture
+def getFitnessParameters():
+	def _foo(fitfun='pgg'):
+		return fitpardict[fitfun]
+	return _foo
 	
-	for ind in range(len(parents)):
-		indiv = fakepop.individuals[ind]
-		indiv.resourcesAmount = ind * 2
-	
-	fakepop.populationReproduction(**fakepop.fitnessParameters)
-	
-	return (fakepop, parents)
-	
+@pytest.fixture
+def runSim():
+	def _foo(outputfile,fb=10):
+		population = Pop(fit_fun='pgg')
+		population.numberOfDemes = 5
+		population.initialDemeSize = 8
+		population.numberOfGenerations = 5
+		# make sure fitness parameters are alright
+		population.fitnessParameters.clear()
+		population.fitnessParameters.update(fitpardict['pgg'])
+		population.fitnessParameters.update({"fb":fb})
+		population.runSimulation(outputfile)
+		return population.numberOfGenerations
+	return _foo

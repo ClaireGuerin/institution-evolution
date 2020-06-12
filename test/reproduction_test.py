@@ -162,25 +162,119 @@ class TestReproductionFunction(object):
 				assert offspring.phenotypicValues == indiv.phenotypicValues, "Offspring does not inherit parent's phenotype: {0} instead of {1}".format(offspring.phenotypicValues, indiv.phenotypicValues)
 		
 	def test_offspring_are_added_to_the_population(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert hasattr(self.fakepop, "offspring"), "No individual instances created in the population"
 		
 	def test_parents_are_replaced_by_offspring_in_population(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert self.fakepop.individuals != self.parents, "Population not updated"
 		assert self.fakepop.individuals == self.fakepop.offspring, "Population not updated correctly"
 		
 	def test_deme_demography_is_updated(self, makePopulationReproduce):
-		self.fakepop, self.parents = makePopulationReproduce
+		self.fakepop, self.parents = makePopulationReproduce()
 		
 		assert self.fakepop.demography == len(self.fakepop.individuals), "Population demography not updated"
 		
-	
+	def test_fertility_cannot_be_calculated_if_par_dict_incomplete(self, instantiateSingleDemePopulation):
+		self.fakepop = instantiateSingleDemePopulation(1)
+		self.fakepop.fitnessParameters = {"b":0.5,
+		"c":0.05,
+		"fb":2,
+		"gamma":0.01}
+		self.fakepop.individualResources = 2
+		self.fakepop.initialPhenotypes = [0.2, 0.5]
+		self.fakepop.numberOfPhenotypes = len(self.fakepop.initialPhenotypes)
+		self.fakepop.migrationRate = 0
+		self.fakepop.mutationRate = 0
+
+		nFreeDict = {"xmean":self.fakepop.initialPhenotypes,"x":self.fakepop.initialPhenotypes, "pg":10}
+		try:
+			self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**nFreeDict})
+			assert False, "Did not detect that n is missing"
+		except KeyError as e:
+			assert str(e).replace("'", "") == 'n', "Should raise key error for n, instead '{0}'".format(e)
+		else:
+			assert False, "some other error"
+
+		xFreeDict = {"xmean":self.fakepop.initialPhenotypes,"n":5, "pg":10}
+		try:
+			self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**xFreeDict})
+			assert False, "Did not detect that x is missing"
+		except KeyError as e:
+			assert str(e).replace("'", "") == 'x', "Should raise key error for x, instead '{0}'".format(e)
+		else:
+			assert False, "some other error"
+
+		xmeanFreeDict = {"x":self.fakepop.initialPhenotypes,"n":5, "pg":10}
+		try:
+			self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**xmeanFreeDict})
+			assert False, "Did not detect that xmean is missing"
+		except KeyError as e:
+			assert str(e).replace("'", "") == 'xmean', "Should raise key error for xmean, instead '{0}'".format(e)
+		else:
+			assert False, "some other error"
+
+		pgFreeDict = {"xmean":self.fakepop.initialPhenotypes,"x":self.fakepop.initialPhenotypes, "n":10}
+		try:
+			self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**pgFreeDict})
+			assert False, "Did not detect that pg is missing"
+		except KeyError as e:
+			assert str(e).replace("'", "") == 'pg', "Should raise key error for pg, instead '{0}'".format(e)
+		else:
+			assert False, "some other error"
+
+	def test_individual_procreates_even_if_fertility_negative(self, instantiateSingleDemePopulation):
+		fakeind = Ind()
+		self.fakepop = instantiateSingleDemePopulation(1)
+
+		ind = self.fakepop.individuals[0]
+		ind.fertilityValue = -1
+
+		try:
+			ind.procreate()
+		except ValueError as e:
+			assert False, "calculate offspring number even if fertility is negative"
+
+	def test_geometric_function_runs_properly(self, instantiateSingleIndividualsDemes):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "geom"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update({"fb":10,"gamma":0.1})
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on geometric function" + str(e)
+
+	def test_policing_function_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "policing"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update(getFitnessParameters(self.pop.fit_fun))
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on policing function" + str(e)
+
+	def test_policing_function_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "policingdemog2"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update(getFitnessParameters("policingdemog"))
+		self.pop.fitnessParameters.update({"bb":0.5, "pp":0.1, "c1": 0.05, "c2":0.0})
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on policing-deomography 2 function" + str(e)
 
 
-			
-			
-		
-	
+
+
+

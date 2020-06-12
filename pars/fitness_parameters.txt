@@ -1,4 +1,22 @@
-fb,5
-b,0.5
-c,0.05
-gamma,0.07
+fb, 5
+b, 0.5
+c, 0.05
+th, 0.1
+rb, 10
+c1, 0.2
+c2, 0
+bb, 6
+pp, 0.9
+p, 0.4
+eta, 1
+gamma, 0.01
+alpha, 0.2
+beta1, 0.5
+beta0, 0.6
+kb, 2
+epsilon, 3
+zeta1, 0.5
+zeta0, 0.6
+phi, 1
+atech,0.1
+btech,1.2

@@ -10,11 +10,15 @@ class Individual(object):
 		self.resourcesAmount = None
 		self.fertilityValue = None
 		self.offspringNumber = None
+		self.cheater = None
+		self.punished = None
+		self.punishmentFee = None
+		self.socialStatus = None 
 
-	def mutate(self, mutRate, mutStep):
+	def mutate(self, mutRate, mutStep, bounded = True):
 		self.mutant = bool(rd.binomial(1, mutRate))
 		self.deviate(mutStep, len(self.phenotypicValues))
-		self.applyMutation(self.mutationDeviation)
+		self.applyMutation(self.mutationDeviation, bounded)
 	
 	def deviate(self, ms, n):
 		if self.mutant:
@@ -23,12 +27,15 @@ class Individual(object):
 			dev = [0] * n
 		self.mutationDeviation = dev
 		
-	def applyMutation(self, dev):
+	def applyMutation(self, dev, bounded):
 		phen = self.phenotypicValues
 		unboundedphen = list(map(add, phen, dev))
-		boundedphen = list(map(lambda x: min(max(x,0.0),1.0), unboundedphen))
-		self.unboundedPhenotypicValues = unboundedphen
-		setattr(self, "phenotypicValues", boundedphen)
+		if bounded == False:
+			setattr(self, "phenotypicValues", unboundedphen)
+		else:
+			boundedphen = list(map(lambda x: min(max(x,0.0),1.0), unboundedphen))
+			self.unboundedPhenotypicValues = unboundedphen
+			setattr(self, "phenotypicValues", boundedphen)
 		
 	def migrate(self, nDemes, migRate, rds=None):
 		rd.seed(rds)
@@ -63,4 +70,8 @@ class Individual(object):
 		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
 		
 	def procreate(self):
-		self.offspringNumber = rd.poisson(self.fertilityValue)
+		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
+
+	def produceResources(self, fun_name="pgg", **kwargs):
+		if fun_name == 'technology':
+			self.resourcesAmount = (1 - kwargs['civilianPublicTime']) * (kwargs['labourForce'] ** (-kwargs['alphaResources'])) * kwargs['technologyLevel'] ** kwargs['alphaResources']
