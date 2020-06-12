@@ -237,5 +237,44 @@ class TestReproductionFunction(object):
 		except ValueError as e:
 			assert False, "calculate offspring number even if fertility is negative"
 
+	def test_geometric_function_runs_properly(self, instantiateSingleIndividualsDemes):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "geom"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update({"fb":10,"gamma":0.1})
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on geometric function" + str(e)
+
+	def test_policing_function_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "policing"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update(getFitnessParameters(self.pop.fit_fun))
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on policing function" + str(e)
+
+	def test_policing_function_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+		self.pop = instantiateSingleIndividualsDemes(3)
+		self.pop.fit_fun = "policingdemog2"
+		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
+		self.pop.fitnessParameters.update(getFitnessParameters("policingdemog"))
+		self.pop.fitnessParameters.update({"bb":0.5, "pp":0.1, "c1": 0.05, "c2":0.0})
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, "could not run lifecycle on policing-deomography 2 function" + str(e)
+
+
+
 
 
