@@ -242,7 +242,7 @@ class Population(object):
 		
 			self.pathToOutputFolder = fman.getPathToFile(self.pathToOutputFiles)
 			if not os.path.exists(self.pathToOutputFolder):
-				os.makedirs(self.pathToOutputFolder)
+				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 
 			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
 			phenvariancefile = '{0}/{1}_pheno_var.txt'.format(self.pathToOutputFolder, outputfile)
