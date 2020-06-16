@@ -272,10 +272,10 @@ class TestTechnology(object):
 		self.ind1 = Ind()
 		self.pars = getFitnessParameters('technology')
 		#self.pars.update({'civilianPublicTime': 0, 'labourForce': 10, 'technologyLevel': 2})
-		res1 = 0.5*(1 - self.pars['productionTime']) * ((self.pars['n'] * (1 - self.pars['productionTime'])) ** (-self.pars['alphaResources'])) * 2 ** self.pars['alphaResources']
-		res2 = 0.5*(1 - self.pars['productionTime']) * ((self.pars['n'] * (1 - self.pars['productionTime'])) ** (-self.pars['alphaResources'])) * 5 ** self.pars['alphaResources']
-
+		res1 = 0.5*self.pars['productionTime'] * ((self.pars['n'] * self.pars['productionTime']) ** (-self.pars['alphaResources'])) * 2 ** self.pars['alphaResources']
+		res2 = 0.5*self.pars['productionTime'] * ((self.pars['n'] * self.pars['productionTime']) ** (-self.pars['alphaResources'])) * 5 ** self.pars['alphaResources']
 		assert res1 < res2
+		
 		self.pars.update({'tech': 2, 'p':0})
 		self.ind1.phenotypicValues = phen
 		self.ind1.resourcesAmount = res
@@ -342,7 +342,7 @@ class TestTechnology(object):
 			assert deme.progressValues["labourForce"] is not None, "labour force is none!"
 			assert deme.progressValues["labourForce"] != 0, "labour force is null!"
 			assert deme.progressValues["technologyLevel"] is not None, "labour force is null!"
-			resourcesProduced = (1 - pars['productionTime']) * ((pars['n'] * (1 - pars['productionTime'])) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
+			resourcesProduced = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
 			payoff = (1 - ind.phenotypicValues[0]) * (resourcesProduced - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
 			ind.produceResources(self.pop.fit_fun, **pars)
 			assert ind.resourcesAmount == payoff, "ind produced {0} instead of {1}".format(ind.resourcesAmount, production)
@@ -379,7 +379,7 @@ class TestTechnology(object):
 		self.ind.phenotypicValues = [0.5] * 3
 		self.ind.reproduce('technology',**pars)
 
-		res = 0.5 * (1 - pars['productionTime']) * ((pars['n'] * (1 - pars['productionTime'])) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
+		res = 0.5 * pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
 		assert res > 0, "no resources produced"
 		f = (pars["rb"] + res) / (1 + pars["gamma"] * pars["n"])
 		assert self.ind.fertilityValue == f, "wrong fertility value"
@@ -388,7 +388,7 @@ class TestTechnology(object):
 		self.ind2.neighbours = [1,2]
 		self.ind2.phenotypicValues = [0.5] * 3
 		self.ind2.reproduce('technology',**pars)
-		res2 = (1 - pars['productionTime']) * ((pars['n'] * (1 - pars['productionTime'])) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
+		res2 = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
 		payoff2 = (1 - self.ind.phenotypicValues[0]) * (res2 * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
 		assert pars['q'] * (pars['pg'] * pars['p'])/pars['n'] == 0
 		assert (1 - pars['q'] * pars['d'] * pars['p']) == 1
@@ -404,7 +404,7 @@ class TestTechnology(object):
 		self.ind3.neighbours = [1,2]
 		self.ind3.phenotypicValues = [0.5] * 3
 		self.ind3.reproduce('technology',**pars)
-		res3 = (1 - pars['productionTime']) * ((pars['n'] * (1 - pars['productionTime'])) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
+		res3 = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
 		payoff3 = (1 - self.ind.phenotypicValues[0]) * (res3 * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
 		assert res3 > 0, "no resources produced"
 		f3 = (pars["rb"] + payoff3) / (1 + pars["gamma"] * pars["n"])

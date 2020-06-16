@@ -76,6 +76,7 @@ class Individual(object):
 
 	def produceResources(self, fun_name="pgg", **kwargs):
 		if fun_name == 'technology':
-			resourcesProduced = (1 - kwargs['productionTime']) * ((kwargs['n'] * (1 - kwargs['productionTime'])) ** (-kwargs['alphaResources'])) * kwargs['tech'] ** kwargs['alphaResources']
+			self.consensusTime = 1 - kwargs['productionTime']
+			resourcesProduced = (1 - self.consensusTime) * ((kwargs['n'] * (1 - self.consensusTime)) ** (-kwargs['alphaResources'])) * kwargs['tech'] ** kwargs['alphaResources']
 			payoff = (1 - self.phenotypicValues[0]) * (resourcesProduced * (1 - kwargs['q'] * kwargs['d'] * kwargs['p']) - kwargs['q'] * (kwargs['pg'] * kwargs['p'])/kwargs['n'])
 			self.resourcesAmount = payoff
