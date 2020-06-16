@@ -87,6 +87,7 @@ class TestDebateFeature(object):
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 2
 		self.pop.mutationRate = 0
+		self.pop.migrationRate = 0
 
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
