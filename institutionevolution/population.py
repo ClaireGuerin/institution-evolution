@@ -119,7 +119,7 @@ class Population(object):
 		return tmpmean
 
 	def specialdivision(self, x, y):
-		if y == 0 or y == 1:
+		if y == 0:
 			tmp = None
 		else:
 			tmp = x / y
@@ -127,7 +127,7 @@ class Population(object):
 
 	def specialvariance(self, samplesum, samplesumofsq, samplelength):
 		if samplelength == 0:
-			tmpvar = 0
+			tmpvar = 0.0
 		else:
 			tmpvar = (samplesumofsq - samplesum ** 2 / samplelength) / samplelength
 		return tmpvar
@@ -139,6 +139,9 @@ class Population(object):
 		testdemog = 0
 
 		for ind in self.individuals:
+			# DEBATE
+			setattr(ind, "consensusTime", self.demes[ind.currentDeme].progressValues["consensusTime"])
+			if ind.consensusTime is not None: setattr(ind, "productionTime", 1 - ind.consensusTime)
 			# REPRODUCTION
 			infoToAdd = {}
 			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
@@ -157,13 +160,14 @@ class Population(object):
 			testdemog += ind.offspringNumber
 			self.populationStructure[ind.currentDeme] += ind.offspringNumber
 
-
+		self.parents = self.individuals
 		assert len(self.offspring) == testdemog
 		self.individuals = self.offspring
 		assert len(self.individuals) == testdemog
 		self.demography = len(self.offspring)
 
 	def clearDemeInfo(self):
+		self.parents = None
 		for deme in range(self.numberOfDemes):
 			if self.fit_fun == 'technology':
 				tmpTech = self.initialTechnologyLevel if self.demes[deme].publicGood == None else (1 + self.fitnessParameters['atech'] * self.demes[deme].publicGood) * self.demes[deme].progressValues['technologyLevel'] / (1 + self.fitnessParameters['btech'] * self.demes[deme].progressValues['technologyLevel'])
@@ -278,7 +282,7 @@ class Population(object):
 						for phen in range(self.numberOfPhenotypes):
 							tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 							tmpMean = self.specialmean(tmpPhenotypes)
-							tmpVar = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
+							tmpVar = self.specialvariance(sum(tmpPhenotypes), sum(x ** 2 for x in tmpPhenotypes), len(tmpPhenotypes))
 
 							phenmeans.append(str(round(tmpMean, 3)))
 							assert type(tmpVar) is float, "phenotype variance = {0}, phenotypes = {1}".format(tmpVar, tmpPhenotypes)
@@ -289,7 +293,7 @@ class Population(object):
 						fp.write('{0}\n'.format(sep.join(phenmeans)))
 						vp.write('{0}\n'.format(sep.join(phenvars)))
 						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
-						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure, len(self.populationStructure), self.demography / self.numberOfDemes)))
+						vd.write('{0}\n'.format(self.specialvariance(sum(self.populationStructure), sum(x ** 2 for x in self.populationStructure), self.numberOfDemes)))
 				
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

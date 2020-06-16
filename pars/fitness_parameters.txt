@@ -14,7 +14,7 @@ alpha, 0.2
 beta1, 0.5
 beta0, 0.6
 kb, 2
-epsilon, 3
+epsilon, 0.01
 zeta1, 0.5
 zeta0, 0.6
 phi, 1
@@ -25,3 +25,6 @@ alphaResources,0.5
 q,0.9
 d, 0.7
 aconsensus, 0.6
+bconsensus, 0.6
+aquality, 1.2
+alphaquality, 0.9

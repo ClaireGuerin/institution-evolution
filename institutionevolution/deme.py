@@ -15,8 +15,9 @@ class Deme(object):
 		"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
 		"labourForce": None, 
-		"policingConsensus": None,
 		"returnedGoods": None,
 		"effectivePublicGood": None,
 		"consensus": None,
-		"consensusTime": None}
+		"consensusTime": None,
+		"institutionQuality": None,
+		"fineBudget": None}

@@ -52,9 +52,12 @@ def technology(**kwargs):
 
 def debate(**kwargs):
 	prog = {}
-	prog['consensus'] = kwargs['phen'][2]
-	tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
-	prog['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (1 + tmpDisagreement)
+	if kwargs['n'] > 0:
+		prog['consensus'] = kwargs['phen'][2]
+		tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
+		prog['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (kwargs['bconsensus'] + tmpDisagreement)
+		prog['institutionQuality'] = (prog['consensus'] * kwargs['pg'] * kwargs['aquality'] / kwargs['totRes']) ** kwargs['alphaquality']
+		prog['fineBudget'] = prog['consensus'] * kwargs['pg'] * (1 - kwargs['aquality'])
 	return prog
 
 functions = {}

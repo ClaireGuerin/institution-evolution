@@ -28,7 +28,7 @@ class TestTechnology(object):
 
 		try:
 			tmp = getattr(self.fakeDeme, "progressValues")
-			get = tmp['policingConsensus']
+			get = tmp['consensus']
 		except AttributeError as e:
 			assert False, "where is the policing consensus?"
 
@@ -325,7 +325,7 @@ class TestTechnology(object):
 		# where T1 and T2 is effective time spent in debate by civilian and leader respectively
 
 	def test_production_increase_function(self, getFitnessParameters):
-		pars = getFitnessParameters('technology')
+		#pars = getFitnessParameters('technology')
 		self.pop = Pop()
 		self.pop.fit_fun = 'technology'
 		self.pop.numberOfDemes = 2
@@ -335,17 +335,23 @@ class TestTechnology(object):
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
 		self.pop.update()
+		pars = self.pop.fitnessParameters
 
 		for ind in self.pop.individuals:
 			deme = self.pop.demes[ind.currentDeme]
-			pars.update(deme.progressValues)
+			infoToAdd = {}
+			infoToAdd["tech"] = deme.progressValues["technologyLevel"]
+			infoToAdd["n"] = deme.demography
+			infoToAdd["xmean"] = deme.meanPhenotypes
+			infoToAdd["pg"] = deme.publicGood
+			infoToAdd["x"] = ind.phenotypicValues
 			assert deme.progressValues["labourForce"] is not None, "labour force is none!"
 			assert deme.progressValues["labourForce"] != 0, "labour force is null!"
 			assert deme.progressValues["technologyLevel"] is not None, "labour force is null!"
-			resourcesProduced = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
-			payoff = (1 - ind.phenotypicValues[0]) * (resourcesProduced - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
-			ind.produceResources(self.pop.fit_fun, **pars)
-			assert ind.resourcesAmount == payoff, "ind produced {0} instead of {1}".format(ind.resourcesAmount, production)
+			resourcesProduced = pars['productionTime'] * ((deme.demography * pars['productionTime']) ** (-pars['alphaResources'])) * infoToAdd['tech'] ** pars['alphaResources']
+			payoff = (1 - ind.phenotypicValues[0]) * (resourcesProduced * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (deme.publicGood * pars['p'])/deme.demography)
+			ind.produceResources(self.pop.fit_fun, **{**self.pop.fitnessParameters,**infoToAdd})
+			assert ind.resourcesAmount == payoff, "ind produced {0} instead of {1}".format(ind.resourcesAmount, payoff)
 
 	def test_fitness_function_returns_correct_value(self):
 		self.pop = Pop()
