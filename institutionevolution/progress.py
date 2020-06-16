@@ -60,6 +60,9 @@ def debate(**kwargs):
 		prog['fineBudget'] = prog['consensus'] * kwargs['pg'] * (1 - kwargs['aquality'])
 	return prog
 
+def socialclass(**kwargs):
+	pass
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:
