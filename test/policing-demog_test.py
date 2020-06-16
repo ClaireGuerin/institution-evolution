@@ -99,6 +99,6 @@ class TestPolicingDemographyFunction(object):
 			fakepop.runSimulation(outputfile=self.out)
 			for f in glob.glob('{0}/{1}'.format(OUTPUT_FOLDER, self.out)):
 				os.remove(f)
-		except:
-			assert False, "something went wrong"
+		except ValueError as e:
+			assert False, str(e)
 

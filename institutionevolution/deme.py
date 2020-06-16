@@ -6,13 +6,18 @@ class Deme(object):
 		self.publicGood = None
 		self.neighbours = []
 		self.meanPhenotypes = None
+		self.varPhenotypes = None
 		self.totalPhenotypes = None
+		self.totalPhenotypeSquares = None
 		self.policingConsensus = None
 		self.progressValues = {"technologyLevel": None,
 		"numberOfLeaders": None, 
 		"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
 		"labourForce": None, 
-		"policingConsensus": None,
 		"returnedGoods": None,
-		"effectivePublicGood": None}
+		"effectivePublicGood": None,
+		"consensus": None,
+		"consensusTime": None,
+		"institutionQuality": None,
+		"fineBudget": None}

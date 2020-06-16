@@ -1,6 +1,7 @@
 import numpy.random as rd
 from operator import add
 import institutionevolution.fitness as fitness
+import institutionevolution.production as production
 
 class Individual(object):
 	
@@ -14,6 +15,8 @@ class Individual(object):
 		self.punished = None
 		self.punishmentFee = None
 		self.socialStatus = None 
+		self.consensusTime = None
+		self.productionTime = None
 
 	def mutate(self, mutRate, mutStep, bounded = True):
 		self.mutant = bool(rd.binomial(1, mutRate))
@@ -74,8 +77,5 @@ class Individual(object):
 		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
 
 	def produceResources(self, fun_name="pgg", **kwargs):
-		if fun_name == 'technology':
-			self.consensusTime = 1 - kwargs['productionTime']
-			resourcesProduced = (1 - self.consensusTime) * ((kwargs['n'] * (1 - self.consensusTime)) ** (-kwargs['alphaResources'])) * kwargs['tech'] ** kwargs['alphaResources']
-			payoff = (1 - self.phenotypicValues[0]) * (resourcesProduced * (1 - kwargs['q'] * kwargs['d'] * kwargs['p']) - kwargs['q'] * (kwargs['pg'] * kwargs['p'])/kwargs['n'])
-			self.resourcesAmount = payoff
+		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**kwargs))
+		self.resourcesAmount = tmpRes
