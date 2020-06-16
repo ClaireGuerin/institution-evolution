@@ -61,8 +61,6 @@ class Population(object):
 		self.fit_fun = fit_fun
 		self.mutationBoundaries = mutationBoundaries
 
-		self.numberOfPhenotypes = len(self.initialPhenotypes)
-			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
 			nDemes = self.numberOfDemes
@@ -74,6 +72,8 @@ class Population(object):
 			
 		self.demes = []
 		self.individuals = []
+
+		self.numberOfPhenotypes = len(self.initialPhenotypes)
 		
 		for deme in range(nDemes):
 			newDemeInstance = Dem()
@@ -82,7 +82,9 @@ class Population(object):
 			newDemeInstance.neighbours = self.identifyNeighbours(nDemes, deme)
 			newDemeInstance.demography = dSize
 			newDemeInstance.meanPhenotypes = self.initialPhenotypes
+			newDemeInstance.varPhenotypes = 0
 			newDemeInstance.totalPhenotypes = [x * dSize for x in self.initialPhenotypes]
+			newDemeInstance.totalPhenotypeSquares = [(x ** 2) * dSize for x in self.initialPhenotypes]
 			newDemeInstance.progressValues['technologyLevel'] = self.initialTechnologyLevel
 						
 			for ind in range(dSize):
@@ -95,11 +97,6 @@ class Population(object):
 			
 			self.demes.append(newDemeInstance)
 
-	def publicGood(self):
-		for individual in self.individuals:
-			self.demes[individual.currentDeme].publicGood += individual.phenotypicValues[0] * individual.resourcesAmount
-
-			
 	def identifyNeighbours(self, nd, demeID):
 		tmp = list(range(nd))
 		del tmp[demeID]
@@ -123,14 +120,11 @@ class Population(object):
 			tmp = x / y
 		return tmp
 
-	def specialvariance(self, lst, samplelength, samplemean):
+	def specialvariance(self, samplesum, samplesumofsq, samplelength):
 		if samplelength == 0:
-			tmpvar = 0
+			tmpvar = 0.0
 		else:
-			total = 0
-			for phenotype in lst:
-				total += (phenotype - samplemean) ** 2
-			tmpvar = total / samplelength
+			tmpvar = (samplesumofsq - samplesum ** 2 / samplelength) / samplelength
 		return tmpvar
 
 	def populationReproduction(self, seed=None, **kwargs):
@@ -140,8 +134,12 @@ class Population(object):
 		testdemog = 0
 
 		for ind in self.individuals:
+			# DEBATE
+			setattr(ind, "consensusTime", self.demes[ind.currentDeme].progressValues["consensusTime"])
+			if ind.consensusTime is not None: setattr(ind, "productionTime", 1 - ind.consensusTime)
 			# REPRODUCTION
 			infoToAdd = {}
+			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
 			infoToAdd["n"] = self.demes[ind.currentDeme].demography
 			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
@@ -157,13 +155,14 @@ class Population(object):
 			testdemog += ind.offspringNumber
 			self.populationStructure[ind.currentDeme] += ind.offspringNumber
 
-
+		self.parents = self.individuals
 		assert len(self.offspring) == testdemog
 		self.individuals = self.offspring
 		assert len(self.individuals) == testdemog
 		self.demography = len(self.offspring)
 
 	def clearDemeInfo(self):
+		self.parents = None
 		for deme in range(self.numberOfDemes):
 			if self.fit_fun == 'technology':
 				tmpTech = self.initialTechnologyLevel if self.demes[deme].publicGood == None else (1 + self.fitnessParameters['atech'] * self.demes[deme].publicGood) * self.demes[deme].progressValues['technologyLevel'] / (1 + self.fitnessParameters['btech'] * self.demes[deme].progressValues['technologyLevel'])
@@ -172,6 +171,7 @@ class Population(object):
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
+			self.demes[deme].totalResources = 0
 			# progress
 			self.demes[deme].progressValues.update({"technologyLevel": tmpTech,
 			"numberOfLeaders": 0, 
@@ -180,7 +180,7 @@ class Population(object):
 			"labourForce": 0, 
 			"policingConsensus": 0,
 			"returnedGoods": 0,
-			"effectivePublicGood": 0})
+			"effectivePublicGood": None})
 
 	def populationMutationMigration(self):
 
@@ -198,32 +198,28 @@ class Population(object):
 			self.demes[ind.currentDeme].demography += 1
 			## public good
 			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
-			## total phenotypes
+			## total resources (private and public)
+			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
+			# total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
+				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] ** 2
 
 	def update(self):
 		for deme in self.demes:
 			meanphen = []
+			varphen = []
 			for phen in range(self.numberOfPhenotypes):
 				calculateMean = self.specialdivision(deme.totalPhenotypes[phen], deme.demography)
 				meanphen.append(calculateMean) 
 
-			setattr(deme, "meanPhenotypes", meanphen)
+				calculateVar = self.specialvariance(deme.totalPhenotypes[phen],deme.totalPhenotypeSquares[phen],deme.demography)
+				varphen.append(calculateVar)
 
-			try:
-				tmpmean = deme.meanPhenotypes[1]
-				if tmpmean is not None:
-					setattr(deme, "policingConsensus", tmpmean)
-				else:
-					setattr(deme, "policingConsensus", 0.0)
-			except IndexError as e:
-				setattr(deme, "policingConsensus", 0.0)
-			## effective public good
-			setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
-			
+			setattr(deme, "meanPhenotypes", meanphen)
+			setattr(deme, "varPhenotypes", varphen)			
 			## progress
-			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes}
+			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
 
 	def lifecycle(self, **kwargs):
@@ -242,7 +238,7 @@ class Population(object):
 		
 			self.pathToOutputFolder = fman.getPathToFile(self.pathToOutputFiles)
 			if not os.path.exists(self.pathToOutputFolder):
-				os.makedirs(self.pathToOutputFolder)
+				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 
 			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
 			phenvariancefile = '{0}/{1}_pheno_var.txt'.format(self.pathToOutputFolder, outputfile)
@@ -270,7 +266,7 @@ class Population(object):
 						for phen in range(self.numberOfPhenotypes):
 							tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
 							tmpMean = self.specialmean(tmpPhenotypes)
-							tmpVar = self.specialvariance(tmpPhenotypes, len(tmpPhenotypes), tmpMean)
+							tmpVar = self.specialvariance(sum(tmpPhenotypes), sum(x ** 2 for x in tmpPhenotypes), len(tmpPhenotypes))
 
 							phenmeans.append(str(round(tmpMean, 3)))
 							assert type(tmpVar) is float, "phenotype variance = {0}, phenotypes = {1}".format(tmpVar, tmpPhenotypes)
@@ -281,7 +277,7 @@ class Population(object):
 						fp.write('{0}\n'.format(sep.join(phenmeans)))
 						vp.write('{0}\n'.format(sep.join(phenvars)))
 						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
-						vd.write('{0}\n'.format(self.specialvariance(self.populationStructure, len(self.populationStructure), self.demography / self.numberOfDemes)))
+						vd.write('{0}\n'.format(self.specialvariance(sum(self.populationStructure), sum(x ** 2 for x in self.populationStructure), self.numberOfDemes)))
 				
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

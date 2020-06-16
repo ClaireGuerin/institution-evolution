@@ -99,7 +99,7 @@ class TestSimpleRun(object):
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
-		ngen = runSim(self.out,20)
+		ngen = runSim(self.out,5)
 		
 		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
 			self.fplines = fp.readlines()
