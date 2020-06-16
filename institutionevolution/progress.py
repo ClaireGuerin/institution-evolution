@@ -42,6 +42,8 @@ def technology(**kwargs):
 	prog = {}
 	phenos = [0 if p is None else p for p in kwargs['phen']]
 	election = 0 #phenos[3]
+	effectivePublicGood = kwargs['pg'] * (1 - kwargs['p']) + kwargs['q'] * kwargs['d'] * kwargs['p'] * (kwargs['totRes'] - kwargs['pg'])
+	prog['effectivePublicGood'] = effectivePublicGood
 	prog['numberOfLeaders'] = kwargs['n'] * election
 	prog['civilianPublicTime'] = 0
 	prog['leaderPublicTime'] = 1

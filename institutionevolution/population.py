@@ -61,8 +61,6 @@ class Population(object):
 		self.fit_fun = fit_fun
 		self.mutationBoundaries = mutationBoundaries
 
-		self.numberOfPhenotypes = len(self.initialPhenotypes)
-			
 	def createAndPopulateDemes(self, nDemes = None, dSize = None):
 		if nDemes == None:
 			nDemes = self.numberOfDemes
@@ -74,6 +72,8 @@ class Population(object):
 			
 		self.demes = []
 		self.individuals = []
+
+		self.numberOfPhenotypes = len(self.initialPhenotypes)
 		
 		for deme in range(nDemes):
 			newDemeInstance = Dem()
@@ -95,9 +95,9 @@ class Population(object):
 			
 			self.demes.append(newDemeInstance)
 
-	def publicGood(self):
-		for individual in self.individuals:
-			self.demes[individual.currentDeme].publicGood += individual.phenotypicValues[0] * individual.resourcesAmount
+	# def publicGood(self):
+	# 	for individual in self.individuals:
+	# 		self.demes[individual.currentDeme].publicGood += individual.phenotypicValues[0] * individual.resourcesAmount
 
 			
 	def identifyNeighbours(self, nd, demeID):
@@ -142,6 +142,7 @@ class Population(object):
 		for ind in self.individuals:
 			# REPRODUCTION
 			infoToAdd = {}
+			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
 			infoToAdd["n"] = self.demes[ind.currentDeme].demography
 			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
@@ -172,6 +173,7 @@ class Population(object):
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
+			self.demes[deme].totalResources = 0
 			# progress
 			self.demes[deme].progressValues.update({"technologyLevel": tmpTech,
 			"numberOfLeaders": 0, 
@@ -180,7 +182,7 @@ class Population(object):
 			"labourForce": 0, 
 			"policingConsensus": 0,
 			"returnedGoods": 0,
-			"effectivePublicGood": 0})
+			"effectivePublicGood": None})
 
 	def populationMutationMigration(self):
 
@@ -198,6 +200,8 @@ class Population(object):
 			self.demes[ind.currentDeme].demography += 1
 			## public good
 			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
+			## total resources (private and public)
+			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
 			## total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
@@ -211,19 +215,19 @@ class Population(object):
 
 			setattr(deme, "meanPhenotypes", meanphen)
 
-			try:
-				tmpmean = deme.meanPhenotypes[1]
-				if tmpmean is not None:
-					setattr(deme, "policingConsensus", tmpmean)
-				else:
-					setattr(deme, "policingConsensus", 0.0)
-			except IndexError as e:
-				setattr(deme, "policingConsensus", 0.0)
-			## effective public good
-			setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
+			# try:
+			# 	tmpmean = deme.meanPhenotypes[1]
+			# 	if tmpmean is not None:
+			# 		setattr(deme, "policingConsensus", tmpmean)
+			# 	else:
+			# 		setattr(deme, "policingConsensus", 0.0)
+			# except IndexError as e:
+			# 	setattr(deme, "policingConsensus", 0.0)
+			# ## effective public good
+			# setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
 			
 			## progress
-			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes}
+			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
 
 	def lifecycle(self, **kwargs):

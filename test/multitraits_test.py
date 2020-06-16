@@ -37,13 +37,13 @@ class TestMultipleTraits(object):
 				f.write('{0}\n'.format(i/self.ntraits))
 
 		self.fakepop = Pop()
-		assert self.fakepop.numberOfPhenotypes == self.ntraits, "uh-oh, the test did not change the number of phenotypes"
 
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.initialDemeSize = 2
 		self.fakepop.numberOfGenerations = 5
 
 		self.fakepop.createAndPopulateDemes()
+		assert self.fakepop.numberOfPhenotypes == self.ntraits, "uh-oh, the test did not change the number of phenotypes"
 		self.fakepop.runSimulation('tmptest')
 		
 		with open(OUTPUT_FOLDER + '/tmptest_phenotypes.txt') as fp:
