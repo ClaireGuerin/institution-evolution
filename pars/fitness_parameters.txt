@@ -20,3 +20,7 @@ zeta0, 0.6
 phi, 1
 atech,0.1
 btech,1.2
+productionTime,0.8
+alphaResources,0.5
+q,0.9
+d, 0.7
