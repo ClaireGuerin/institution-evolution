@@ -97,11 +97,6 @@ class Population(object):
 			
 			self.demes.append(newDemeInstance)
 
-	# def publicGood(self):
-	# 	for individual in self.individuals:
-	# 		self.demes[individual.currentDeme].publicGood += individual.phenotypicValues[0] * individual.resourcesAmount
-
-			
 	def identifyNeighbours(self, nd, demeID):
 		tmp = list(range(nd))
 		del tmp[demeID]
@@ -222,19 +217,7 @@ class Population(object):
 				varphen.append(calculateVar)
 
 			setattr(deme, "meanPhenotypes", meanphen)
-			setattr(deme, "varPhenotypes", varphen)
-
-			# try:
-			# 	tmpmean = deme.meanPhenotypes[1]
-			# 	if tmpmean is not None:
-			# 		setattr(deme, "policingConsensus", tmpmean)
-			# 	else:
-			# 		setattr(deme, "policingConsensus", 0.0)
-			# except IndexError as e:
-			# 	setattr(deme, "policingConsensus", 0.0)
-			# ## effective public good
-			# setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
-			
+			setattr(deme, "varPhenotypes", varphen)			
 			## progress
 			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
