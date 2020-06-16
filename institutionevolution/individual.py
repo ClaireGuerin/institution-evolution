@@ -14,6 +14,7 @@ class Individual(object):
 		self.punished = None
 		self.punishmentFee = None
 		self.socialStatus = None 
+		self.debateTime = None
 
 	def mutate(self, mutRate, mutStep, bounded = True):
 		self.mutant = bool(rd.binomial(1, mutRate))

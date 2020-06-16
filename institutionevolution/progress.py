@@ -50,6 +50,13 @@ def technology(**kwargs):
 	prog['labourForce'] = (kwargs['n'] - prog['numberOfLeaders']) * (1 - prog['civilianPublicTime']) + prog['numberOfLeaders'] * (1 - prog['leaderPublicTime'])
 	return prog
 
+def debate(**kwargs):
+	prog = {}
+	prog['consensus'] = kwargs['phen'][2]
+	tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
+	prog['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (1 + tmpDisagreement)
+	return prog
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

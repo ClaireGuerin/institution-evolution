@@ -24,3 +24,4 @@ productionTime,0.8
 alphaResources,0.5
 q,0.9
 d, 0.7
+aconsensus, 0.6

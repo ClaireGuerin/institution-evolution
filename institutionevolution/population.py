@@ -82,7 +82,9 @@ class Population(object):
 			newDemeInstance.neighbours = self.identifyNeighbours(nDemes, deme)
 			newDemeInstance.demography = dSize
 			newDemeInstance.meanPhenotypes = self.initialPhenotypes
+			newDemeInstance.varPhenotypes = 0
 			newDemeInstance.totalPhenotypes = [x * dSize for x in self.initialPhenotypes]
+			newDemeInstance.totalPhenotypeSquares = [(x ** 2) * dSize for x in self.initialPhenotypes]
 			newDemeInstance.progressValues['technologyLevel'] = self.initialTechnologyLevel
 						
 			for ind in range(dSize):
@@ -117,20 +119,17 @@ class Population(object):
 		return tmpmean
 
 	def specialdivision(self, x, y):
-		if y == 0:
+		if y == 0 or y == 1:
 			tmp = None
 		else:
 			tmp = x / y
 		return tmp
 
-	def specialvariance(self, lst, samplelength, samplemean):
+	def specialvariance(self, samplesum, samplesumofsq, samplelength):
 		if samplelength == 0:
 			tmpvar = 0
 		else:
-			total = 0
-			for phenotype in lst:
-				total += (phenotype - samplemean) ** 2
-			tmpvar = total / samplelength
+			tmpvar = (samplesumofsq - samplesum ** 2 / samplelength) / samplelength
 		return tmpvar
 
 	def populationReproduction(self, seed=None, **kwargs):
@@ -202,18 +201,24 @@ class Population(object):
 			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
 			## total resources (private and public)
 			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
-			## total phenotypes
+			# total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
+				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] ** 2
 
 	def update(self):
 		for deme in self.demes:
 			meanphen = []
+			varphen = []
 			for phen in range(self.numberOfPhenotypes):
 				calculateMean = self.specialdivision(deme.totalPhenotypes[phen], deme.demography)
 				meanphen.append(calculateMean) 
 
+				calculateVar = self.specialvariance(deme.totalPhenotypes[phen],deme.totalPhenotypeSquares[phen],deme.demography)
+				varphen.append(calculateVar)
+
 			setattr(deme, "meanPhenotypes", meanphen)
+			setattr(deme, "varPhenotypes", varphen)
 
 			# try:
 			# 	tmpmean = deme.meanPhenotypes[1]
@@ -227,7 +232,7 @@ class Population(object):
 			# setattr(deme, "effectivePublicGood", float((1.0 - deme.policingConsensus) * deme.publicGood))
 			
 			## progress
-			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
+			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
 
 	def lifecycle(self, **kwargs):
