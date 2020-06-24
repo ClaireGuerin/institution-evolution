@@ -52,8 +52,7 @@ class Individual(object):
 			
 		setattr(self, "currentDeme", self.destinationDeme)
 
-	def ascend(self, leadProp, rds=None):
-		rd.seed(rds)
+	def ascend(self, leadProp):
 		self.leader = bool(rd.binomial(1,leadProp))
 	
 	def reproduce(self, fun_name="pgg", **kwargs):

@@ -6,6 +6,7 @@ import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
 import random as rd
 import scipy.stats as scistats
+import gc
 
 class TestSocialClassesFeature(object):
 
@@ -38,15 +39,16 @@ class TestSocialClassesFeature(object):
 			assert deme.progressValues["proportionOfLeaders"] == deme.meanPhenotypes[3]
 
 	def test_individuals_get_assigned_a_role_during_elections(self, pseudorandom, instantiateSingleDemePopulation):
+		#proportionOfLeaders = rd.random()
 		pseudorandom(0)
 		self.nIndividuals = 1000
 		self.pop = instantiateSingleDemePopulation(self.nIndividuals)
-		proportionOfLeaders = rd.random()
+		proportionOfLeaders = 0.896
 
 		leaderCount = 0
 		for ind in self.pop.individuals:
 			assert hasattr(ind, "ascend"), "individual needs to be able to ascend social ladder"
-			ind.ascend(leadProp=proportionOfLeaders, rds=96)
+			ind.ascend(leadProp=proportionOfLeaders)
 			if ind.leader:
 				leaderCount += 1
 
@@ -54,7 +56,8 @@ class TestSocialClassesFeature(object):
 		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(leaderCount/self.nIndividuals, proportionOfLeaders)
 		self.test = scistats.binom_test(leaderCount, self.nIndividuals, proportionOfLeaders, alternative = "two-sided")
 		assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(leaderCount/self.nIndividuals, proportionOfLeaders)
-		 
+		
+		gc.collect()
 
 	def test_deme_gets_number_of_leaders(self):
 		self.pop = Pop('socialclass')
