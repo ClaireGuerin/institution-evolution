@@ -58,6 +58,9 @@ def debate(res, **kwargs):
 	f = 1
 	return f
 
+def socialclass(res, **kwargs):
+	pass
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

@@ -205,7 +205,7 @@ class Population(object):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] ** 2
 
-	def update(self):
+	def updatePopulation(self):
 		for deme in self.demes:
 			meanphen = []
 			varphen = []
@@ -227,7 +227,7 @@ class Population(object):
 		self.clearDemeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
-		self.update()
+		self.updatePopulation()
 		logging.info("reproduction")
 		self.populationReproduction(**kwargs)
 		

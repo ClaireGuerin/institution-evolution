@@ -1,41 +1,21 @@
 def pgg(**kwargs):
 	prog = {}
-	prog['numberOfLeaders'] = None
-	prog['civilianPublicTime'] = None
-	prog['leaderPublicTime'] = None
-	prog['labourForce'] = None
 	return prog
 
 def geom(**kwargs):
 	prog = {}
-	prog['numberOfLeaders'] = None
-	prog['civilianPublicTime'] = None
-	prog['leaderPublicTime'] = None
-	prog['labourForce'] = None
 	return prog
 
 def policing(**kwargs):
 	prog = {}
-	prog['numberOfLeaders'] = None
-	prog['civilianPublicTime'] = None
-	prog['leaderPublicTime'] = None
-	prog['labourForce'] = None
 	return prog
 
 def policingdemog(**kwargs):
 	prog = {}
-	prog['numberOfLeaders'] = None
-	prog['civilianPublicTime'] = None
-	prog['leaderPublicTime'] = None
-	prog['labourForce'] = None
 	return prog
 
 def policingdemog2(**kwargs):
 	prog = {}
-	prog['numberOfLeaders'] = None
-	prog['civilianPublicTime'] = None
-	prog['leaderPublicTime'] = None
-	prog['labourForce'] = None
 	return prog
 
 def technology(**kwargs):
@@ -61,9 +41,17 @@ def debate(**kwargs):
 	return prog
 
 def socialclass(**kwargs):
-	pass
+	prog = {}
+	return prog
 
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:
         functions[key] = value
+
+
+	#prog['numberOfLeaders'] = None
+	#prog['civilianPublicTime'] = None
+	#prog['leaderPublicTime'] = None
+	#prog['labourForce'] = None
+	
