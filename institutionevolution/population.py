@@ -191,6 +191,9 @@ class Population(object):
 			# MIGRATION
 			ind.migrate(nDemes=self.numberOfDemes, migRate=self.migrationRate)
 
+			# ELECTIONS
+			ind.ascend(leadProp=self.demes[ind.currentDeme].progressValues["proportionOfLeaders"])
+
 			# UPDATE
 			assert ind.currentDeme == ind.destinationDeme
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
@@ -200,10 +203,12 @@ class Population(object):
 			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
 			## total resources (private and public)
 			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
+			## number of leaders within deme
+			self.demes[ind.currentDeme].progressValues["numberOfLeaders"] += ind.leader
 			# total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
-				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] ** 2
+				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
 	def updatePopulation(self):
 		for deme in self.demes:
