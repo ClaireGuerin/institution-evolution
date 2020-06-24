@@ -7,7 +7,7 @@ import os
 
 dirpath = os.getcwd()
 #time = range(0,10000)
-targetdir = '/home/claire/Desktop/res/techsim/'
+targetdir = '/home/claire/Desktop/res/pars3-bign0/'
 
 meancoop = []
 varcoop = []
@@ -15,7 +15,7 @@ varcoop = []
 for i in range(9):
 	parvalue = (i + 1) / 10
 	#fileslist = glob.glob('{0}/res/test/out-d{1}*'.format(dirpath,dispersal))
-	fileslist = glob.glob(targetdir+'out-p{0}_phenotypes.txt'.format(parvalue))
+	fileslist = glob.glob(targetdir+'out-d{0}_demography.txt'.format(parvalue))
 	#fileslist = glob.glob('/home/claire/Desktop/pol-demog/rawdat/out-p{0}-[0123456789].txt_d*'.format(parvalue))
 	fig = plt.figure(figsize=(20,10))
 	ax1 = fig.add_subplot(111)
@@ -31,8 +31,9 @@ for i in range(9):
 				coop.append(float(row[0]))
 		time = range(0,len(coop))
 		plt.plot(time,coop, label=simfile)
-		dispcoopmean.append(mean(coop[2000:-1]))
-		dispcoopvar.append(variance(coop[2000:-1]))
+		filelength = len(coop)
+		dispcoopmean.append(mean(coop[filelength-1000:filelength]))
+		dispcoopvar.append(variance(coop[filelength-1000:filelength]))
 
 		plt.xlabel('Generations')
 		plt.ylabel('Value')
