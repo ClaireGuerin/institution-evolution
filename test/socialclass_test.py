@@ -118,11 +118,15 @@ class TestSocialClassesFeature(object):
 		self.firstInd = Ind()
 		self.firstInd.resourcesAmount = 1
 		self.firstInd.leader = bool(1)
+		pars.update({'leadership':self.firstInd.leader})
 		self.firstInd.reproduce(fun_name='socialclass',**pars)
 		self.secndInd = Ind()
 		self.secndInd.resourcesAmount = 1
 		self.secndInd.leader = bool(0)
+		pars.update({'leadership':self.secndInd.leader})
 		self.secndInd.reproduce(fun_name='socialclass',**pars)
 
 		assert self.firstInd.fertilityValue != self.secndInd.fertilityValue, "leaders and commoners should not get the same fitness"
 
+	def test_fitness_function_runs_at_population_level(self):
+		assert False, "write this test!"

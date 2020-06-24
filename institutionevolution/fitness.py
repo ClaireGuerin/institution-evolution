@@ -59,7 +59,7 @@ def debate(res, **kwargs):
 	return f
 
 def socialclass(res, **kwargs):
-	f = -1
+	f = (kwargs["rb"] + res + 2 * kwargs['leadership']) / (1 + kwargs["gamma"] * kwargs["n"])
 	return f
 
 functions = {}
