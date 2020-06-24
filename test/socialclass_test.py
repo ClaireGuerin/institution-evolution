@@ -24,6 +24,7 @@ class TestSocialClassesFeature(object):
 		self.pop = Pop('socialclass')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 2
+		self.pop.migrationRate = 0
 
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
@@ -34,12 +35,44 @@ class TestSocialClassesFeature(object):
 			assert deme.progressValues["proportionOfLeaders"] is not None
 			assert deme.progressValues["proportionOfLeaders"] == deme.meanPhenotypes[3]
 
-	def test_individuals_get_assigned_a_role_after_elections(self):
-		assert False, "write this test"
+	def test_individuals_get_assigned_a_role_during_elections(self, pseudorandom, instantiateSingleDemePopulation):
+		pseudorandom(0)
+		self.nIndividuals = 1000
+		self.pop = instantiateSingleDemePopulation(self.nIndividuals)
 
-	def test_deme_counts_actual_number_of_leaders_after_elections(self):
+		for ind in self.pop.individuals:
+			assert hasattr(ind, "ascend"), "individual needs to be able to ascend social ladder"
+
+
+
+	def test_deme_gets_number_of_leaders(self):
+		self.pop = Pop('socialclass')
+		self.pop.numberOfDemes = 1000
+		self.pop.initialDemeSize = 3
+		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
+		self.pop.migrationRate = 0
+		self.pop.mutationRate = 0
+
+		self.pop.createAndPopulateDemes()
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+		self.pop.updatePopulation()
+
 		for deme in self.pop.demes:
-			assert deme.progressValues["numberOfLeaders"] is not None
+			nlead = deme.progressValues["numberOfLeaders"]
+			assert nlead is not None
+			assert type(nlead) is float
+			assert nlead >= 0
+			stat1, pval1 = scistats.ttest_1samp([1] * nlead + [0] * (deme.demography - nlead), self.pop.initialPhenotypes[3])
+			assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
+			self.test = scistats.binom_test(pop.initialPhenotypes[3], deme.demography, self.pop.initialPhenotypes[3], alternative = "two-sided")
+			assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
+		
+		gc.collect()
 
 		assert False, "write a test of distribution of numberOfLeaders"
+
+	def test_deme__number_of_leaders_is_number_of_individuals_with_that_role(self):
+		assert False, "write this test"
+		
 

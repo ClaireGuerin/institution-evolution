@@ -51,6 +51,11 @@ class Individual(object):
 			self.destinationDeme = self.currentDeme
 			
 		setattr(self, "currentDeme", self.destinationDeme)
+
+	def ascend(self, leadProp, rds=None):
+		pass
+		#rd.seed(rds)
+		#self.socialStatus = bool(rd.binomial(1,leadProp))
 	
 	def reproduce(self, fun_name="pgg", **kwargs):
 		self.produceResources(fun_name, **kwargs)

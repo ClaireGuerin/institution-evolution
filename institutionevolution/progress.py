@@ -42,6 +42,7 @@ def debate(**kwargs):
 
 def socialclass(**kwargs):
 	prog = {}
+	prog['proportionOfLeaders'] = kwargs['phen'][3]
 	return prog
 
 functions = {}
