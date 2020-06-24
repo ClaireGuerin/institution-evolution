@@ -5,12 +5,13 @@ from institutionevolution.population import Population as Pop
 import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
 import random as rd
+import scipy.stats as scistats
 
 class TestSocialClassesFeature(object):
 
-	def test_individual_belongs_to_a_social_class(self):
+	def test_individual_can_become_leader(self):
 		self.ind = Ind()
-		assert hasattr(self.ind, "socialStatus")
+		assert hasattr(self.ind, "leader")
 
 	def test_demes_have_a_number_of_elected_leaders(self):
 		self.deme = Dem()
