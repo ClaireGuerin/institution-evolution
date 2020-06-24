@@ -38,5 +38,8 @@ class TestSocialClassesFeature(object):
 		assert False, "write this test"
 
 	def test_deme_counts_actual_number_of_leaders_after_elections(self):
-		assert False, "write this test"
+		for deme in self.pop.demes:
+			assert deme.progressValues["numberOfLeaders"] is not None
+
+		assert False, "write a test of distribution of numberOfLeaders"
 
