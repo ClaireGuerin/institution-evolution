@@ -51,6 +51,11 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "d": 0.5},
 			  "debate":{"x": [0.5, 0.2, 0.7],
 			  "xmean": [0.2, 0.5, 0.8],
+			  "n": 10},
+			  'socialclass':{"x": [0.5],
+			  "xmean": [0.2], 
+			  "fb": 2, 
+			  "gamma": 0.01,
 			  "n": 10}}
 
 @pytest.fixture

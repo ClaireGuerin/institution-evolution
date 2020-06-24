@@ -113,5 +113,16 @@ class TestSocialClassesFeature(object):
 			assert nl != 10, "all individuals in deme have been elected leaders when proportion should be about: "+self.pop.initialPhenotypes[3]
 			assert leaderCountPerDeme[deme] == nl, "deme counts {0} leaders when there are {1}".format(nl,leaderCountPerDeme[deme])
 
-	def test_social_class_determines_fitness(self):
-		assert False, "write this test!"
+	def test_social_class_determines_fitness(self,getFitnessParameters):
+		pars = getFitnessParameters('socialclass')
+		self.firstInd = Ind()
+		self.firstInd.resourcesAmount = 1
+		self.firstInd.leader = bool(1)
+		self.firstInd.reproduce(fun_name='socialclass',**pars)
+		self.secndInd = Ind()
+		self.secndInd.resourcesAmount = 1
+		self.secndInd.leader = bool(0)
+		self.secndInd.reproduce(fun_name='socialclass',**pars)
+
+		assert self.firstInd.fertilityValue != self.secndInd.fertilityValue, "leaders and commoners should not get the same fitness"
+
