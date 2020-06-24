@@ -14,7 +14,7 @@ class Individual(object):
 		self.cheater = None
 		self.punished = None
 		self.punishmentFee = None
-		self.socialStatus = None 
+		self.leader = None 
 		self.consensusTime = None
 		self.productionTime = None
 
@@ -55,7 +55,7 @@ class Individual(object):
 	def ascend(self, leadProp, rds=None):
 		pass
 		#rd.seed(rds)
-		#self.socialStatus = bool(rd.binomial(1,leadProp))
+		#self.leader = bool(rd.binomial(1,leadProp))
 	
 	def reproduce(self, fun_name="pgg", **kwargs):
 		self.produceResources(fun_name, **kwargs)

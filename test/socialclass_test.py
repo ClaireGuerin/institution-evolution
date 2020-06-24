@@ -4,6 +4,7 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
 import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
+import random as rd
 
 class TestSocialClassesFeature(object):
 
@@ -39,11 +40,20 @@ class TestSocialClassesFeature(object):
 		pseudorandom(0)
 		self.nIndividuals = 1000
 		self.pop = instantiateSingleDemePopulation(self.nIndividuals)
+		proportionOfLeaders = rd.random()
 
+		leaderCount = 0
 		for ind in self.pop.individuals:
 			assert hasattr(ind, "ascend"), "individual needs to be able to ascend social ladder"
+			ind.ascend(leadProp=proportionOfLeaders, rds=96)
+			if ind.leader:
+				leaderCount += 1
 
-
+		stat1, pval1 = scistats.ttest_1samp([1] * leaderCount + [0] * (self.nIndividuals - leaderCount), proportionOfLeaders)
+		assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(leaderCount/self.nIndividuals, proportionOfLeaders)
+		self.test = scistats.binom_test(leaderCount, self.nIndividuals, proportionOfLeaders, alternative = "two-sided")
+		assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(leaderCount/self.nIndividuals, proportionOfLeaders)
+		 
 
 	def test_deme_gets_number_of_leaders(self):
 		self.pop = Pop('socialclass')
@@ -65,7 +75,7 @@ class TestSocialClassesFeature(object):
 			assert nlead >= 0
 			stat1, pval1 = scistats.ttest_1samp([1] * nlead + [0] * (deme.demography - nlead), self.pop.initialPhenotypes[3])
 			assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
-			self.test = scistats.binom_test(pop.initialPhenotypes[3], deme.demography, self.pop.initialPhenotypes[3], alternative = "two-sided")
+			self.test = scistats.binom_test(nlead, deme.demography, self.pop.initialPhenotypes[3], alternative = "two-sided")
 			assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
 		
 		gc.collect()
