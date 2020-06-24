@@ -59,7 +59,8 @@ def debate(res, **kwargs):
 	return f
 
 def socialclass(res, **kwargs):
-	pass
+	f = -1
+	return f
 
 functions = {}
 for key, value in list(locals().items()):

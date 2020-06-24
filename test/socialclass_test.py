@@ -59,10 +59,11 @@ class TestSocialClassesFeature(object):
 		
 		gc.collect()
 
-	def test_deme_gets_number_of_leaders(self):
+	def test_deme_gets_number_of_leaders(self, pseudorandom):
+		pseudorandom(10)
 		self.pop = Pop('socialclass')
-		self.pop.numberOfDemes = 1000
-		self.pop.initialDemeSize = 3
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 1000
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
 		self.pop.migrationRate = 0
 		self.pop.mutationRate = 0
@@ -71,22 +72,46 @@ class TestSocialClassesFeature(object):
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
 		self.pop.updatePopulation()
+		self.pop.populationReproduction()
+
+		plead = self.pop.initialPhenotypes[3]
 
 		for deme in self.pop.demes:
 			nlead = deme.progressValues["numberOfLeaders"]
 			assert nlead is not None
-			assert type(nlead) is float
+			assert type(nlead) is int
 			assert nlead >= 0
-			stat1, pval1 = scistats.ttest_1samp([1] * nlead + [0] * (deme.demography - nlead), self.pop.initialPhenotypes[3])
-			assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
-			self.test = scistats.binom_test(nlead, deme.demography, self.pop.initialPhenotypes[3], alternative = "two-sided")
-			assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(nlead/deme.demography, self.pop.initialPhenotypes[3])
+			assert pytest.approx(deme.progressValues["proportionOfLeaders"]) == plead
+			stat1, pval1 = scistats.ttest_1samp([1] * nlead + [0] * (deme.demography - nlead), plead)
+			#assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(nlead/deme.demography, plead)
+			self.test = scistats.binom_test(nlead, deme.demography, plead, alternative = "two-sided")
+			assert self.test > 0.05, "Success rate = {0} when proportion of leaders = {1}".format(nlead/deme.demography, plead)
 		
 		gc.collect()
 
-		assert False, "write a test of distribution of numberOfLeaders"
+	def test_deme_number_of_leaders_is_number_of_individuals_with_that_role(self, pseudorandom):
+		pseudorandom(0)
+		self.pop = Pop('socialclass')
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 10
+		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
+		self.pop.migrationRate = 0
+		self.pop.mutationRate = 0
 
-	def test_deme__number_of_leaders_is_number_of_individuals_with_that_role(self):
-		assert False, "write this test"
-		
+		self.pop.createAndPopulateDemes()
+		self.pop.clearDemeInfo()
+		self.pop.populationMutationMigration()
+		self.pop.updatePopulation()
+		self.pop.populationReproduction()
 
+		leaderCountPerDeme = [0] * self.pop.numberOfDemes
+		for ind in self.pop.parents:
+			leaderCountPerDeme[ind.currentDeme] += ind.leader
+
+		for deme in range(self.pop.numberOfDemes):
+			nl = self.pop.demes[deme].progressValues["numberOfLeaders"]
+			assert nl != 10, "all individuals in deme have been elected leaders when proportion should be about: "+self.pop.initialPhenotypes[3]
+			assert leaderCountPerDeme[deme] == nl, "deme counts {0} leaders when there are {1}".format(nl,leaderCountPerDeme[deme])
+
+	def test_social_class_determines_fitness(self):
+		assert False, "write this test!"
