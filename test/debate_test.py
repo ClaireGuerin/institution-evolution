@@ -120,3 +120,6 @@ class TestDebateFeature(object):
 
 		for deme in self.pop.demes:
 			assert deme.progressValues['consensusTime'] < 1, "epsilon is {2} so asymptote should be: {1}. variance in opinions: {0}".format(deme.varPhenotypes[2], self.pop.fitnessParameters['epsilon']+1, self.pop.fitnessParameters['epsilon'])
+
+	def test_fitness_depends_on_debate_time(self):
+		assert False, "write this test!"
