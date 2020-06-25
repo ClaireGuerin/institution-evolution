@@ -43,7 +43,7 @@ class TestMigrationFunction(object):
 			
 		gc.collect()
 
-	def test_migrants_are_drawn_equally_depending_on_seed(self):
+	def test_migrants_are_drawn_equally_depending_on_seed(self, pseudorandom):
 		self.individualsPerDeme = 1000
 		self.fakepop = Pop(inst='test')
 		self.fakepop.initialDemeSize = self.individualsPerDeme
@@ -53,8 +53,8 @@ class TestMigrationFunction(object):
 		self.migrants = []
 
 		for ind in self.fakepop.individuals:
-			# pseudorandom
-			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=0)
+			pseudorandom(56)
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 			self.migrants.append(ind.migrant)
 
 		assert all(self.migrants) or not any(self.migrants), "Migration values differ for same seed resetting: {0}".format(set(self.migrants))
@@ -75,7 +75,7 @@ class TestMigrationFunction(object):
 				indiv = self.fakepop.individuals[ind]
 				originalDeme = indiv.currentDeme
 				pseudorandom(0)
-				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=ind)
+				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 				if indiv.migrant:
 					migrantsCount += 1
 				i += 1
@@ -89,7 +89,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 	
 	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, pseudorandom, instantiateSingleIndividualsDemes):
-		pseudorandom(0)
+		pseudorandom(69)
 		self.fakepop = Pop(inst='test')
 		self.ds = 100
 		self.nd = 10
@@ -99,7 +99,7 @@ class TestMigrationFunction(object):
 		
 		for ind in range(self.fakepop.demography):
 			indiv = self.fakepop.individuals[ind]
-			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1, rds=10 * ind)
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1)
 			destinations.append(indiv.destinationDeme)
 
 		observedCountUnsorted = Counter(destinations)

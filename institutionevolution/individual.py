@@ -40,12 +40,10 @@ class Individual(object):
 			self.unboundedPhenotypicValues = unboundedphen
 			setattr(self, "phenotypicValues", boundedphen)
 		
-	def migrate(self, nDemes, migRate, rds=None):
-		rd.seed(rds)
+	def migrate(self, nDemes, migRate):
 		self.migrant = bool(rd.binomial(1, migRate))
 		
 		if self.migrant:
-			rd.seed(rds)
 			self.destinationDeme = int(rd.choice(self.neighbours))
 		else:
 			self.destinationDeme = self.currentDeme

@@ -64,7 +64,7 @@ class TestSocialClassesFeature(object):
 		self.pop = Pop(fit_fun='socialclass', inst='test')
 		self.pop.fitnessParameters = getFitnessParameters('socialclass')
 		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 5000
+		self.pop.initialDemeSize = 1000
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
 		self.pop.migrationRate = 0
 		self.pop.mutationRate = 0
