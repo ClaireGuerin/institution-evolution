@@ -58,6 +58,10 @@ def debate(res, **kwargs):
 	f = 1
 	return f
 
+def socialclass(res, **kwargs):
+	f = (res + 2 * kwargs['leadership']) / (1 + kwargs["gamma"] * kwargs["n"])
+	return f
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

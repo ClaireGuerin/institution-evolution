@@ -12,6 +12,7 @@ class Deme(object):
 		self.policingConsensus = None
 		self.progressValues = {"technologyLevel": None,
 		"numberOfLeaders": None, 
+		"proportionOfLeaders": None, 
 		"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
 		"labourForce": None, 

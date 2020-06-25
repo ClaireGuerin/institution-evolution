@@ -7,8 +7,7 @@ import gc
 class TestTechnology(object):
 
 	def test_deme_technology_is_right_format(self):
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 3
 		#self.fakeDeme.publicGood = 20
@@ -100,7 +99,7 @@ class TestTechnology(object):
 		phen = [0.5] * 3
 
 		## WHEN THERE IS NO POLICING, NO GOODS ARE RETURNED
-		self.fakepopNoPolicing = Pop(fitfun)
+		self.fakepopNoPolicing = Pop(fit_fun=fitfun, inst='test')
 		self.fakepopNoPolicing.fit_fun = fitfun
 		self.fakepopNoPolicing.fitnessParameters = pars
 		self.fakepopNoPolicing.nDemes = ndemes
@@ -112,7 +111,7 @@ class TestTechnology(object):
 		self.fakepopNoPolicing.createAndPopulateDemes()
 		self.fakepopNoPolicing.clearDemeInfo()
 		self.fakepopNoPolicing.populationMutationMigration()
-		self.fakepopNoPolicing.update()
+		self.fakepopNoPolicing.updateDemeInfo()
 
 		collectGoods = [0] * self.fakepopNoPolicing.numberOfDemes
 		for ind in self.fakepopNoPolicing.individuals:
@@ -124,8 +123,7 @@ class TestTechnology(object):
 			assert self.fakepopNoPolicing.demes[dem].progressValues['effectivePublicGood'] == collectGoods[dem]
 
 		## WHEN THERE IS POLICING, GOODS MUST BE RETURNED
-		self.fakepopPolicing = Pop(fitfun)
-		self.fakepopPolicing.fit_fun = fitfun
+		self.fakepopPolicing = Pop(fit_fun=fitfun, inst='test')
 		self.fakepopPolicing.fitnessParameters = pars
 		self.fakepopPolicing.nDemes = ndemes
 		self.fakepopPolicing.initialDemeSize = initdemesize
@@ -136,7 +134,7 @@ class TestTechnology(object):
 		self.fakepopPolicing.createAndPopulateDemes()
 		self.fakepopPolicing.clearDemeInfo()
 		self.fakepopPolicing.populationMutationMigration()
-		self.fakepopPolicing.update()
+		self.fakepopPolicing.updateDemeInfo()
 
 		collectGoods = [0] * self.fakepopPolicing.numberOfDemes
 		for ind in self.fakepopPolicing.individuals:
@@ -150,7 +148,7 @@ class TestTechnology(object):
 		
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.update()
+		self.fakepop.updateDemeInfo()
 
 		for dem in self.fakepop.demes:
 			assert dem.progressValues['effectivePublicGood'] is not None, "No value in the effective public good"
@@ -185,7 +183,7 @@ class TestTechnology(object):
 			assert False, "technology fitness function does not yet take arguments, fix this!"
 
 	def test_initial_deme_technology_is_not_null(self):
-		self.pop = Pop()
+		self.pop = Pop(inst='test')
 		self.pop.createAndPopulateDemes()
 
 		assert type(self.pop.demes[0].progressValues['technologyLevel']) is float, "initial technology level info missing"
@@ -193,10 +191,9 @@ class TestTechnology(object):
 
 	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
 		pars = getFitnessParameters('technology')
-		self.pop = Pop()
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
-		self.pop.fit_fun = 'technology'
 		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
@@ -208,10 +205,9 @@ class TestTechnology(object):
 		assert demeTech != self.pop.demes[0].progressValues['technologyLevel'], "the technology level has not changed!"
 
 	def test_public_good_gets_updated(self):
-		self.pop = Pop()
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
-		self.pop.fit_fun = 'technology'
 		self.pop.initialPhenotypes = [0.5] * 4
 		self.pop.createAndPopulateDemes()
 
@@ -222,7 +218,7 @@ class TestTechnology(object):
 		assert self.pop.demes[0].publicGood >= 0, "public good cannot be negative"
 
 	def test_technology_updates_with_correct_number(self):
-		self.pop = Pop()
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
@@ -236,7 +232,7 @@ class TestTechnology(object):
 
 		tech_new = (1 + self.pop.fitnessParameters['atech'] * publicGood) * tech / (1 + self.pop.fitnessParameters['btech'] * tech)
 
-		self.pop.update()
+		self.pop.updateDemeInfo()
 		self.pop.populationReproduction(**self.pop.fitnessParameters)
 		self.pop.clearDemeInfo()
 		assert self.pop.demes[0].progressValues['technologyLevel'] == tech_new, "wrong value for new technology level."
@@ -257,7 +253,7 @@ class TestTechnology(object):
 		self.resBEFORE = self.pop.individuals[0].resourcesAmount
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.update()
+		self.pop.updateDemeInfo()
 		self.ind = self.pop.individuals[0]
 		self.deme = self.pop.demes[self.ind.currentDeme]
 		self.ind.produceResources('technology', **{**self.pop.fitnessParameters,**self.deme.progressValues})
@@ -298,8 +294,7 @@ class TestTechnology(object):
 			self.ind1.resourcesAmount,self.ind2.resourcesAmount)
 
 	def test_group_labour_force_is_calculated_and_given_to_individual_instance(self):
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 20
 		self.pop.createAndPopulateDemes()
@@ -316,7 +311,7 @@ class TestTechnology(object):
 		self.pop.populationMutationMigration()
 		for pheno in self.pop.demes[0].meanPhenotypes:
 			assert pheno is not None, "none phenotypes before update"
-		self.pop.update()
+		self.pop.updateDemeInfo()
 
 		self.demeAFTER = self.pop.demes[0]
 		for key in progressKeys:
@@ -326,15 +321,14 @@ class TestTechnology(object):
 
 	def test_production_increase_function(self, getFitnessParameters):
 		#pars = getFitnessParameters('technology')
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 5
 
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.update()
+		self.pop.updateDemeInfo()
 		pars = self.pop.fitnessParameters
 
 		for ind in self.pop.individuals:
@@ -354,14 +348,13 @@ class TestTechnology(object):
 			assert ind.resourcesAmount == payoff, "ind produced {0} instead of {1}".format(ind.resourcesAmount, payoff)
 
 	def test_fitness_function_returns_correct_value(self):
-		self.pop = Pop()
-		self.pop.fit_fun = 'technology'
+		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 5
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.update()
+		self.pop.updateDemeInfo()
 
 		for ind in self.pop.individuals:
 			#assert self.pop.demes[ind.currentDeme].progressValues['technologyLevel'] > 1, "technology level too low: {0}".format(self.pop.demes[ind.currentDeme].progressValues['technologyLevel'])
