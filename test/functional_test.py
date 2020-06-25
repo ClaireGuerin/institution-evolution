@@ -11,16 +11,16 @@ class TestSimpleRun(object):
 		# Claire wants to model the evolution of a structured population.
 		# She provides the initial conditions for the run: number of demes, initial deme size, number of generations in a file called initialisation.txt
 		self.dirpath = os.getcwd()
-		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER))
+		self.fileslist = os.listdir('{0}/{1}/test'.format(self.dirpath, PARAMETER_FOLDER))
 		assert INITIALISATION_FILE in self.fileslist, "Initialisation file not found in {0}".format(self.dirpath)
 		
 	def test_initialisation_parameters_listed(self):
-		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER+'/test')
 		for par in ['numberOfDemes','initialDemeSize','numberOfGenerations']:
 			fman.searchFile(self.pathToFile, par)
 			
 	def test_initialisation_values_provided(self):
-		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER+'/test')
 		
 		self.pars = fman.extractColumnFromFile(self.pathToFile, 1, int)
 		for par in self.pars:
@@ -30,21 +30,21 @@ class TestSimpleRun(object):
 	def test_parameter_file_exists(self):
 		# Claire provides parameters needed by the program to run functions in a file called parameters.txt
 		self.dirpath = os.getcwd()
-		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER))
+		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER+'/test'))
 		assert PARAMETER_FILE in self.fileslist, "Parameter file not found in {0}".format(self.dirpath) 
 		
 	def test_initial_phenotypes_file_exists(self):
 		self.dirpath = os.getcwd()
-		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER))
+		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER+'/test'))
 		assert INITIAL_PHENOTYPES_FILE in self.fileslist, "Initial phenotypes file not found in {0}".format(self.dirpath) 
 	
 	def test_fitness_parameters_file_exists(self):
 		self.dirpath = os.getcwd()
-		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER))
+		self.fileslist = os.listdir('{0}/{1}'.format(self.dirpath, PARAMETER_FOLDER+'/test'))
 		assert FITNESS_PARAMETERS_FILE in self.fileslist, "Fitness parameter file not found in {0}".format(self.dirpath) 
 		
 	def test_initial_phenotypes_format(self):
-		self.pathToFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=PARAMETER_FOLDER+'/test')
 		with open(self.pathToFile) as f:
 			lines = [float(x) for x in f.readlines()]
 			for line in lines: 
@@ -55,7 +55,7 @@ class TestSimpleRun(object):
 	# This program is not meant for well-mixed populations, and tells Claire so.
 	def test_simulations_only_run_on_structured_populations(self):
 		self.out = 'output_test.txt'
-		self.population = Pop()
+		self.population = Pop(inst='test')
 		setattr(self.population, "numberOfDemes", 1)
 		setattr(self.population, "numberOfGenerations", 4)
 		try:
@@ -71,7 +71,7 @@ class TestSimpleRun(object):
 	
 	def test_program_requires_valid_fitness_function(self):
 		self.out = 'output_test.txt'
-		self.population = Pop(fit_fun="gibberish")
+		self.population = Pop(fit_fun="gibberish", inst='test')
 		setattr(self.population, "numberOfGenerations", 4)
 		try:
 			self.population.runSimulation(self.out)
@@ -84,10 +84,10 @@ class TestSimpleRun(object):
 		# She runs the program:
 	def test_population_is_initialised_with_right_values(self, objectAttributesExist, objectAttributesValues):
 		# First, the population is initialised according to the initialisation settings
-		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER)
+		self.pathToFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=PARAMETER_FOLDER+'/test')
 		self.attributeNames = fman.extractColumnFromFile(self.pathToFile, 0, str)
 		self.attributeValues = fman.extractColumnFromFile(self.pathToFile, 1, int)
-		self.population = Pop()
+		self.population = Pop(inst='test')
 		
 		testAttr, whichAttr = objectAttributesExist(self.population, self.attributeNames)
 		assert testAttr, "Population does not have attribute(s) {0}".format(whichAttr)
@@ -98,7 +98,7 @@ class TestSimpleRun(object):
 		# Second, the population evolves over x generations following the iteration function
 		# After the run, the results are saved in a folder called "res"
 		self.out = 'output_test'
-		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
 		ngen = runSim(self.out,5)
 		
 		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
@@ -117,7 +117,7 @@ class TestSimpleRun(object):
 
 	def test_program_writes_non_empty_output(self, runSim):
 		self.out = 'output_test'
-		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
 		runSim(self.out)
 
 		with open(self.outputFile + '_phenotypes.txt') as fp, open(self.outputFile + '_demography.txt') as fd:
@@ -133,7 +133,7 @@ class TestSimpleRun(object):
 	# She goes to the output folder and sees that two files have been written by the program, one with the mean phenotypes and the other with the mean deme size
 	def test_program_writes_phenotypes_and_deme_sizes(self, runSim):
 		self.out = 'output_test'
-		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
 		runSim(self.out)
 
 		allOutput = glob.glob(self.outputFile + '*.txt')
@@ -146,7 +146,7 @@ class TestSimpleRun(object):
 
 	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim):
 		self.out = 'output_test'
-		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER)
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
 
 		try:
 			runSim(self.out,0)

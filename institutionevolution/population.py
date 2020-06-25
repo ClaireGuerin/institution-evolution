@@ -128,7 +128,7 @@ class Population(object):
 		return tmpvar
 
 	def populationReproduction(self, seed=None, **kwargs):
-		random.seed(seed)
+		if seed is not None: random.seed(seed)
 		self.offspring = []
 		self.populationStructure = [0] * self.numberOfDemes
 		testdemog = 0
@@ -148,6 +148,7 @@ class Population(object):
 			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
 			infoToAdd["x"] = ind.phenotypicValues
+			infoToAdd["leadership"] = ind.leader
 
 			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
 			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
@@ -209,7 +210,7 @@ class Population(object):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
-	def updatePopulation(self):
+	def updateDemeInfo(self):
 		for deme in self.demes:
 			meanphen = []
 			varphen = []
@@ -231,7 +232,7 @@ class Population(object):
 		self.clearDemeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
-		self.updatePopulation()
+		self.updateDemeInfo()
 		logging.info("reproduction")
 		self.populationReproduction(**kwargs)
 		

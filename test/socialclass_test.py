@@ -24,7 +24,7 @@ class TestSocialClassesFeature(object):
 		assert 'socialclass' in progress.functions, "create social class progress function"
 
 	def test_elections_take_place_in_demes(self):
-		self.pop = Pop('socialclass')
+		self.pop = Pop(fit_fun='socialclass', inst='test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 2
 		self.pop.migrationRate = 0
@@ -32,7 +32,7 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updatePopulation()
+		self.pop.updateDemeInfo()
 
 		for deme in self.pop.demes:
 			assert deme.progressValues["proportionOfLeaders"] is not None
@@ -59,11 +59,12 @@ class TestSocialClassesFeature(object):
 		
 		gc.collect()
 
-	def test_deme_gets_number_of_leaders(self, pseudorandom):
+	def test_deme_gets_number_of_leaders(self, pseudorandom, getFitnessParameters):
 		pseudorandom(10)
-		self.pop = Pop('socialclass')
+		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop.fitnessParameters = getFitnessParameters('socialclass')
 		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 1000
+		self.pop.initialDemeSize = 5000
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
 		self.pop.migrationRate = 0
 		self.pop.mutationRate = 0
@@ -71,8 +72,8 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updatePopulation()
-		self.pop.populationReproduction()
+		self.pop.updateDemeInfo()
+		self.pop.populationReproduction(**self.pop.fitnessParameters)
 
 		plead = self.pop.initialPhenotypes[3]
 
@@ -89,9 +90,10 @@ class TestSocialClassesFeature(object):
 		
 		gc.collect()
 
-	def test_deme_number_of_leaders_is_number_of_individuals_with_that_role(self, pseudorandom):
+	def test_deme_number_of_leaders_is_number_of_individuals_with_that_role(self, pseudorandom, getFitnessParameters):
 		pseudorandom(0)
-		self.pop = Pop('socialclass')
+		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop.fitnessParameters = getFitnessParameters('socialclass')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 10
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.6]
@@ -101,8 +103,8 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updatePopulation()
-		self.pop.populationReproduction()
+		self.pop.updateDemeInfo()
+		self.pop.populationReproduction(**self.pop.fitnessParameters)
 
 		leaderCountPerDeme = [0] * self.pop.numberOfDemes
 		for ind in self.pop.parents:
@@ -118,15 +120,26 @@ class TestSocialClassesFeature(object):
 		self.firstInd = Ind()
 		self.firstInd.resourcesAmount = 1
 		self.firstInd.leader = bool(1)
+		self.firstInd.neighbours = [1,2]
 		pars.update({'leadership':self.firstInd.leader})
 		self.firstInd.reproduce(fun_name='socialclass',**pars)
 		self.secndInd = Ind()
 		self.secndInd.resourcesAmount = 1
 		self.secndInd.leader = bool(0)
+		self.secndInd.neighbours = [1,2]
 		pars.update({'leadership':self.secndInd.leader})
 		self.secndInd.reproduce(fun_name='socialclass',**pars)
 
 		assert self.firstInd.fertilityValue != self.secndInd.fertilityValue, "leaders and commoners should not get the same fitness"
 
 	def test_fitness_function_runs_at_population_level(self):
-		assert False, "write this test!"
+		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop.numberOfDemes = 3
+		self.pop.initialDemeSize = 5
+		self.pop.initialPhenotypes = [0.9,0.7,0.5,0.3]
+		self.pop.createAndPopulateDemes()
+
+		try:
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+		except ValueError as e:
+			assert False, str(e)
