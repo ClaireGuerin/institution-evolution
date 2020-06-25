@@ -1,0 +1,1 @@
+for i in {1..100}; do python -m pytest test/socialclass_test.py; done

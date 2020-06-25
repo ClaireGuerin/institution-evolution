@@ -14,7 +14,7 @@ class Individual(object):
 		self.cheater = None
 		self.punished = None
 		self.punishmentFee = None
-		self.socialStatus = None 
+		self.leader = None 
 		self.consensusTime = None
 		self.productionTime = None
 
@@ -40,17 +40,18 @@ class Individual(object):
 			self.unboundedPhenotypicValues = unboundedphen
 			setattr(self, "phenotypicValues", boundedphen)
 		
-	def migrate(self, nDemes, migRate, rds=None):
-		rd.seed(rds)
+	def migrate(self, nDemes, migRate):
 		self.migrant = bool(rd.binomial(1, migRate))
 		
 		if self.migrant:
-			rd.seed(rds)
 			self.destinationDeme = int(rd.choice(self.neighbours))
 		else:
 			self.destinationDeme = self.currentDeme
 			
 		setattr(self, "currentDeme", self.destinationDeme)
+
+	def ascend(self, leadProp):
+		self.leader = bool(rd.binomial(1,leadProp))
 	
 	def reproduce(self, fun_name="pgg", **kwargs):
 		self.produceResources(fun_name, **kwargs)

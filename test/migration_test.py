@@ -43,9 +43,9 @@ class TestMigrationFunction(object):
 			
 		gc.collect()
 
-	def test_migrants_are_drawn_equally_depending_on_seed(self):
+	def test_migrants_are_drawn_equally_depending_on_seed(self, pseudorandom):
 		self.individualsPerDeme = 1000
-		self.fakepop = Pop()
+		self.fakepop = Pop(inst='test')
 		self.fakepop.initialDemeSize = self.individualsPerDeme
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.createAndPopulateDemes()
@@ -53,8 +53,8 @@ class TestMigrationFunction(object):
 		self.migrants = []
 
 		for ind in self.fakepop.individuals:
-			# pseudorandom
-			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=0)
+			pseudorandom(56)
+			ind.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 			self.migrants.append(ind.migrant)
 
 		assert all(self.migrants) or not any(self.migrants), "Migration values differ for same seed resetting: {0}".format(set(self.migrants))
@@ -63,7 +63,7 @@ class TestMigrationFunction(object):
 
 	def test_migrants_are_drawn_from_binomial(self, pseudorandom):
 		self.individualsPerDeme = 1000
-		self.fakepop = Pop()
+		self.fakepop = Pop(inst='test')
 		self.fakepop.initialDemeSize = self.individualsPerDeme
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.createAndPopulateDemes()
@@ -75,7 +75,7 @@ class TestMigrationFunction(object):
 				indiv = self.fakepop.individuals[ind]
 				originalDeme = indiv.currentDeme
 				pseudorandom(0)
-				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate, rds=ind)
+				indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=self.fakepop.migrationRate)
 				if indiv.migrant:
 					migrantsCount += 1
 				i += 1
@@ -89,8 +89,8 @@ class TestMigrationFunction(object):
 		gc.collect()
 	
 	def test_migrants_destinations_equally_likely_as_in_uniform_distribution(self, pseudorandom, instantiateSingleIndividualsDemes):
-		pseudorandom(0)
-		self.fakepop = Pop()
+		pseudorandom(69)
+		self.fakepop = Pop(inst='test')
 		self.ds = 100
 		self.nd = 10
 		self.fakepop.createAndPopulateDemes(nDemes=self.nd, dSize=self.ds)
@@ -99,7 +99,7 @@ class TestMigrationFunction(object):
 		
 		for ind in range(self.fakepop.demography):
 			indiv = self.fakepop.individuals[ind]
-			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1, rds=10 * ind)
+			indiv.migrate(nDemes=self.fakepop.numberOfDemes, migRate=1)
 			destinations.append(indiv.destinationDeme)
 
 		observedCountUnsorted = Counter(destinations)
@@ -145,13 +145,13 @@ class TestMigrationFunction(object):
 	
 	def test_demes_collect_all_their_individuals_after_migration(self):
 		self.demesize = 10
-		self.fakepop = Pop()
+		self.fakepop = Pop(inst='test')
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd, self.demesize)
 		
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.update()
+		self.fakepop.updateDemeInfo()
 		
 		self.newDemography = []		
 		for ind in self.fakepop.individuals:
@@ -165,7 +165,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 		
 	def test_migration_is_ran_at_the_population_level(self):
-		self.fakepop = Pop()
+		self.fakepop = Pop(inst='test')
 		self.nd = self.fakepop.numberOfDemes
 		self.fakepop.createAndPopulateDemes(self.nd,10)
 		
@@ -175,7 +175,7 @@ class TestMigrationFunction(object):
 		gc.collect()
 
 	def test_migration_at_population_level_updates_phenotypes(self):
-		self.fakepop = Pop()
+		self.fakepop = Pop(inst='test')
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 10
 		self.fakepop.initialPhenotypes = [0.5]
