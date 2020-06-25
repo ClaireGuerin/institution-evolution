@@ -121,5 +121,17 @@ class TestDebateFeature(object):
 		for deme in self.pop.demes:
 			assert deme.progressValues['consensusTime'] < 1, "epsilon is {2} so asymptote should be: {1}. variance in opinions: {0}".format(deme.varPhenotypes[2], self.pop.fitnessParameters['epsilon']+1, self.pop.fitnessParameters['epsilon'])
 
-	def test_fitness_depends_on_debate_time(self):
-		assert False, "write this test!"
+	def test_fitness_depends_on_debate_time(self, getFitnessParameters):
+		fitfun = 'debate'
+		pars = getFitnessParameters(fitfun)
+		self.firstInd = Ind()
+		self.firstInd.neighbours = [1,2]
+		self.firstInd.productionTime = 0.8
+		self.firstInd.reproduce(fitfun, **pars)
+
+		self.secndInd = Ind()
+		self.secndInd.neighbours = [1,2]
+		self.secndInd.productionTime = 0.2
+		self.secndInd.reproduce(fitfun, **pars)
+
+		assert self.firstInd.fertilityValue > self.secndInd.fertilityValue, "Individual with {0}% production time should have higher fitness than individual with {1}%".format(self.firstInd.productionTime*100, self.secndInd.productionTime*100)
