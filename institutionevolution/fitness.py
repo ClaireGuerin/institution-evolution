@@ -55,7 +55,8 @@ def technology(res, **kwargs):
 	return f
 
 def debate(res, **kwargs):
-	f = 1
+	#payoff = kwargs['productionTime'] * kwargs['labourForce'] * kwargs['techcapital'] ** kwargs['']
+	f=1
 	return f
 
 def socialclass(res, **kwargs):
