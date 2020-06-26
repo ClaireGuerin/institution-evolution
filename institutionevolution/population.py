@@ -150,7 +150,6 @@ class Population(object):
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
 			infoToAdd["x"] = ind.phenotypicValues
 			infoToAdd["leadership"] = ind.leader
-			infoToAdd["productivity"] = ind.productionTime
 			infoToAdd["labourForce"] = self.demes[ind.currentDeme].progressValues["consensusTime"] * self.demes[ind.currentDeme].demography
 
 			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])

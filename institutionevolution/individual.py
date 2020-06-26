@@ -78,5 +78,5 @@ class Individual(object):
 		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
 
 	def produceResources(self, fun_name="pgg", **kwargs):
-		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**kwargs))
+		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**{**{'productivity': self.productionTime},**kwargs}))
 		self.resourcesAmount = tmpRes
