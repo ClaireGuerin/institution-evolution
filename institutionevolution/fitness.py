@@ -55,7 +55,7 @@ def technology(res, **kwargs):
 	return f
 
 def debate(res, **kwargs):
-	f = 1
+	f = (kwargs["rb"] + res) / (1 + kwargs["gamma"] * kwargs["n"])
 	return f
 
 def socialclass(res, **kwargs):

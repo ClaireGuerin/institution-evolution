@@ -28,3 +28,4 @@ aconsensus, 0.6
 bconsensus, 0.6
 aquality, 1.2
 alphaquality, 0.9
+techcapital, 10

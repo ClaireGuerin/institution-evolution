@@ -13,8 +13,9 @@ Download the repository *institution-evolution* on your local machine.
 
 ## Requirements
 
-Scipy, Numpy, 
-Pytest to test code 
+Scipy and Numpy for running simulations, Pytest to test code. To install all requirements, run: pip install -r requirements.txt
+
+This code is written under Python 3.7.3
 
 ## Parameters
 
@@ -31,4 +32,8 @@ Set parameters as desired in *pars* folder:
 	- number of generations (iterations) to run.
 
 ## Command line
-python script.py
+### Run a single simulation
+python script_single_simulation.py
+
+### Test parameter space
+python script_parameter_space.py
