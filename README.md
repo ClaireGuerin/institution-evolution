@@ -11,6 +11,8 @@ Download the repository *institution-evolution* on your local machine.
 
 # Launch simulation
 
+> :warning: **Non-values are marked with -99 in output files**: Be mindful there when analyzing data! For instance, when technology level is not recorded in the simulation, the corresponding output file will show a mean technology level of -99 for every generation.
+
 ## Requirements
 
 Scipy and Numpy for running simulations, Pytest to test code. To install all requirements, run: pip install -r requirements.txt
