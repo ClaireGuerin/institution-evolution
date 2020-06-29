@@ -192,6 +192,7 @@ class Population(object):
 
 	def updateDemeInfo(self):
 		self.resources = []
+		self.debatetime = []
 		for deme in self.demes:
 			self.resources.append(deme.totalResources)
 			meanphen = []
@@ -208,6 +209,7 @@ class Population(object):
 			## progress
 			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
+			self.debatetime.append(deme.progressValues["consensusTime"])
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
@@ -265,13 +267,15 @@ class Population(object):
 						sep = ','
 						fp.write('{0},{1}\n'.format(sep.join(phenmeans),sep.join(phenvars)))
 						(demmean,demvar) = ar.extractMeanAndVariance(lst=self.populationStructure, n=self.numberOfDemes)
-						fd.write('{0},{1}\n'.format(demmean, demvar))
 						assert all([x is not None for x in self.advances]), "some or all deme tech entries are none at generation {1}: {0}".format(self.advances,gen)
 						(techmean,techvar) = ar.extractMeanAndVariance(lst=self.advances, n=self.numberOfDemes)
-						ft.write('{0},{1}\n'.format(techmean, techvar))
 						(resmean,resvar) = ar.extractMeanAndVariance(lst=self.resources, n=self.numberOfDemes)
+						assert all([x is not None for x in self.debatetime]), "some or all deme debate time entries are none at generation {1}: {0}".format(self.debatetime,gen)
+						(consmean,consvar) = ar.extractMeanAndVariance(lst=self.debatetime, n=self.numberOfDemes)
+						fd.write('{0},{1}\n'.format(demmean, demvar))
+						ft.write('{0},{1}\n'.format(techmean, techvar))
 						fr.write('{0},{1}\n'.format(resmean,resvar))
-						fc.write('{0},{1}\n'.format(1,2))
+						fc.write('{0},{1}\n'.format(consmean,consvar))
 
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')

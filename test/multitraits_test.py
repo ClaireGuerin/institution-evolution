@@ -49,8 +49,8 @@ class TestMultipleTraits(object):
 		with open(OUTPUT_FOLDER + '/test/tmptest_phenotypes.txt') as fp:
 			firstline = fp.readline()
 			phenotypeMeans = firstline.split(',')
-
-		assert len(phenotypeMeans) == self.ntraits, "Simulation returns mean of {0} phenotypes instead of {1}".format(len(phenotypeMeans), self.ntraits)
+		### only take half of the line, since the second half is the variance in phenotypes, not the mean
+		assert len(phenotypeMeans)/2 == self.ntraits, "Simulation returns mean of {0} phenotypes instead of {1}".format(len(phenotypeMeans), self.ntraits)
 
 		os.remove(OUTPUT_FOLDER + '/test/tmptest_phenotypes.txt')
 		os.remove(OUTPUT_FOLDER + '/test/tmptest_demography.txt')
