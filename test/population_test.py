@@ -2,6 +2,7 @@ import pytest
 from institutionevolution.individual import Individual as Ind
 from institutionevolution.deme import Deme as Dem
 from institutionevolution.population import Population as Pop
+import institutionevolution.myarithmetics as ar
 import scipy.stats as scistats
 from operator import add
 import random
@@ -138,5 +139,5 @@ class TestPopulation(object):
 
 		self.fakepop.updateDemeInfo()
 
-		assert self.fakepop.demes[0].meanPhenotypes[0] == self.fakepop.specialdivision(phendeme0, demogdeme0)
-		assert self.fakepop.demes[1].meanPhenotypes[0] == self.fakepop.specialdivision(phendeme1, demogdeme1)
+		assert self.fakepop.demes[0].meanPhenotypes[0] == ar.specialdivision(phendeme0, demogdeme0)
+		assert self.fakepop.demes[1].meanPhenotypes[0] == ar.specialdivision(phendeme1, demogdeme1)

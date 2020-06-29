@@ -5,6 +5,7 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.individual import Individual as Ind
 import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
+import institutionevolution.myarithmetics as ar
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 import random
@@ -101,31 +102,6 @@ class Population(object):
 		tmp = list(range(nd))
 		del tmp[demeID]
 		return tmp
-			
-	def specialmean(self, lst):
-		length, total = 0, 0
-		for phenotype in lst:
-			total += phenotype
-			length += 1
-		if length == 0:
-			tmpmean = None
-		else:
-			tmpmean = total / length
-		return tmpmean
-
-	def specialdivision(self, x, y):
-		if y == 0:
-			tmp = None
-		else:
-			tmp = x / y
-		return tmp
-
-	def specialvariance(self, samplesum, samplesumofsq, samplelength):
-		if samplelength == 0:
-			tmpvar = 0.0
-		else:
-			tmpvar = (samplesumofsq - samplesum ** 2 / samplelength) / samplelength
-		return tmpvar
 
 	def populationReproduction(self, seed=None, **kwargs):
 		if seed is not None: random.seed(seed)
@@ -170,11 +146,13 @@ class Population(object):
 
 	def clearDemeInfo(self):
 		self.parents = None
+		self.advances = []
 		for deme in range(self.numberOfDemes):
 			if self.fit_fun == 'technology':
 				tmpTech = self.initialTechnologyLevel if self.demes[deme].publicGood == None else (1 + self.fitnessParameters['atech'] * self.demes[deme].publicGood) * self.demes[deme].progressValues['technologyLevel'] / (1 + self.fitnessParameters['btech'] * self.demes[deme].progressValues['technologyLevel'])
 			else:
-				tmpTech = None
+				tmpTech = -99
+			self.advances.append(tmpTech)
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
@@ -213,14 +191,17 @@ class Population(object):
 				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
 	def updateDemeInfo(self):
+		self.resources = []
+		self.debatetime = []
 		for deme in self.demes:
+			self.resources.append(deme.totalResources)
 			meanphen = []
 			varphen = []
 			for phen in range(self.numberOfPhenotypes):
-				calculateMean = self.specialdivision(deme.totalPhenotypes[phen], deme.demography)
+				calculateMean = ar.specialdivision(deme.totalPhenotypes[phen], deme.demography)
 				meanphen.append(calculateMean) 
 
-				calculateVar = self.specialvariance(deme.totalPhenotypes[phen],deme.totalPhenotypeSquares[phen],deme.demography)
+				calculateVar = ar.specialvariance(deme.totalPhenotypes[phen],deme.totalPhenotypeSquares[phen],deme.demography)
 				varphen.append(calculateVar)
 
 			setattr(deme, "meanPhenotypes", meanphen)
@@ -228,6 +209,7 @@ class Population(object):
 			## progress
 			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
 			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
+			self.debatetime.append(deme.progressValues["consensusTime"])
 
 	def lifecycle(self, **kwargs):
 		logging.info("migration and mutation")
@@ -248,14 +230,16 @@ class Population(object):
 				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 
 			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
-			phenvariancefile = '{0}/{1}_pheno_var.txt'.format(self.pathToOutputFolder, outputfile)
 			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
-			demovariancefile = '{0}/{1}_demo_var.txt'.format(self.pathToOutputFolder, outputfile)
+			technologyfile = '{0}/{1}_technology.txt'.format(self.pathToOutputFolder, outputfile)
+			resourcesfile = '{0}/{1}_resources.txt'.format(self.pathToOutputFolder, outputfile)
+			consensusfile = '{0}/{1}_consensus.txt'.format(self.pathToOutputFolder, outputfile)
 			
 			with open(phenotypesfile, "w", buffering=1) as fp, \
 			open(demographyfile, "w", buffering=1) as fd, \
-			open(demovariancefile, "w", buffering=1) as vd, \
-			open(phenvariancefile, "w", buffering=1) as vp:
+			open(technologyfile, "w", buffering=1) as ft, \
+			open(resourcesfile, "w", buffering=1) as fr, \
+			open(consensusfile, "w", buffering=1) as fc:
 				for gen in range(self.numberOfGenerations):
 					logging.info('Running generation {0}'.format(gen))
 					
@@ -272,8 +256,8 @@ class Population(object):
 
 						for phen in range(self.numberOfPhenotypes):
 							tmpPhenotypes = [ind.phenotypicValues[phen] for ind in self.individuals]
-							tmpMean = self.specialmean(tmpPhenotypes)
-							tmpVar = self.specialvariance(sum(tmpPhenotypes), sum(x ** 2 for x in tmpPhenotypes), len(tmpPhenotypes))
+							tmpMean = ar.specialmean(tmpPhenotypes)
+							tmpVar = ar.specialvariance(sum(tmpPhenotypes), sum(x ** 2 for x in tmpPhenotypes), len(tmpPhenotypes))
 
 							phenmeans.append(str(round(tmpMean, 3)))
 							assert type(tmpVar) is float, "phenotype variance = {0}, phenotypes = {1}".format(tmpVar, tmpPhenotypes)
@@ -281,11 +265,18 @@ class Population(object):
 
 
 						sep = ','
-						fp.write('{0}\n'.format(sep.join(phenmeans)))
-						vp.write('{0}\n'.format(sep.join(phenvars)))
-						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
-						vd.write('{0}\n'.format(self.specialvariance(sum(self.populationStructure), sum(x ** 2 for x in self.populationStructure), self.numberOfDemes)))
-				
+						fp.write('{0},{1}\n'.format(sep.join(phenmeans),sep.join(phenvars)))
+						(demmean,demvar) = ar.extractMeanAndVariance(lst=self.populationStructure, n=self.numberOfDemes)
+						assert all([x is not None for x in self.advances]), "some or all deme tech entries are none at generation {1}: {0}".format(self.advances,gen)
+						(techmean,techvar) = ar.extractMeanAndVariance(lst=self.advances, n=self.numberOfDemes)
+						(resmean,resvar) = ar.extractMeanAndVariance(lst=self.resources, n=self.numberOfDemes)
+						assert all([x is not None for x in self.debatetime]), "some or all deme debate time entries are none at generation {1}: {0}".format(self.debatetime,gen)
+						(consmean,consvar) = ar.extractMeanAndVariance(lst=self.debatetime, n=self.numberOfDemes)
+						fd.write('{0},{1}\n'.format(demmean, demvar))
+						ft.write('{0},{1}\n'.format(techmean, techvar))
+						fr.write('{0},{1}\n'.format(resmean,resvar))
+						fc.write('{0},{1}\n'.format(consmean,consvar))
+
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
 			

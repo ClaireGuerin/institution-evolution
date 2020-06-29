@@ -1,25 +1,25 @@
 def pgg(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	return prog
 
 def geom(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	return prog
 
 def policing(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	return prog
 
 def policingdemog(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	return prog
 
 def policingdemog2(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	return prog
 
 def technology(**kwargs):
-	prog = {'proportionOfLeaders':0.0}
+	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
 	phenos = [0 if p is None else p for p in kwargs['phen']]
 	effectivePublicGood = kwargs['pg'] * (1 - kwargs['p']) + kwargs['q'] * kwargs['d'] * kwargs['p'] * (kwargs['totRes'] - kwargs['pg'])
 	prog['numberOfLeaders'] = 0
@@ -40,7 +40,7 @@ def debate(**kwargs):
 	return prog
 
 def socialclass(**kwargs):
-	prog = {}
+	prog = {'consensusTime':0.0}
 	prog['proportionOfLeaders'] = kwargs['phen'][3]
 	return prog
 
