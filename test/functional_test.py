@@ -156,6 +156,26 @@ class TestSimpleRun(object):
 		os.remove(self.outputFile + '_resources.txt')
 		os.remove(self.outputFile + '_consensus.txt')
 
+	# she opens the phenotypes file, and check that the number of phenotypes is right and that the value seem correct.
+	def test_phenotype_file_has_correct_output(self): 
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
+		runSim(outputfile=self.out, mutRate=0)
+
+		with open(PARAMETER_FOLDER+'/test/initial_phenotypes.txt', 'r') as initphen:
+			phenstr = initphen.readline()
+			phens = [float(x) for x in phenstr.split(',')]
+			nphens = len(phens)
+
+		with open(self.outputFile + '_phenotypes.txt') as outphenfile:
+			for line in outphenfile:
+				getphens = line.strip(',')[0:nphens-1]
+				assert len(getphens) == nphens
+				assert getphens == nphens, "this line is not identical to initial phenotypes even though mutaiton rate is null"
+
+	#she then moves on to verify every single output file:
+
+	# she tries a new set of parameters for which the population size goes to zero. The prgoram exits with a warning
 	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim):
 		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
@@ -171,4 +191,4 @@ class TestSimpleRun(object):
 		os.remove(self.outputFile + '_resources.txt')
 		os.remove(self.outputFile + '_consensus.txt')
 		
-		# Satisfied, she goes to sleep.
+	# Satisfied, she goes to sleep.

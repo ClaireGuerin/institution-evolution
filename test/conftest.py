@@ -194,11 +194,12 @@ def getFitnessParameters():
 	
 @pytest.fixture
 def runSim():
-	def _foo(outputfile,fb=10):
+	def _foo(outputfile, fb=10, mutRate=0.1):
 		population = Pop(fit_fun='pgg', inst='test')
 		population.numberOfDemes = 5
 		population.initialDemeSize = 8
 		population.numberOfGenerations = 5
+		population.mutationRate = mutRate
 		# make sure fitness parameters are alright
 		population.fitnessParameters.clear()
 		population.fitnessParameters.update(fitpardict['pgg'])
