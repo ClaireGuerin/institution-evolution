@@ -198,14 +198,14 @@ class TestReproductionFunction(object):
 		else:
 			assert False, "some other error"
 
-		xFreeDict = {"xmean":self.fakepop.initialPhenotypes,"n":5, "pg":10}
-		try:
-			self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**xFreeDict})
-			assert False, "Did not detect that x is missing"
-		except KeyError as e:
-			assert str(e).replace("'", "") == 'x', "Should raise key error for x, instead '{0}'".format(e)
-		else:
-			assert False, "some other error"
+		# xFreeDict = {"xmean":self.fakepop.initialPhenotypes,"n":5, "pg":10}
+		# try:
+		# 	self.fakepop.individuals[0].fertility('policing', **{**self.fakepop.fitnessParameters,**xFreeDict})
+		# 	assert False, "Did not detect that x is missing"
+		# except KeyError as e:
+		# 	assert str(e).replace("'", "") == 'x', "Should raise key error for x, instead '{0}'".format(e)
+		# else:
+		# 	assert False, "some other error"
 
 		xmeanFreeDict = {"x":self.fakepop.initialPhenotypes,"n":5, "pg":10}
 		try:

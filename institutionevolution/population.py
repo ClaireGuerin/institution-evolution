@@ -119,18 +119,19 @@ class Population(object):
 			if ind.consensusTime is not None: 
 				setattr(ind, "productionTime", 1 - ind.consensusTime)
 			# REPRODUCTION
+			## add deme information necessary to calculate individual fitness
 			infoToAdd = {}
 			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
 			infoToAdd["n"] = self.demes[ind.currentDeme].demography
 			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
-			infoToAdd["x"] = ind.phenotypicValues
-			infoToAdd["leadership"] = ind.leader
+			#infoToAdd["x"] = ind.phenotypicValues
+			#infoToAdd["leadership"] = ind.leader
 			infoToAdd["labourForce"] = self.demes[ind.currentDeme].progressValues["consensusTime"] * self.demes[ind.currentDeme].demography
 
 			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
 			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
-			assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
+			#assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
 			assert type(infoToAdd["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, infoToAdd["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
 
 			ind.reproduce(self.fit_fun, **{**kwargs, **infoToAdd})

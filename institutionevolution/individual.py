@@ -69,14 +69,14 @@ class Individual(object):
 		
 	def fertility(self, fun_name="pgg", **kwargs):
 		assert type(kwargs["n"]) is int, "group size of deme {0} is {1}".format(self.currentDeme, kwargs["n"])
-		assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(self.currentDeme, kwargs["x"])
+		#assert type(kwargs["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(self.currentDeme, kwargs["x"])
 		assert type(kwargs["xmean"][0]) is float, "mean phenotype in deme {0} is {1}".format(self.currentDeme, kwargs["xmean"])
 
-		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **kwargs))
+		self.fertilityValue = float(fitness.functions[fun_name](self.resourcesAmount, **{**{'x': self.phenotypicValues, 'leadership': self.leader},**kwargs}))
 		
 	def procreate(self):
 		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
 
 	def produceResources(self, fun_name="pgg", **kwargs):
-		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**{**{'productivity': self.productionTime},**kwargs}))
+		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**{**{'productivity': self.productionTime, 'x': self.phenotypicValues},**kwargs}))
 		self.resourcesAmount = tmpRes
