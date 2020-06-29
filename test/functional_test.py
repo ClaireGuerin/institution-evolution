@@ -189,20 +189,6 @@ class TestSimpleRun(object):
 		clearOutputFiles(self.outputFile)
 
 	# next, technology...
-
-	# she tries a new set of parameters for which the population size goes to zero. The prgoram exits with a warning
-	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim, clearOutputFiles):
-		self.out = 'output_test'
-		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
-
-		try:
-			runSim(self.out,0)
-		except TypeError as e:
-			assert False, "The program should exit with information message when population goes extinct!"
-
-		clearOutputFiles(self.outputFile)
-		
-	# Satisfied, she goes to sleep.
 	def test_technology_file_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
 		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":3}
 		pseudorandom(85) 
@@ -230,4 +216,48 @@ class TestSimpleRun(object):
 
 		assert obsTechno == expTechno, "unexpected value of technology level has been printed"
 
-		#clearOutputFiles(self.outputFile)
+		clearOutputFiles(self.outputFile)
+
+	# then, resources...
+	def test_resources_files_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
+		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":3}
+		pseudorandom(54) 
+		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop.mutationRate = 0.1
+		self.pop.numberOfDemes = 5
+		self.pop.initialDemeSize = 8
+		self.pop.fitnessParameters.clear()
+		self.pop.fitnessParameters.update(parameters)
+		self.pop.createAndPopulateDemes()
+		expTotRes = []
+		for gen in range(5):
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+			assert self.pop.numberOfDemes == 5
+			collectDemeTotRes = []
+			for deme in self.pop.demes:
+				collectDemeTotRes.append(deme.totalResources)
+			expTotRes.append(sum(collectDemeTotRes)/len(collectDemeTotRes))
+
+		pseudorandom(54)
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
+		runSim(outputfile=self.out, fun='technology', pars=parameters)
+		obsTotRes = fman.extractColumnFromFile(self.outputFile + '_resources.txt', 0, float)
+
+		assert obsTotRes == expTotRes, "unexpected value of total resources has been printed"
+
+		clearOutputFiles(self.outputFile)
+
+	# she tries a new set of parameters for which the population size goes to zero. The prgoram exits with a warning
+	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim, clearOutputFiles):
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
+
+		try:
+			runSim(self.out,0)
+		except TypeError as e:
+			assert False, "The program should exit with information message when population goes extinct!"
+
+		clearOutputFiles(self.outputFile)
+		
+	# Satisfied, she goes to sleep.
