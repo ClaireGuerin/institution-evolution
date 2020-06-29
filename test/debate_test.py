@@ -20,7 +20,7 @@ class TestDebateFeature(object):
 		pars = getFitnessParameters('debate')
 
 		try:
-			self.ind.reproduce('debate', **pars)
+			self.ind.reproduce('debate', **{**{'productivity': 0.6},**pars})
 		except ValueError as e:
 			assert False, "include a debate function"
 
