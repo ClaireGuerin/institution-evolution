@@ -3,6 +3,7 @@ from institutionevolution.population import Population as Pop
 from institutionevolution.individual import Individual as Ind
 import random as rd
 import numpy.random as np
+import os
 
 fitpardict = {'pgg': {"x": [0.5],
 			  "xmean": [0.2], 
@@ -194,15 +195,26 @@ def getFitnessParameters():
 	
 @pytest.fixture
 def runSim():
-	def _foo(outputfile,fb=10):
-		population = Pop(fit_fun='pgg', inst='test')
+	def _foo(outputfile, fb=10, mutRate=0.1, fun='pgg', pars={"fb": 10, "b": 0.5, "c": 0.05, "gamma": 0.01}):
+		population = Pop(fit_fun=fun, inst='test')
 		population.numberOfDemes = 5
 		population.initialDemeSize = 8
 		population.numberOfGenerations = 5
+		population.mutationRate = mutRate
 		# make sure fitness parameters are alright
 		population.fitnessParameters.clear()
-		population.fitnessParameters.update(fitpardict['pgg'])
-		population.fitnessParameters.update({"fb":fb})
+		population.fitnessParameters.update(pars)
+		population.fitnessParameters.update({'fb': fb})
 		population.runSimulation(outputfile)
 		return population.numberOfGenerations
+	return _foo
+
+@pytest.fixture
+def clearOutputFiles():
+	def _foo(path):
+		os.remove(path + '_phenotypes.txt')
+		os.remove(path + '_demography.txt')
+		os.remove(path + '_technology.txt')
+		os.remove(path + '_resources.txt')
+		os.remove(path + '_consensus.txt')
 	return _foo
