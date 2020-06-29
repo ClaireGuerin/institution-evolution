@@ -248,6 +248,36 @@ class TestSimpleRun(object):
 
 		clearOutputFiles(self.outputFile)
 
+	# finally, consensus...
+	def test_consensus_files_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
+		parameters = {"gamma": 0.01, "aconsensus":3, "bconsensus":2, "epsilon":0.01, "aquality":4, "alphaquality":0.9, "alphaResources":0.8, "techcapital":50, "rb":10}
+		pseudorandom(22) 
+		self.pop = Pop(fit_fun='debate', inst='test')
+		self.pop.mutationRate = 0.1
+		self.pop.numberOfDemes = 5
+		self.pop.initialDemeSize = 8
+		self.pop.fitnessParameters.clear()
+		self.pop.fitnessParameters.update(parameters)
+		self.pop.createAndPopulateDemes()
+		expCons = []
+		for gen in range(5):
+			self.pop.lifecycle(**self.pop.fitnessParameters)
+			assert self.pop.numberOfDemes == 5
+			collectDemeCons = []
+			for deme in self.pop.demes:
+				collectDemeCons.append(deme.progressValues["consensusTime"])
+			expCons.append(sum(collectDemeCons)/len(collectDemeCons))
+
+		pseudorandom(22)
+		self.out = 'output_test'
+		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
+		runSim(outputfile=self.out, fun='debate', pars=parameters)
+		obsCons = fman.extractColumnFromFile(self.outputFile + '_consensus.txt', 0, float)
+
+		assert obsCons == expCons, "unexpected value of total resources has been printed"
+
+		clearOutputFiles(self.outputFile)
+
 	# she tries a new set of parameters for which the population size goes to zero. The prgoram exits with a warning
 	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim, clearOutputFiles):
 		self.out = 'output_test'
