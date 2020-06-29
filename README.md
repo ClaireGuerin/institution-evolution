@@ -37,3 +37,5 @@ python script_single_simulation.py
 
 ### Test parameter space
 python script_parameter_space.py
+
+> :warning: **Non-values are marked with -99 in output files**: Be mindful there when analyzing data! For instance, when technology level is not recorded in the simulation, the corresponding output file will show a mean technology level of -99 for every generation.
