@@ -248,14 +248,16 @@ class Population(object):
 				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 
 			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
-			phenvariancefile = '{0}/{1}_pheno_var.txt'.format(self.pathToOutputFolder, outputfile)
 			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
-			demovariancefile = '{0}/{1}_demo_var.txt'.format(self.pathToOutputFolder, outputfile)
+			technologyfile = '{0}/{1}_technology.txt'.format(self.pathToOutputFolder, outputfile)
+			resourcesfile = '{0}/{1}_resources.txt'.format(self.pathToOutputFolder, outputfile)
+			consensusfile = '{0}/{1}_consensus.txt'.format(self.pathToOutputFolder, outputfile)
 			
 			with open(phenotypesfile, "w", buffering=1) as fp, \
 			open(demographyfile, "w", buffering=1) as fd, \
-			open(demovariancefile, "w", buffering=1) as vd, \
-			open(phenvariancefile, "w", buffering=1) as vp:
+			open(technologyfile, "w", buffering=1) as ft, \
+			open(resourcesfile, "w", buffering=1) as fr, \
+			open(consensusfile, "w", buffering=1) as fc:
 				for gen in range(self.numberOfGenerations):
 					logging.info('Running generation {0}'.format(gen))
 					
@@ -281,11 +283,13 @@ class Population(object):
 
 
 						sep = ','
-						fp.write('{0}\n'.format(sep.join(phenmeans)))
-						vp.write('{0}\n'.format(sep.join(phenvars)))
-						fd.write('{0}\n'.format(self.demography / self.numberOfDemes))
-						vd.write('{0}\n'.format(self.specialvariance(sum(self.populationStructure), sum(x ** 2 for x in self.populationStructure), self.numberOfDemes)))
-				
+						fp.write('{0},{1}\n'.format(sep.join(phenmeans),sep.join(phenvars)))
+						demvar = self.specialvariance(sum(self.populationStructure), sum([x ** 2 for x in self.populationStructure]), self.numberOfDemes)
+						fd.write('{0},{1}\n'.format(self.demography / self.numberOfDemes, demvar))
+						ft.write('{0},{1},\n'.format(1,2))
+						fr.write('{0},{1},\n'.format(1,2))
+						fc.write('{0},{1},\n'.format(1,2))
+
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
 			raise ValueError('This program runs simulations on well-mixed populations only. "numberOfDemes" in initialisation.txt must be > 1')
 			
