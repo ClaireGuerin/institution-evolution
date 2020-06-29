@@ -131,7 +131,7 @@ class TestSimpleRun(object):
 		os.remove(self.outputFile + '_demography.txt')
 
 	# She goes to the output folder and sees that two files have been written by the program, one with the mean phenotypes and the other with the mean deme size
-	def test_program_writes_phenotypes_and_deme_sizes(self, runSim):
+	def test_program_writes_all_variable_files(self, runSim):
 		self.out = 'output_test'
 		self.outputFile = fman.getPathToFile(filename=self.out, dirname=OUTPUT_FOLDER+'/test')
 		runSim(self.out)
@@ -140,9 +140,15 @@ class TestSimpleRun(object):
 		assert len(allOutput) == 4, f"did not find output files with pattern: {self.outputFile + '*.txt'} in {allOutput}"
 		assert self.outputFile + '_phenotypes.txt' in allOutput, f"did not find phenotypes output file in {allOutput}"
 		assert self.outputFile + '_demography.txt' in allOutput, f"did not find demography output file in {allOutput}"
+		assert self.outputFile + '_technology.txt' in allOutput, f"did not find technology output file in {allOutput}"
+		assert self.outputFile + '_resources.txt' in allOutput, f"did not find resources output file in {allOutput}"
+		assert self.outputFile + '_consensustime.txt' in allOutput, f"did not find consensus time output file in {allOutput}"
 
 		os.remove(self.outputFile + '_phenotypes.txt')
 		os.remove(self.outputFile + '_demography.txt')
+		os.remove(self.outputFile + '_technology.txt')
+		os.remove(self.outputFile + '_resources.txt')
+		os.remove(self.outputFile + '_consensustime.txt')
 
 	def test_simulation_stops_with_information_message_when_population_extinct(self, runSim):
 		self.out = 'output_test'
