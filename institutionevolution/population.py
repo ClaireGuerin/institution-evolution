@@ -140,7 +140,8 @@ class Population(object):
 			self.demes[ind.currentDeme].progressValues["numberOfLeaders"] += ind.leader
 			# DEBATE
 			setattr(ind, "consensusTime", self.demes[ind.currentDeme].progressValues["consensusTime"])
-			if ind.consensusTime is not None: setattr(ind, "productionTime", 1 - ind.consensusTime)
+			if ind.consensusTime is not None: 
+				setattr(ind, "productionTime", 1 - ind.consensusTime)
 			# REPRODUCTION
 			infoToAdd = {}
 			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
@@ -149,6 +150,7 @@ class Population(object):
 			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
 			infoToAdd["x"] = ind.phenotypicValues
 			infoToAdd["leadership"] = ind.leader
+			infoToAdd["labourForce"] = self.demes[ind.currentDeme].progressValues["consensusTime"] * self.demes[ind.currentDeme].demography
 
 			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
 			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
