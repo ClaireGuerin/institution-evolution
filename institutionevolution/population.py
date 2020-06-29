@@ -191,7 +191,9 @@ class Population(object):
 				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
 	def updateDemeInfo(self):
+		self.resources = []
 		for deme in self.demes:
+			self.resources.append(deme.totalResources)
 			meanphen = []
 			varphen = []
 			for phen in range(self.numberOfPhenotypes):
@@ -267,7 +269,8 @@ class Population(object):
 						assert all([x is not None for x in self.advances]), "some or all deme tech entries are none at generation {1}: {0}".format(self.advances,gen)
 						(techmean,techvar) = ar.extractMeanAndVariance(lst=self.advances, n=self.numberOfDemes)
 						ft.write('{0},{1}\n'.format(techmean, techvar))
-						fr.write('{0},{1}\n'.format(1,2))
+						(resmean,resvar) = ar.extractMeanAndVariance(lst=self.resources, n=self.numberOfDemes)
+						fr.write('{0},{1}\n'.format(resmean,resvar))
 						fc.write('{0},{1}\n'.format(1,2))
 
 		elif self.numberOfDemes < 2 and self.fit_fun in fitness.functions:
