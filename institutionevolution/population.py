@@ -150,7 +150,12 @@ class Population(object):
 		self.advances = []
 		for deme in range(self.numberOfDemes):
 			if self.fit_fun == 'technology':
-				tmpTech = self.initialTechnologyLevel if self.demes[deme].publicGood == None else (1 + self.fitnessParameters['atech'] * self.demes[deme].publicGood) * self.demes[deme].progressValues['technologyLevel'] / (1 + self.fitnessParameters['btech'] * self.demes[deme].progressValues['technologyLevel'])
+				tmpTech = self.initialTechnologyLevel 
+				if self.demes[deme].publicGood == None:
+					tmpTech = self.initialTechnologyLevel 
+				else:
+					tech = self.demes[deme].progressValues['technologyLevel']
+					tmpTech = tech * (self.fitnessParameters['atech'] + ((1 - p) * self.demes[deme].publicGood) ** (1 - betaTech)) / (1 + self.fitnessParameters['btech'] * tech)
 			else:
 				tmpTech = -99
 			self.advances.append(tmpTech)
