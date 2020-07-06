@@ -91,69 +91,69 @@ class TestTechnology(object):
 
 	# 		# assert dem.returnedGoods == 
 
-	def test_individual_returns_resources(self, getFitnessParameters):
-		ndemes = 3
-		initdemesize = 2
-		pars = getFitnessParameters('technology')
-		fitfun = 'technology'
-		phen = [0.5] * 3
+	# def test_individual_returns_resources(self, getFitnessParameters):
+	# 	ndemes = 3
+	# 	initdemesize = 2
+	# 	pars = getFitnessParameters('technology')
+	# 	fitfun = 'technology'
+	# 	phen = [0.5] * 3
 
-		## WHEN THERE IS NO POLICING, NO GOODS ARE RETURNED
-		self.fakepopNoPolicing = Pop(fit_fun=fitfun, inst='test')
-		self.fakepopNoPolicing.fit_fun = fitfun
-		self.fakepopNoPolicing.fitnessParameters = pars
-		self.fakepopNoPolicing.nDemes = ndemes
-		self.fakepopNoPolicing.initialDemeSize = initdemesize
-		self.fakepopNoPolicing.initialPhenotypes = phen
-		self.fakepopNoPolicing.migrationRate = 0
-		self.fakepopNoPolicing.fitnessParameters.update({'p':0})
+	# 	## WHEN THERE IS NO POLICING, NO GOODS ARE RETURNED
+	# 	self.fakepopNoPolicing = Pop(fit_fun=fitfun, inst='test')
+	# 	self.fakepopNoPolicing.fit_fun = fitfun
+	# 	self.fakepopNoPolicing.fitnessParameters = pars
+	# 	self.fakepopNoPolicing.nDemes = ndemes
+	# 	self.fakepopNoPolicing.initialDemeSize = initdemesize
+	# 	self.fakepopNoPolicing.initialPhenotypes = phen
+	# 	self.fakepopNoPolicing.migrationRate = 0
+	# 	self.fakepopNoPolicing.fitnessParameters.update({'p':0})
 
-		self.fakepopNoPolicing.createAndPopulateDemes()
-		self.fakepopNoPolicing.clearDemeInfo()
-		self.fakepopNoPolicing.populationMutationMigration()
-		self.fakepopNoPolicing.updateDemeInfo()
+	# 	self.fakepopNoPolicing.createAndPopulateDemes()
+	# 	self.fakepopNoPolicing.clearDemeInfo()
+	# 	self.fakepopNoPolicing.populationMutationMigration()
+	# 	self.fakepopNoPolicing.updateDemeInfo()
 
-		collectGoods = [0] * self.fakepopNoPolicing.numberOfDemes
-		for ind in self.fakepopNoPolicing.individuals:
-			collectGoods[ind.currentDeme] += ind.resourcesAmount * ind.phenotypicValues[0]
-		for dem in range(self.fakepopNoPolicing.numberOfDemes):
-			assert self.fakepopNoPolicing.fit_fun == 'technology'
-			assert self.fakepopNoPolicing.fitnessParameters['p'] == 0
-			assert self.fakepopNoPolicing.demes[dem].progressValues['effectivePublicGood'] == self.fakepopNoPolicing.demes[dem].publicGood
-			assert self.fakepopNoPolicing.demes[dem].progressValues['effectivePublicGood'] == collectGoods[dem]
+	# 	collectGoods = [0] * self.fakepopNoPolicing.numberOfDemes
+	# 	for ind in self.fakepopNoPolicing.individuals:
+	# 		collectGoods[ind.currentDeme] += ind.resourcesAmount * ind.phenotypicValues[0]
+	# 	for dem in range(self.fakepopNoPolicing.numberOfDemes):
+	# 		assert self.fakepopNoPolicing.fit_fun == 'technology'
+	# 		assert self.fakepopNoPolicing.fitnessParameters['p'] == 0
+	# 		assert self.fakepopNoPolicing.demes[dem].progressValues['effectivePublicGood'] == self.fakepopNoPolicing.demes[dem].publicGood
+	# 		assert self.fakepopNoPolicing.demes[dem].progressValues['effectivePublicGood'] == collectGoods[dem]
 
-		## WHEN THERE IS POLICING, GOODS MUST BE RETURNED
-		self.fakepopPolicing = Pop(fit_fun=fitfun, inst='test')
-		self.fakepopPolicing.fitnessParameters = pars
-		self.fakepopPolicing.nDemes = ndemes
-		self.fakepopPolicing.initialDemeSize = initdemesize
-		self.fakepopPolicing.initialPhenotypes = phen
-		self.fakepopPolicing.migrationRate = 0
-		self.fakepopPolicing.fitnessParameters.update({'p':0.8})
+	# 	## WHEN THERE IS POLICING, GOODS MUST BE RETURNED
+	# 	self.fakepopPolicing = Pop(fit_fun=fitfun, inst='test')
+	# 	self.fakepopPolicing.fitnessParameters = pars
+	# 	self.fakepopPolicing.nDemes = ndemes
+	# 	self.fakepopPolicing.initialDemeSize = initdemesize
+	# 	self.fakepopPolicing.initialPhenotypes = phen
+	# 	self.fakepopPolicing.migrationRate = 0
+	# 	self.fakepopPolicing.fitnessParameters.update({'p':0.8})
 
-		self.fakepopPolicing.createAndPopulateDemes()
-		self.fakepopPolicing.clearDemeInfo()
-		self.fakepopPolicing.populationMutationMigration()
-		self.fakepopPolicing.updateDemeInfo()
+	# 	self.fakepopPolicing.createAndPopulateDemes()
+	# 	self.fakepopPolicing.clearDemeInfo()
+	# 	self.fakepopPolicing.populationMutationMigration()
+	# 	self.fakepopPolicing.updateDemeInfo()
 
-		collectGoods = [0] * self.fakepopPolicing.numberOfDemes
-		for ind in self.fakepopPolicing.individuals:
-			collectGoods[ind.currentDeme] += ind.resourcesAmount * ind.phenotypicValues[0]
-		for dem in range(self.fakepopPolicing.numberOfDemes):
-			assert self.fakepopPolicing.demes[dem].progressValues['effectivePublicGood'] > collectGoods[dem] * (1-self.fakepopPolicing.fitnessParameters['p']), "goods are not returned after policing"
+	# 	collectGoods = [0] * self.fakepopPolicing.numberOfDemes
+	# 	for ind in self.fakepopPolicing.individuals:
+	# 		collectGoods[ind.currentDeme] += ind.resourcesAmount * ind.phenotypicValues[0]
+	# 	for dem in range(self.fakepopPolicing.numberOfDemes):
+	# 		assert self.fakepopPolicing.demes[dem].progressValues['effectivePublicGood'] > collectGoods[dem] * (1-self.fakepopPolicing.fitnessParameters['p']), "goods are not returned after policing"
 
-	def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
-		self.fakepop = instantiateSingleIndividualsDemes(2)
-		self.fakepop.fit_fun = 'technology'
+	# def test_effective_public_good_of_right_format(self, instantiateSingleIndividualsDemes):
+	# 	self.fakepop = instantiateSingleIndividualsDemes(2)
+	# 	self.fakepop.fit_fun = 'technology'
 		
-		self.fakepop.clearDemeInfo()
-		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfo()
+	# 	self.fakepop.clearDemeInfo()
+	# 	self.fakepop.populationMutationMigration()
+	# 	self.fakepop.updateDemeInfo()
 
-		for dem in self.fakepop.demes:
-			assert dem.progressValues['effectivePublicGood'] is not None, "No value in the effective public good"
-			assert dem.progressValues['effectivePublicGood'] >= 0, "Effective public good shouldn't be negative"
-			assert type(dem.progressValues['effectivePublicGood']) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
+	# 	for dem in self.fakepop.demes:
+	# 		assert dem.progressValues['effectivePublicGood'] is not None, "No value in the effective public good"
+	# 		assert dem.progressValues['effectivePublicGood'] >= 0, "Effective public good shouldn't be negative"
+	# 		assert type(dem.progressValues['effectivePublicGood']) is float, "Effective public good should be float, not {0}".format(type(dem.effectivePublicGood))
 
 	def test_technology_fitness_fct_returns_value(self, getFitnessParameters):
 		self.ind = Ind()
@@ -230,7 +230,7 @@ class TestTechnology(object):
 		publicGood = self.pop.demes[0].publicGood
 		tech = self.pop.demes[0].progressValues['technologyLevel']
 
-		tech_new = (1 + self.pop.fitnessParameters['atech'] * publicGood) * tech / (1 + self.pop.fitnessParameters['btech'] * tech)
+		tech_new = tech * (self.pop.fitnessParameters['atech'] + ((1 - self.pop.fitnessParameters['p']) * publicGood) ** (1 - self.pop.fitnessParameters['betaTech'])) / (1 + self.pop.fitnessParameters['btech'] * tech)
 
 		self.pop.updateDemeInfo()
 		self.pop.populationReproduction(**self.pop.fitnessParameters)
@@ -268,8 +268,8 @@ class TestTechnology(object):
 		self.ind1 = Ind()
 		self.pars = getFitnessParameters('technology')
 		#self.pars.update({'civilianPublicTime': 0, 'labourForce': 10, 'technologyLevel': 2})
-		res1 = 0.5*self.pars['productionTime'] * ((self.pars['n'] * self.pars['productionTime']) ** (-self.pars['alphaResources'])) * 2 ** self.pars['alphaResources']
-		res2 = 0.5*self.pars['productionTime'] * ((self.pars['n'] * self.pars['productionTime']) ** (-self.pars['alphaResources'])) * 5 ** self.pars['alphaResources']
+		res1 = (self.pars['n'] ** (-self.pars['alphaResources'])) * (2 ** self.pars['alphaResources'])
+		res2 = (self.pars['n'] ** (-self.pars['alphaResources'])) * (5 ** self.pars['alphaResources'])
 		assert res1 < res2
 		
 		self.pars.update({'tech': 2, 'p':0})
@@ -339,13 +339,15 @@ class TestTechnology(object):
 			infoToAdd["xmean"] = deme.meanPhenotypes
 			infoToAdd["pg"] = deme.publicGood
 			infoToAdd["x"] = ind.phenotypicValues
-			assert deme.progressValues["labourForce"] is not None, "labour force is none!"
-			assert deme.progressValues["labourForce"] != 0, "labour force is null!"
-			assert deme.progressValues["technologyLevel"] is not None, "labour force is null!"
-			resourcesProduced = pars['productionTime'] * ((deme.demography * pars['productionTime']) ** (-pars['alphaResources'])) * infoToAdd['tech'] ** pars['alphaResources']
-			payoff = (1 - ind.phenotypicValues[0]) * (resourcesProduced * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (deme.publicGood * pars['p'])/deme.demography)
+			# assert deme.progressValues["labourForce"] is not None, "labour force is none!"
+			# assert deme.progressValues["labourForce"] != 0, "labour force is null!"
+			assert deme.progressValues["technologyLevel"] is not None, "technology is none!"
+			fine = deme.publicGood * pars['p'] / deme.demography
+			benef = ((deme.publicGood * (1 - pars['p'])) ** pars["betaTech"]) / deme.demography
+			resourcesProduced = deme.demography ** (-pars['alphaResources']) * infoToAdd['tech'] ** pars['alphaResources']
+			
 			ind.produceResources(self.pop.fit_fun, **{**self.pop.fitnessParameters,**infoToAdd})
-			assert ind.resourcesAmount == payoff, "ind produced {0} instead of {1}".format(ind.resourcesAmount, payoff)
+			assert ind.resourcesAmount == resourcesProduced, "ind produced {0} instead of {1}".format(ind.resourcesAmount, payoff)
 
 	def test_fitness_function_returns_correct_value(self):
 		self.pop = Pop(fit_fun='technology', inst='test')
@@ -367,7 +369,10 @@ class TestTechnology(object):
 			infoToAdd['x'] = ind.phenotypicValues
 			ind.reproduce('technology', **{**self.pop.fitnessParameters, **infoToAdd})
 
-			w = (self.pop.fitnessParameters['rb'] + ind.resourcesAmount) / (1 + self.pop.fitnessParameters['gamma'] * infoToAdd['n'])
+			fine = infoToAdd['pg'] * self.pop.fitnessParameters['p'] / infoToAdd['n']
+			benef = ((infoToAdd['pg'] * (1 - self.pop.fitnessParameters['p'])) ** self.pop.fitnessParameters["betaTech"]) / infoToAdd['n']
+			payoff = (1 - self.pop.fitnessParameters['q']) * (1 - infoToAdd['x'][0]) * ind.resourcesAmount + self.pop.fitnessParameters['q'] * ((1 - infoToAdd['x'][0]) * ind.resourcesAmount - fine) + benef
+			w = (self.pop.fitnessParameters['rb'] + payoff) / (1 + self.pop.fitnessParameters['gamma'] * infoToAdd['n'])
 			assert ind.fertilityValue == w, "wrong fitness calculation for individual, should return {0}".format(w)
 
 	def test_individuals_reproduce_after_production(self, getFitnessParameters):
@@ -378,21 +383,25 @@ class TestTechnology(object):
 		self.ind.phenotypicValues = [0.5] * 3
 		self.ind.reproduce('technology',**pars)
 
-		res = 0.5 * pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
+		res = (pars['n'] ** (-pars['alphaResources'])) * (pars['tech'] ** pars['alphaResources'])
 		assert res > 0, "no resources produced"
-		f = (pars["rb"] + res) / (1 + pars["gamma"] * pars["n"])
+		fine = pars['pg'] * pars['p'] / pars['n']
+		benef = ((pars['pg'] * (1 - pars['p'])) ** pars["betaTech"]) / pars['n']
+		payoff = (1 - pars['q']) * (1 - self.ind.phenotypicValues[0]) * res + pars['q'] * ((1 - self.ind.phenotypicValues[0]) * res - fine) + benef
+		f = (pars["rb"] + payoff) / (1 + pars["gamma"] * pars["n"])
 		assert self.ind.fertilityValue == f, "wrong fertility value"
 
 		self.ind2 = Ind()
 		self.ind2.neighbours = [1,2]
 		self.ind2.phenotypicValues = [0.5] * 3
 		self.ind2.reproduce('technology',**pars)
-		res2 = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
-		payoff2 = (1 - self.ind.phenotypicValues[0]) * (res2 * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
+		res2 = (pars['n'] ** (-pars['alphaResources'])) * (pars['tech'] ** pars['alphaResources'])
+		fine2 = pars['pg'] * pars['p'] / pars['n']
+		benef2 = ((pars['pg'] * (1 - pars['p'])) ** pars["betaTech"]) / pars['n']
+		payoff2 = (1 - pars['q']) * (1 - self.ind2.phenotypicValues[0]) * res2 + pars['q'] * ((1 - self.ind2.phenotypicValues[0]) * res2 - fine2) + benef2
 		assert pars['q'] * (pars['pg'] * pars['p'])/pars['n'] == 0
 		assert (1 - pars['q'] * pars['d'] * pars['p']) == 1
 		assert (1 - self.ind.phenotypicValues[0]) == 0.5
-		assert payoff2 == 0.5 * res2
 		assert res2 > 0, "no resources produced"
 		f2 = (pars["rb"] + payoff2) / (1 + pars["gamma"] * pars["n"])
 		assert f2 == f, "all being equal, the fertility values should be the same"
@@ -403,8 +412,10 @@ class TestTechnology(object):
 		self.ind3.neighbours = [1,2]
 		self.ind3.phenotypicValues = [0.5] * 3
 		self.ind3.reproduce('technology',**pars)
-		res3 = pars['productionTime'] * ((pars['n'] * pars['productionTime']) ** (-pars['alphaResources'])) * pars['tech'] ** pars['alphaResources']
-		payoff3 = (1 - self.ind.phenotypicValues[0]) * (res3 * (1 - pars['q'] * pars['d'] * pars['p']) - pars['q'] * (pars['pg'] * pars['p'])/pars['n'])
+		res3 = (pars['n'] ** (-pars['alphaResources'])) * (pars['tech'] ** pars['alphaResources'])
+		fine3 = pars['pg'] * pars['p'] / pars['n']
+		benef3 = ((pars['pg'] * (1 - pars['p'])) ** pars["betaTech"]) / pars['n']
+		payoff3 = (1 - pars['q']) * (1 - self.ind3.phenotypicValues[0]) * res3 + pars['q'] * ((1 - self.ind3.phenotypicValues[0]) * res3 - fine3) + benef3
 		assert res3 > 0, "no resources produced"
 		f3 = (pars["rb"] + payoff3) / (1 + pars["gamma"] * pars["n"])
 		assert self.ind3.fertilityValue == f3, "wrong fertility value"

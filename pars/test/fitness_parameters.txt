@@ -18,8 +18,8 @@ epsilon, 0.01
 zeta1, 0.5
 zeta0, 0.6
 phi, 1
-atech,0.1
-btech,1.2
+atech,2
+btech,0.1
 productionTime,0.8
 alphaResources,0.5
 q,0.9
@@ -29,3 +29,4 @@ bconsensus, 0.6
 aquality, 1.2
 alphaquality, 0.9
 techcapital, 10
+betaTech,0.5
