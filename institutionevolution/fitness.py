@@ -51,7 +51,16 @@ def policingdemog2(res, **kwargs):
 	return f
 
 def technology(res, **kwargs):
-	f = (kwargs["rb"] + res) / (1 + kwargs["gamma"] * kwargs["n"])
+	x = kwargs['x'][0]
+	n = kwargs["n"]
+	q = kwargs['q']
+	p = kwargs["p"]
+	pg = kwargs['pg']
+	fine = pg * p / n
+	benef = ((pg * (1 - p)) ** kwargs["betaTech"]) / n
+	
+	payoff = (1 - kwargs['q']) * (1 - x) * res + kwargs['q'] * ((1 - x) * res - fine) + benef
+	f = (kwargs["rb"] + payoff) / (1 + kwargs["gamma"] * kwargs["n"])
 	return f
 
 def debate(res, **kwargs):

@@ -155,7 +155,7 @@ class Population(object):
 					tmpTech = self.initialTechnologyLevel 
 				else:
 					tech = self.demes[deme].progressValues['technologyLevel']
-					tmpTech = tech * (self.fitnessParameters['atech'] + ((1 - p) * self.demes[deme].publicGood) ** (1 - betaTech)) / (1 + self.fitnessParameters['btech'] * tech)
+					tmpTech = tech * (self.fitnessParameters['atech'] + ((1 - self.fitnessParameters['p']) * self.demes[deme].publicGood) ** (1 - self.fitnessParameters['betaTech'])) / (1 + self.fitnessParameters['btech'] * tech)
 			else:
 				tmpTech = -99
 			self.advances.append(tmpTech)

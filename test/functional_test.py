@@ -190,7 +190,7 @@ class TestSimpleRun(object):
 
 	# next, technology...
 	def test_technology_file_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
-		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":3}
+		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":0.2, "betaTech": 0.6}
 		pseudorandom(85) 
 		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.mutationRate = 0.1
@@ -220,7 +220,7 @@ class TestSimpleRun(object):
 
 	# then, resources...
 	def test_resources_files_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
-		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":3}
+		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":0.2, "betaTech": 0.6}
 		pseudorandom(54) 
 		self.pop = Pop(fit_fun='technology', inst='test')
 		self.pop.mutationRate = 0.1
