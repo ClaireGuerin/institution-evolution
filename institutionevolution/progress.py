@@ -20,13 +20,6 @@ def policingdemog2(**kwargs):
 
 def technology(**kwargs):
 	prog = {'proportionOfLeaders':0.0, 'consensusTime':0.0}
-	phenos = [0 if p is None else p for p in kwargs['phen']]
-	effectivePublicGood = kwargs['pg'] * (1 - kwargs['p']) + kwargs['q'] * kwargs['d'] * kwargs['p'] * (kwargs['totRes'] - kwargs['pg'])
-	prog['numberOfLeaders'] = 0
-	prog['effectivePublicGood'] = effectivePublicGood
-	prog['civilianPublicTime'] = 0
-	prog['leaderPublicTime'] = 1
-	prog['labourForce'] = (kwargs['n'] - prog['numberOfLeaders']) * (1 - prog['civilianPublicTime']) + prog['numberOfLeaders'] * (1 - prog['leaderPublicTime'])
 	return prog
 
 def debate(**kwargs):

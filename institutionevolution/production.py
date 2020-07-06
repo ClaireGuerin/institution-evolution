@@ -14,10 +14,8 @@ def policingdemog2(res, **kwargs):
 	return res
 
 def technology(res, **kwargs):
-	consensusTime = 1 - kwargs['productionTime']
-	resourcesProduced = (1 - consensusTime) * ((kwargs['n'] * (1 - consensusTime)) ** (-kwargs['alphaResources'])) * kwargs['tech'] ** kwargs['alphaResources']
-	payoff = (1 - kwargs['x'][0]) * (resourcesProduced * (1 - kwargs['q'] * kwargs['d'] * kwargs['p']) - kwargs['q'] * (kwargs['pg'] * kwargs['p'])/kwargs['n'])
-	return payoff
+	resourcesProduced = kwargs["n"] ** (-kwargs['alphaResources']) * kwargs['tech'] ** kwargs['alphaResources']
+	return resourcesProduced
 		
 def debate(res, **kwargs):
 	payoff = kwargs['productivity'] * kwargs['labourForce'] ** (-kwargs['alphaResources']) * kwargs['techcapital'] ** kwargs['alphaResources']
