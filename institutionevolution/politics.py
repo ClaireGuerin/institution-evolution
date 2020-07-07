@@ -24,14 +24,11 @@ def technology(**kwargs):
 
 def debate(**kwargs):
 	pol = {}
-	if kwargs['n'] > 0:
-		pol['consensus'] = kwargs['phen'][2]
-		tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
-		pol['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (kwargs['bconsensus'] + tmpDisagreement)
-		pol['productionTime'] = 1 - pol["consensusTime"]
-		pol['labourForce'] = pol['consensusTime'] * kwargs['n']
-	else:
-		pol.update({'consensus':0,'consensusTime':0,'productionTime':1,'labourForce':0})
+	pol['consensus'] = kwargs['phen'][2]
+	tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
+	pol['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (kwargs['bconsensus'] + tmpDisagreement)
+	pol['productionTime'] = 1 - pol["consensusTime"]
+	pol['labourForce'] = pol['consensusTime'] * kwargs['n']
 	return pol
 
 def socialclass(**kwargs):
