@@ -5,6 +5,7 @@ from institutionevolution.population import Population as Pop
 import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
 import random as rd
+import math as m
 import scipy.stats as scistats
 import gc
 
@@ -16,27 +17,27 @@ class TestSocialClassesFeature(object):
 
 	def test_demes_have_a_number_of_elected_leaders(self):
 		self.deme = Dem()
-		assert "numberOfLeaders" in self.deme.progressValues
-		assert "proportionOfLeaders" in self.deme.progressValues 
+		assert hasattr(self.deme, "numberOfLeaders")
 
 	def test_social_class_function_in_fitness_and_progress(self):
 		assert 'socialclass' in fitness.functions, "create social class fitness function"
 		assert 'socialclass' in progress.functions, "create social class progress function"
 
-	def test_elections_take_place_in_demes(self):
+	def test_elections_take_place_in_demes(self, pseudorandom):
+		pseudorandom(23)
 		self.pop = Pop(fit_fun='socialclass', inst='test')
 		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 2
+		self.pop.initialDemeSize = 100
 		self.pop.migrationRate = 0
 
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updateDemeInfo()
+		self.pop.updateDemeInfoPreProduction()
 
 		for deme in self.pop.demes:
-			assert deme.progressValues["proportionOfLeaders"] is not None
-			assert deme.progressValues["proportionOfLeaders"] == deme.meanPhenotypes[3]
+			assert deme.numberOfLeaders is not None
+			assert deme.numberOfLeaders / deme.demography == pytest.approx(deme.meanPhenotypes[3], 0.1)
 
 	def test_individuals_get_assigned_a_role_during_elections(self, pseudorandom, instantiateSingleDemePopulation):
 		#proportionOfLeaders = rd.random()
@@ -72,17 +73,16 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updateDemeInfo()
-		self.pop.populationReproduction(**self.pop.fitnessParameters)
+		self.pop.updateDemeInfoPreProduction()
 
 		plead = self.pop.initialPhenotypes[3]
 
 		for deme in self.pop.demes:
-			nlead = deme.progressValues["numberOfLeaders"]
+			nlead = deme.numberOfLeaders
 			assert nlead is not None
 			assert type(nlead) is int
 			assert nlead >= 0
-			assert pytest.approx(deme.progressValues["proportionOfLeaders"]) == plead
+			assert pytest.approx(nlead / deme.demography, 0.1) == plead
 			stat1, pval1 = scistats.ttest_1samp([1] * nlead + [0] * (deme.demography - nlead), plead)
 			#assert pval1 > 0.05, "T-test mean failed. Observed: {0}, Expected: {1}".format(nlead/deme.demography, plead)
 			self.test = scistats.binom_test(nlead, deme.demography, plead, alternative = "two-sided")
@@ -103,15 +103,14 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 		self.pop.clearDemeInfo()
 		self.pop.populationMutationMigration()
-		self.pop.updateDemeInfo()
-		self.pop.populationReproduction(**self.pop.fitnessParameters)
+		self.pop.updateDemeInfoPreProduction()
 
 		leaderCountPerDeme = [0] * self.pop.numberOfDemes
-		for ind in self.pop.parents:
+		for ind in self.pop.individuals:
 			leaderCountPerDeme[ind.currentDeme] += ind.leader
 
 		for deme in range(self.pop.numberOfDemes):
-			nl = self.pop.demes[deme].progressValues["numberOfLeaders"]
+			nl = self.pop.demes[deme].numberOfLeaders
 			assert nl != 10, "all individuals in deme have been elected leaders when proportion should be about: "+self.pop.initialPhenotypes[3]
 			assert leaderCountPerDeme[deme] == nl, "deme counts {0} leaders when there are {1}".format(nl,leaderCountPerDeme[deme])
 
@@ -140,6 +139,6 @@ class TestSocialClassesFeature(object):
 		self.pop.createAndPopulateDemes()
 
 		try:
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 		except ValueError as e:
 			assert False, str(e)

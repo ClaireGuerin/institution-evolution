@@ -52,9 +52,12 @@ class Individual(object):
 
 	def ascend(self, leadProp):
 		self.leader = bool(rd.binomial(1,leadProp))
+
+	def produceResources(self, fun_name="pgg", **kwargs):
+		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**{**{'x': self.phenotypicValues},**kwargs}))
+		self.resourcesAmount = tmpRes
 	
 	def reproduce(self, fun_name="pgg", **kwargs):
-		self.produceResources(fun_name, **kwargs)
 		self.fertility(fun_name, **kwargs)
 		self.procreate()
 		
@@ -76,7 +79,3 @@ class Individual(object):
 		
 	def procreate(self):
 		self.offspringNumber = rd.poisson(max(0,self.fertilityValue))
-
-	def produceResources(self, fun_name="pgg", **kwargs):
-		tmpRes = float(production.functions[fun_name](self.resourcesAmount,**{**{'productivity': self.productionTime, 'x': self.phenotypicValues},**kwargs}))
-		self.resourcesAmount = tmpRes

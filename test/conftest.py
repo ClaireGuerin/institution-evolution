@@ -39,7 +39,7 @@ fitpardict = {'pgg': {"x": [0.5],
 			  'technology': {"x": [0.5, 0.2],
 			  "xmean": [0.2, 0.5],
 			  "n": 10,
-			  "pg": 7,
+			  "pg": 7.6,
 			  "atech": 2,
 			  "btech": 0.1,
 			  "betaTech": 0.5, 
@@ -47,7 +47,7 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "rb": 2,
 			  "gamma": 0.1,
 			  "productionTime": 0.8,
-			  "tech": 10,
+			  "tech": 10.5,
 			  "q": 0.9,
 			  "p": 0.3,
 			  "d": 0.5},
@@ -183,8 +183,10 @@ def makePopulationReproduce():
 			indiv.resourcesAmount = ind * 2
 		fakepop.clearDemeInfo()
 		fakepop.populationMutationMigration()
-		fakepop.updateDemeInfo()
-		fakepop.populationReproduction(**fakepop.fitnessParameters)
+		fakepop.updateDemeInfoPreProduction()
+		fakepop.populationProduction()
+		fakepop.updateDemeInfoPostProduction()
+		fakepop.populationReproduction()
 		return (fakepop, parents)
 	return _foo
 

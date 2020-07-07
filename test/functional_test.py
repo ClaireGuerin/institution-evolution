@@ -174,7 +174,7 @@ class TestSimpleRun(object):
 		self.pop.createAndPopulateDemes()
 		expDemog = []
 		for gen in range(5):
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 			assert self.pop.numberOfDemes == 5
 			expDemog.append(self.pop.demography / self.pop.numberOfDemes)
 
@@ -201,11 +201,11 @@ class TestSimpleRun(object):
 		self.pop.createAndPopulateDemes()
 		expTechno = []
 		for gen in range(5):
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 			assert self.pop.numberOfDemes == 5
 			collectDemeTech = []
 			for deme in self.pop.demes:
-				collectDemeTech.append(deme.progressValues["technologyLevel"])
+				collectDemeTech.append(deme.technologyLevel)
 			expTechno.append(sum(collectDemeTech)/len(collectDemeTech))
 
 		pseudorandom(85)
@@ -219,7 +219,7 @@ class TestSimpleRun(object):
 		clearOutputFiles(self.outputFile)
 
 	# then, resources...
-	def test_resources_files_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
+	def test_resources_file_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
 		parameters = {"gamma": 0.01, "p": 0.6, "q":0.9, "d":0.2, "productionTime": 1, "alphaResources": 0.6, "rb": 10, "atech": 2, "btech":0.2, "betaTech": 0.6}
 		pseudorandom(54) 
 		self.pop = Pop(fit_fun='technology', inst='test')
@@ -231,7 +231,7 @@ class TestSimpleRun(object):
 		self.pop.createAndPopulateDemes()
 		expTotRes = []
 		for gen in range(5):
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 			assert self.pop.numberOfDemes == 5
 			collectDemeTotRes = []
 			for deme in self.pop.demes:
@@ -249,7 +249,7 @@ class TestSimpleRun(object):
 		clearOutputFiles(self.outputFile)
 
 	# finally, consensus...
-	def test_consensus_files_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
+	def test_consensus_file_has_correct_output(self, pseudorandom, runSim, clearOutputFiles):
 		parameters = {"gamma": 0.01, "aconsensus":3, "bconsensus":2, "epsilon":0.01, "aquality":4, "alphaquality":0.9, "alphaResources":0.8, "techcapital":50, "rb":10}
 		pseudorandom(22) 
 		self.pop = Pop(fit_fun='debate', inst='test')
@@ -261,11 +261,11 @@ class TestSimpleRun(object):
 		self.pop.createAndPopulateDemes()
 		expCons = []
 		for gen in range(5):
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 			assert self.pop.numberOfDemes == 5
 			collectDemeCons = []
 			for deme in self.pop.demes:
-				collectDemeCons.append(deme.progressValues["consensusTime"])
+				collectDemeCons.append(deme.politicsValues["consensusTime"])
 			expCons.append(sum(collectDemeCons)/len(collectDemeCons))
 
 		pseudorandom(22)
