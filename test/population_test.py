@@ -137,7 +137,9 @@ class TestPopulation(object):
 		demogdeme1 = self.fakepop.demes[1].demography
 		phendeme1 = self.fakepop.demes[1].totalPhenotypes[0]
 
-		self.fakepop.updateDemeInfo()
+		self.fakepop.updateDemeInfoPreProduction()
+		self.fakepop.populationProduction()
+		self.fakepop.updateDemeInfoPostProduction()
 
 		assert self.fakepop.demes[0].meanPhenotypes[0] == ar.specialdivision(phendeme0, demogdeme0)
 		assert self.fakepop.demes[1].meanPhenotypes[0] == ar.specialdivision(phendeme1, demogdeme1)

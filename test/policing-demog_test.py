@@ -83,10 +83,12 @@ class TestPolicingDemographyFunction(object):
 		fakepop.createAndPopulateDemes()
 		fakepop.clearDemeInfo()
 		fakepop.populationMutationMigration()
-		fakepop.updateDemeInfo()
+		fakepop.updateDemeInfoPreProduction()
+		fakepop.populationProduction()
+		fakepop.updateDemeInfoPostProduction()
 		
 		try:
-			fakepop.populationReproduction(**fakepop.fitnessParameters)
+			fakepop.populationReproduction()
 		except:
 			assert False, "not running"
 

@@ -5,6 +5,7 @@ from institutionevolution.deme import Deme as Dem
 from institutionevolution.individual import Individual as Ind
 import institutionevolution.fitness as fitness
 import institutionevolution.progress as progress
+import institutionevolution.politics as politics
 import institutionevolution.myarithmetics as ar
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
@@ -86,7 +87,7 @@ class Population(object):
 			newDemeInstance.varPhenotypes = 0
 			newDemeInstance.totalPhenotypes = [x * dSize for x in self.initialPhenotypes]
 			newDemeInstance.totalPhenotypeSquares = [(x ** 2) * dSize for x in self.initialPhenotypes]
-			newDemeInstance.progressValues['technologyLevel'] = self.initialTechnologyLevel
+			newDemeInstance.technologyLevel = self.initialTechnologyLevel
 						
 			for ind in range(dSize):
 				indiv = Ind()
@@ -103,78 +104,43 @@ class Population(object):
 		del tmp[demeID]
 		return tmp
 
-	def populationReproduction(self, seed=None, **kwargs):
-		if seed is not None: random.seed(seed)
-		self.offspring = []
-		self.populationStructure = [0] * self.numberOfDemes
-		testdemog = 0
-
-		for ind in self.individuals:
-			# ELECTIONS
-			ind.ascend(leadProp=self.demes[ind.currentDeme].progressValues["proportionOfLeaders"])
-			## increment number of leaders within deme
-			self.demes[ind.currentDeme].progressValues["numberOfLeaders"] += ind.leader
-			# DEBATE
-			setattr(ind, "consensusTime", self.demes[ind.currentDeme].progressValues["consensusTime"])
-			if ind.consensusTime is not None: 
-				setattr(ind, "productionTime", 1 - ind.consensusTime)
-			# REPRODUCTION
-			## add deme information necessary to calculate individual fitness
-			infoToAdd = {}
-			infoToAdd["tech"] = self.demes[ind.currentDeme].progressValues["technologyLevel"]
-			infoToAdd["n"] = self.demes[ind.currentDeme].demography
-			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
-			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
-			#infoToAdd["x"] = ind.phenotypicValues
-			#infoToAdd["leadership"] = ind.leader
-			infoToAdd["labourForce"] = self.demes[ind.currentDeme].progressValues["consensusTime"] * self.demes[ind.currentDeme].demography
-
-			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
-			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
-			#assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
-			assert type(infoToAdd["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, infoToAdd["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
-
-			ind.reproduce(self.fit_fun, **{**kwargs, **infoToAdd})
-			self.offspring += ind.offspring
-			testdemog += ind.offspringNumber
-			self.populationStructure[ind.currentDeme] += ind.offspringNumber
-
-		self.parents = self.individuals
-		assert len(self.offspring) == testdemog
-		self.individuals = self.offspring
-		assert len(self.individuals) == testdemog
-		self.demography = len(self.offspring)
-
 	def clearDemeInfo(self):
 		self.parents = None
 		self.advances = []
 		for deme in range(self.numberOfDemes):
+			# INCREMENT TECHNOLOGY LEVEL IN DEME
 			if self.fit_fun == 'technology':
-				tmpTech = self.initialTechnologyLevel 
-				if self.demes[deme].publicGood == None:
-					tmpTech = self.initialTechnologyLevel 
-				else:
-					tech = self.demes[deme].progressValues['technologyLevel']
+				tech = self.demes[deme].technologyLevel
+				try:
 					tmpTech = tech * (self.fitnessParameters['atech'] + ((1 - self.fitnessParameters['p']) * self.demes[deme].publicGood) ** (1 - self.fitnessParameters['betaTech'])) / (1 + self.fitnessParameters['btech'] * tech)
+				except TypeError as e:
+					tmpTech = tech
 			else:
 				tmpTech = -99
+			self.demes[deme].technologyLevel = tmpTech
 			self.advances.append(tmpTech)
+
+			# RESET ALL OTHER DEME INFORMATION
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
 			self.demes[deme].totalResources = 0
-			# progress
-			self.demes[deme].progressValues.update({"technologyLevel": tmpTech,
-			"numberOfLeaders": 0, 
-			"civilianPublicTime": 0, 
+			self.demes[deme].numberOfLeaders = 0
+			# politics
+			self.demes[deme].politicsValues = {"civilianPublicTime": 0, 
 			"leaderPublicTime": 0, 
-			"labourForce": 0, 
-			"policingConsensus": 0,
-			"returnedGoods": 0,
-			"effectivePublicGood": None})
+			"labourForce": 0,
+			"consensus": 0,
+			"consensusTime": 0}
+			# progress
+			self.demes[deme].progressValues.update({"returnedGoods": 0,
+			"effectivePublicGood": None,
+			"institutionQuality": 0,
+			"fine": 0,
+			"fineBudget": 0,
+			"investmentReward": 0})
 
 	def populationMutationMigration(self):
-
 		for ind in self.individuals:
 			# MUTATION
 			ind.mutate(self.mutationRate, self.mutationStep, bounded=self.mutationBoundaries)
@@ -187,20 +153,14 @@ class Population(object):
 			ind.neighbours = self.demes[ind.currentDeme].neighbours
 			## demography
 			self.demes[ind.currentDeme].demography += 1
-			## public good
-			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
-			## total resources (private and public)
-			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
 			# total phenotypes
 			for phen in range(self.numberOfPhenotypes):
 				self.demes[ind.currentDeme].totalPhenotypes[phen] += ind.phenotypicValues[phen]
 				self.demes[ind.currentDeme].totalPhenotypeSquares[phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
-	def updateDemeInfo(self):
-		self.resources = []
+	def updateDemeInfoPreProduction(self):
 		self.debatetime = []
 		for deme in self.demes:
-			self.resources.append(deme.totalResources)
 			meanphen = []
 			varphen = []
 			for phen in range(self.numberOfPhenotypes):
@@ -211,20 +171,80 @@ class Population(object):
 				varphen.append(calculateVar)
 
 			setattr(deme, "meanPhenotypes", meanphen)
-			setattr(deme, "varPhenotypes", varphen)			
-			## progress
-			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
-			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars}))
-			self.debatetime.append(deme.progressValues["consensusTime"])
+			setattr(deme, "varPhenotypes", varphen)
 
-	def lifecycle(self, **kwargs):
+		for ind in self.individuals:
+			# ELECTIONS
+			try:
+				proportion = self.demes[ind.currentDeme].meanPhenotypes[3]
+			except IndexError as e:
+				proportion = 0
+			ind.ascend(leadProp=proportion)
+			## increment number of leaders within deme
+			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
+
+		for deme in self.demes:
+			politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
+			deme.politicsValues.update(politics.functions[self.fit_fun](**{**self.fitnessParameters,**politicsPars}))
+			self.debatetime.append(deme.politicsValues["consensusTime"])
+
+	def populationProduction(self):
+		# INDIVIDUAL PRODUCTION AND CONTRIBUTION TO PUBLIC GOOD:
+		for ind in self.individuals:
+			infoToAdd = {'n': self.demes[ind.currentDeme].demography, 'tech': self.demes[ind.currentDeme].technologyLevel}
+			ind.produceResources(self.fit_fun, **{**infoToAdd, **self.fitnessParameters, **self.demes[ind.currentDeme].politicsValues})
+			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
+			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount
+
+	def updateDemeInfoPostProduction(self):
+		self.resources = []
+		for deme in self.demes:
+			self.resources.append(deme.totalResources)
+			## progress
+			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
+			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars,**deme.politicsValues}))
+
+	def populationReproduction(self, seed=None):
+		if seed is not None: random.seed(seed)
+		self.offspring = []
+		self.populationStructure = [0] * self.numberOfDemes
+		testdemog = 0
+
+		for ind in self.individuals:
+			# REPRODUCTION
+			## add deme information necessary to calculate individual fitness
+			infoToAdd = {}
+			infoToAdd["tech"] = self.demes[ind.currentDeme].technologyLevel
+			infoToAdd["n"] = self.demes[ind.currentDeme].demography
+			infoToAdd["xmean"] = self.demes[ind.currentDeme].meanPhenotypes
+			infoToAdd["pg"] = self.demes[ind.currentDeme].publicGood
+
+			assert type(infoToAdd["n"]) is int, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			assert infoToAdd["n"] > 0, "group size of deme {0} is {1}".format(ind.currentDeme, infoToAdd["n"])
+			#assert type(infoToAdd["x"][0]) is float, "phenotype of individual in deme {0} is {1}".format(ind.currentDeme, infoToAdd["x"])
+			assert type(infoToAdd["xmean"][0]) is float, "mean phenotype in deme {0} of individual with phen {3} is {1}. N={2}, n={4}, totalx={5}. Special division returns {6}".format(ind.currentDeme, infoToAdd["xmean"], self.demography, ind.phenotypicValues, self.demes[ind.currentDeme].demography, self.demes[ind.currentDeme].totalPhenotypes, self.specialdivision(self.demes[ind.currentDeme].totalPhenotypes[0], self.demes[ind.currentDeme].demography))
+
+			ind.reproduce(self.fit_fun, **{**self.fitnessParameters, **infoToAdd, **self.demes[ind.currentDeme].progressValues})
+			self.offspring += ind.offspring
+			testdemog += ind.offspringNumber
+			self.populationStructure[ind.currentDeme] += ind.offspringNumber
+
+		self.parents = self.individuals
+		assert len(self.offspring) == testdemog
+		self.individuals = self.offspring
+		assert len(self.individuals) == testdemog
+		self.demography = len(self.offspring)
+
+	def lifecycle(self):
 		logging.info("migration and mutation")
 		self.clearDemeInfo()
 		self.populationMutationMigration()
 		logging.info("updating...")
-		self.updateDemeInfo()
+		self.updateDemeInfoPreProduction()
+		self.populationProduction()
+		self.updateDemeInfoPostProduction()
 		logging.info("reproduction")
-		self.populationReproduction(**kwargs)
+		self.populationReproduction()
 		
 	def runSimulation(self, outputfile):
 		
@@ -249,7 +269,7 @@ class Population(object):
 				for gen in range(self.numberOfGenerations):
 					logging.info('Running generation {0}'.format(gen))
 					
-					self.lifecycle(**self.fitnessParameters)
+					self.lifecycle()
 
 					if self.demography == 0:
 						#raise ValueError("The population went extinct after {0} generations".format(gen))
