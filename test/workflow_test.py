@@ -1,19 +1,27 @@
 import pytest
 import os
 import sys
+import shutil
 from institutionevolution.population import Population as Pop
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 
 class TestAutomaticWorkflow(object):
 
 	def test_single_sim_reads_and_writes_from_same_folder(self):
-		self.pop = Pop(inst='test')
+		shutil.copytree('pars/test', 'simulations')
+		self.pop = Pop(inst='simulations')
+		self.pop.numberOfGenerations = 3
 		self.pop.runSimulation()
 
-		assert ["consensus", "demography", "phenotypes", "resources", "technology"] in os.listdir('test')
+		self.outputfiles = ["out_consensus.txt", "out_demography.txt", "out_phenotypes.txt", "out_resources.txt", "out_technology.txt"] 
+
+		for file in self.outputfiles:
+			assert file in os.listdir('simulations')
+
+		shutil.rmtree('simulations')
 
 	def test_script_writes_par_files(self):
-		launcher = open("launch_simulations.py").read()
+		launcher = open("launch_multiple_simulations.py").read()
 		sys.argv = ["launch_simulations.py", "arg1", "arg2", "arg3"]
 		exec(launcher)
 
