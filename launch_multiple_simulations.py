@@ -1,5 +1,6 @@
 import os
 import sys
+from numpy import arange
 import institutionevolution.filemanip as fman
 from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
 
@@ -27,11 +28,46 @@ parfile = args[2]
 print(parfile)
 print(type(parfile))
 
+# CREATE METAFOLDER
 try:
 	os.mkdir(metafolder)
 	print("Created metafolder to store all simulations")
 except FileExistsError:
 	print("Metafolder already exists")
+
+# READ PARAMETER RANGE FILE
+parname = []
+parstart = []
+parend = []
+parstep = []
+
+with open(parfile, 'r') as parranges:
+	for line in parranges:
+		listLine = line.split(',')
+		parname.append(listLine[0])
+		parstart.append(listLine[1])
+		try:
+			parend.append(listLine[2])
+			try:
+				parstep.append(listLine[3])
+			except IndexError:
+				raise TypeError("provide a step for range of parameter "+listLine[0])
+		except IndexError:
+			parend.append(None)
+			parstep.append(None)
+
+# CREATE RANGES
+fitnessFunction = parstart[0]
+ranges = []
+for par in range(len(parname-1)):
+	tmpstart = float(parstart[par+1])
+	tmpend = float(parend[par+1])
+	tmpstep = float(parstep[par+1])
+	tmpRange = arange(tmpstart,tmpend,tmpstep)
+
+# CREATE COMBINATIONS
+
+
 
 parname = fman.extractColumnFromFile(parfile,0,str)
 parvalue = fman.extractColumnFromFile(parfile,1,float)

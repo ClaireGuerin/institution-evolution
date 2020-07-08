@@ -25,7 +25,7 @@ class TestAutomaticWorkflow(object):
 		shutil.rmtree('simulations')
 
 	def test_script_takes_arguments_properly(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
 			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
@@ -42,7 +42,7 @@ class TestAutomaticWorkflow(object):
 			assert printed == sys.argv, "printed {0}".format(printed)
 
 	def test_script_creates_metafolder(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
 			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
@@ -53,7 +53,7 @@ class TestAutomaticWorkflow(object):
 			os.remove('parameter_ranges.txt')
 
 	def test_script_writes_par_files(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
 			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
@@ -75,7 +75,7 @@ class TestAutomaticWorkflow(object):
 				assert False, "one or more parameter file(s) missing. Folder contents: {0}".format(self.fileslist)
 
 	def test_script_handles_files_already_exists_issue(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		shutil.copytree('pars/test', 'simulations')
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
@@ -94,7 +94,7 @@ class TestAutomaticWorkflow(object):
 				assert False, "file not replaced by correct parameter values"
 
 	def test_script_takes_parameter_ranges_file(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
 			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
@@ -120,7 +120,7 @@ class TestAutomaticWorkflow(object):
 				assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
 
 	def test_parameter_files_are_not_empty(self, createParameterRangesFile):
-		createParameterRangesFile
+		createParameterRangesFile()
 		with open("launch_multiple_simulations.py") as launcher_descriptor:
 			launcher = launcher_descriptor.read()
 			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
@@ -136,3 +136,23 @@ class TestAutomaticWorkflow(object):
 				shutil.rmtree('simulations')
 				os.remove('parameter_ranges.txt')
 				assert False, "file is empty"
+
+	def test_script_can_take_parameter_ranges(self, createParameterRangesFile):
+		createParameterRangesFile(multi=True)
+		with open("launch_multiple_simulations.py") as launcher_descriptor:
+			launcher = launcher_descriptor.read()
+			sys.argv = ["launch_multiple_simulations.py", "simulations", "parameter_ranges.txt", "arg3"]
+			exec(launcher)
+
+		files = folders = 0
+
+		for _, dirnames, filenames in os.walk('simulations'):
+		  # ^ this idiom means "we won't be using this value"
+		    files += len(filenames)
+		    folders += len(dirnames)
+
+		shutil.rmtree('simulations')
+		os.remove('parameter_ranges.txt')
+
+		assert files == 5*4, "wrong total number of parameters files"
+		assert folders == 4, "wrong number of subfolders"
