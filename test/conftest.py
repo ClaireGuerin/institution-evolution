@@ -221,3 +221,8 @@ def clearOutputFiles():
 		os.remove(path + '_resources.txt')
 		os.remove(path + '_consensus.txt')
 	return _foo
+
+@pytest.fixture
+def createParameterRangesFile():
+	with open("parameter_ranges.txt", 'w') as f:
+		f.write('pgg,0\nfirst,1\nsecnd,2\nthird,3')
