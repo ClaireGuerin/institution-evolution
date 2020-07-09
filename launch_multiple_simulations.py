@@ -60,6 +60,10 @@ class Launcher(object):
 		self.parend = parend
 		self.parstep = parstep
 
+	def writeParameterFiles(self, fitval):
+		# WRITE PARAMETER FILE FOR SPECIFIC COMBINATION
+		pass
+
 	def createRanges(self):
 		# CREATE RANGES
 		self.fitnessFunction = parstart[0]
