@@ -26,10 +26,10 @@ class TestAutomaticWorkflow(object):
 		shutil.rmtree('simulations')
 
 	def test_script_reads_arguments_properly(self):
-		self.l = Launcher("simulations", "blablabla")
+		self.l = Launcher("tralala", "blablabla")
 
-		assert self.l.metafolder == "simulations"
-		assert self.l.parfile == "parameter_ranges.txt"
+		assert self.l.metafolder == "tralala"
+		assert self.l.parfile == "blablabla"
 
 	def test_script_creates_metafolder(self):
 		self.l = Launcher("simulations", "blablabla")
