@@ -56,20 +56,27 @@ class Launcher(object):
 					parend.append(None)
 					parstep.append(None)
 
-		self.parname = parname
-		self.parstart = parstart
-		self.parend = parend
-		self.parstep = parstep
+		self.parname = parname[1:]
+		self.parstart = parstart[1:]
+		self.parend = parend[1:]
+		self.parstep = parstep[1:]
+
+		self.fitnessFunction = parstart[0]
 
 	def createRanges(self):
 		# CREATE RANGES
-		self.fitnessFunction = parstart[0]
 		ranges = []
-		for par in range(len(parname)-1):
-			tmpstart = float(parstart[par+1])
-			tmpend = float(parend[par+1])
-			tmpstep = float(parstep[par+1])
-			tmpRange = arange(tmpstart,tmpend,tmpstep)
+		for par in range(len(self.parname)):
+			tmpstart = float(self.parstart[par])
+			try:
+				tmpend = float(self.parend[par])
+				tmpstep = float(self.parstep[par])
+				tmpRange = arange(tmpstart,tmpend,tmpstep).tolist()
+			except TypeError:
+				tmpRange = [tmpstart]
+			ranges.append(tmpRange)
+
+		self.ranges = ranges
 
 	def createCombinations(self):
 		# CREATE COMBINATIONS	

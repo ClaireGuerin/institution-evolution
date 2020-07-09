@@ -73,6 +73,42 @@ class TestAutomaticWorkflow(object):
 			assert False, "file not replaced by correct parameter values"
 
 	def test_script_reads_parameter_ranges_file(self, createParameterRangesFile):
+		# SIMPLE, NO RANGES
+
+		createParameterRangesFile()
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.readParameterInfo()
+
+		assert self.l.parname == ["first", "secnd", "third"]
+		self.l.parstart == [1,2,3]
+		self.l.parend == [None] * 3
+		self.l.parstep == [None] * 3
+		assert self.l.fitnessFunction == 'pgg'
+
+		# WITH RANGES
+		createParameterRangesFile(multi=True)
+		#self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.readParameterInfo()
+
+		assert self.l.parname == ["first", "secnd", "third"]
+		self.l.parstart == [1.1,2.3,3.5]
+		self.l.parend == [1.2,None,3.6]
+		self.l.parstep == [0.1,None,0.1]
+		assert self.l.fitnessFunction == 'pgg'
+
+	def test_ranges_creation(self, createParameterRangesFile):
+		createParameterRangesFile(multi=True)
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.readParameterInfo()
+		self.l.createRanges()
+
+		assert len(self.l.ranges) == 3, "wrong number of ranges"
+		assert self.l.ranges == [[1.1,1.2],[2.3],[3.5,3.6]], "wrong ranges"
+
+	def test_combinations_creation(self):
+		assert False, "write this test!"
+
+	def test_script_reads_parameter_ranges_file_and_writes_files_correctly(self, createParameterRangesFile):
 		createParameterRangesFile()
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		self.l.writeParameterFilesInAllFolders()
@@ -95,12 +131,6 @@ class TestAutomaticWorkflow(object):
 			shutil.rmtree('simulations')
 			os.remove('parameter_ranges.txt')
 			assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
-
-	def test_ranges_creation(self):
-		assert False, "write this test!"
-
-	def test_combinations_creation(self):
-		assert False, "write this test!"
 
 	def test_parameter_files_are_not_empty(self, createParameterRangesFile):
 		createParameterRangesFile()
