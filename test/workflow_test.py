@@ -3,6 +3,7 @@ import re
 import os
 import sys
 import shutil
+from pathlib import Path
 from io import StringIO
 from ast import literal_eval
 from launch_multiple_simulations import Launcher
@@ -13,6 +14,10 @@ from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLO
 class TestAutomaticWorkflow(object):
 
 	def test_single_sim_reads_and_writes_from_same_folder(self):
+		dirpath = Path('simulations')
+		if dirpath.exists() and dirpath.is_dir():
+			shutil.rmtree(dirpath)
+
 		shutil.copytree('pars/test', 'simulations')
 		self.pop = Pop(inst='simulations')
 		self.pop.numberOfGenerations = 3
@@ -33,48 +38,46 @@ class TestAutomaticWorkflow(object):
 
 	def test_script_creates_metafolder(self):
 		self.l = Launcher("simulations", "blablabla")
-		self.l.createMetaFolder()
+		self.l.createFolder(self.l.metafolder)
 
 		assert os.path.exists('simulations') == 1, "did not create metafolder"
 		shutil.rmtree('simulations')
 
 	def test_script_writes_par_files(self):
 		self.l = Launcher("simulations", "blablabla")
-		self.l.writeParameterFiles(fitval="")
+		self.l.createFolder(self.l.metafolder)
+		self.l.writeParameterFiles(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
 
 		self.dirpath = os.getcwd()
-		self.fileslist = os.listdir('simulations/pgg0.0first1.0secnd2.0third3.0')
+		self.fileslist = os.listdir('simulations/func_first1secnd2third3')
 		self.inputfiles = [INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE]
 
 		try:
 			for file in self.inputfiles:
 				assert file in self.fileslist
-				shutil.rmtree('simulations')
-				os.remove('parameter_ranges.txt')
+			shutil.rmtree('simulations')
 		except AssertionError:
 			shutil.rmtree('simulations')
-			os.remove('parameter_ranges.txt')
 			assert False, "one or more parameter file(s) missing. Folder contents: {0}".format(self.fileslist)
 
 	def test_script_handles_files_already_exists_issue(self):
 		shutil.copytree('pars/test', 'simulations')
 		self.l = Launcher('simulations', 'blablabla')
-		self.l.writeParameterFiles('first,1.0\nsecnd,2.0\nthird,3.0')
+		self.l.writeParameterFiles(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
 		try:
-			with open('simulations/func_first1.0secnd2.0third3.0/'+FITNESS_PARAMETERS_FILE, 'r') as f:
+			with open('simulations/func_first1secnd2third3/'+FITNESS_PARAMETERS_FILE, 'r') as f:
 				assert len(f.readlines()) == 3, "file not replaced by correct parameter values"
-				shutil.rmtree('simulations')
-				os.remove('parameter_ranges.txt')
+			shutil.rmtree('simulations')
 		except AssertionError:
 			shutil.rmtree('simulations')
-			os.remove('parameter_ranges.txt')
 			assert False, "file not replaced by correct parameter values"
 
-	def test_script_takes_parameter_ranges_file(self, createParameterRangesFile):
+	def test_script_reads_parameter_ranges_file(self, createParameterRangesFile):
 		createParameterRangesFile()
-		self.l = Launcher()
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.writeParameterFilesInAllFolders()
 
-		self.subfoldername = 'func_first1.0secnd2.0third3.0'
+		self.subfoldername = 'pgg_first1.0secnd2.0third3.0'
 
 		assert os.path.exists('simulations/'+self.subfoldername), "did not create specific simulation file: {0}".format(os.listdir('simulations'))
 		self.fileslist = os.listdir('simulations/'+self.subfoldername)
@@ -93,9 +96,16 @@ class TestAutomaticWorkflow(object):
 			os.remove('parameter_ranges.txt')
 			assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
 
+	def test_ranges_creation(self):
+		assert False, "write this test!"
+
+	def test_combinations_creation(self):
+		assert False, "write this test!"
+
 	def test_parameter_files_are_not_empty(self, createParameterRangesFile):
 		createParameterRangesFile()
-		self.l = Launcher()
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.writeParameterFilesInAllFolders()
 
 		self.fileslist = os.listdir('simulations')
 		try:
@@ -110,7 +120,8 @@ class TestAutomaticWorkflow(object):
 
 	def test_script_can_take_parameter_ranges(self, createParameterRangesFile):
 		createParameterRangesFile(multi=True)
-		self.l = Launcher()
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.writeParameterFilesInAllFolders()
 
 		files = folders = 0
 

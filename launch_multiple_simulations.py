@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 from numpy import arange
 import institutionevolution.filemanip as fman
 from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
@@ -25,13 +26,13 @@ class Launcher(object):
 		self.metafolder = metafolder
 		self.parfile = parfile
 
-	def createMetaFolder(self):
-		# CREATE METAFOLDER
+	def createFolder(self,folder):
+		# CREATE FOLDER
 		try:
-			os.mkdir(self.metafolder)
-			print("Created metafolder to store all simulations")
+			os.mkdir(folder)
+			print("Created folder {0} for simulation storage".format(folder))
 		except FileExistsError:
-			print("Metafolder already exists")
+			print("Folder {0} already exists".format(folder))
 
 	def readParameterInfo(self):
 		# READ PARAMETER RANGE FILE
@@ -60,10 +61,6 @@ class Launcher(object):
 		self.parend = parend
 		self.parstep = parstep
 
-	def writeParameterFiles(self, fitval):
-		# WRITE PARAMETER FILE FOR SPECIFIC COMBINATION
-		pass
-
 	def createRanges(self):
 		# CREATE RANGES
 		self.fitnessFunction = parstart[0]
@@ -77,40 +74,31 @@ class Launcher(object):
 	def createCombinations(self):
 		# CREATE COMBINATIONS	
 		pass
+
+	def writeParameterFiles(self, fitfun, pname, pval):
+		# CREATE SUBFOLDER 
+		subfolder = Path(self.metafolder, fitfun+"_"+"".join([i+str(j) for i,j in zip(pname, pval)]))
+		self.createFolder(subfolder)
 		
-# args = sys.argv
-# print(args)
+		# WRITE PARAMETER FILE FOR SPECIFIC COMBINATION
 
-# metafolder = args[1]
-# parfile = args[2]
+		with open(Path(subfolder, FITNESS_PARAMETERS_FILE), "w", buffering=1) as f, \
+		open(Path(subfolder, INITIALISATION_FILE), "w", buffering=1) as a, \
+		open(Path(subfolder, INITIAL_PHENOTYPES_FILE), "w", buffering=1) as b, \
+		open(Path(subfolder, INITIAL_TECHNOLOGY_FILE), "w", buffering=1) as c, \
+		open(Path(subfolder, PARAMETER_FILE), "w", buffering=1) as d:
+			## Fitness parameters
+			for par in range(len(pname)):
+				f.write("{0},{1}\n".format(pname[par],pval[par]))
+			## Initialisation
+			a.write(self.strINITFILE)
+			## Initial phenotypes
+			b.write(self.strPHENFILE)
+			## Initial technology
+			c.write(self.strTECHFILE)
+			## Parameters
+			d.write(self.strPARAFILE)
 
-# print(parfile)
-# print(type(parfile))
-
-# parname = fman.extractColumnFromFile(parfile,0,str)
-# parvalue = fman.extractColumnFromFile(parfile,1,float)
-# try:
-# 	subfolder = metafolder+'/'+"".join([i+str(j) for i,j in zip(parname, parvalue)])
-# 	os.mkdir(subfolder)
-# 	print("Created subfolder to store one simulation")
-# except FileExistsError:
-# 	print("Subfolder already exists")
-
-# #parameterFileNames = [INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE]
-# fitnessFunction = parname[0]
-
-# with open(subfolder+'/'+FITNESS_PARAMETERS_FILE, "w") as f:
-# 	for par in range(1,len(parname)):
-# 		f.write("{0},{1}\n".format(parname[par],parvalue[par]))
-
-# with open(subfolder+'/'+INITIALISATION_FILE, "w") as a:
-# 	a.write(strINITFILE)
-
-# with open(subfolder+'/'+INITIAL_PHENOTYPES_FILE, "w") as b:
-# 	b.write(strPHENFILE)
-
-# with open(subfolder+'/'+INITIAL_TECHNOLOGY_FILE, "w") as c:
-# 	c.write(strTECHFILE)
-
-# with open(subfolder+'/'+PARAMETER_FILE, "w") as d:
-# 	d.write(strPARAFILE)
+	def writeParameterFilesInAllFolders(self):
+		# CREATE METAFOLDER
+		self.createFolder(self.metafolder)
