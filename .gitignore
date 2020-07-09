@@ -4,3 +4,5 @@ res/
 logos/
 log.txt
 analyticalpredictions*.txt
+parameter_ranges.txt
+mock_parameter_ranges.txt
