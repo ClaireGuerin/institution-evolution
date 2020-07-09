@@ -142,14 +142,16 @@ class TestPolicingFunction(object):
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfo()
+		self.fakepop.updateDemeInfoPreProduction()
+		self.fakepop.populationProduction()
+		self.fakepop.updateDemeInfoPostProduction()
 
 		try:
-			self.fakepop.populationReproduction(**self.fakepop.fitnessParameters)
+			self.fakepop.populationReproduction()
 		except Exception as e:
 			assert False, "something went wrong, raised {0}: {1}".format(e.__class__.__name__, str(e))
 
 	def test_deme_has_policing_consensus(self):
 		self.fakeDeme = Dem()
 
-		assert hasattr(self.fakeDeme, "policingConsensus")
+		assert "consensus" in self.fakeDeme.politicsValues

@@ -151,7 +151,7 @@ class TestMigrationFunction(object):
 		
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfo()
+		self.fakepop.updateDemeInfoPreProduction()
 		
 		self.newDemography = []		
 		for ind in self.fakepop.individuals:

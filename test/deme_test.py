@@ -69,7 +69,7 @@ class TestDeme(object):
 
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfo()
+		self.fakepop.updateDemeInfoPreProduction()
 
 		phenDeme0 = []
 		phenDeme1 = []

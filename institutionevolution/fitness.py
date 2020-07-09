@@ -54,13 +54,18 @@ def technology(res, **kwargs):
 	x = kwargs['x'][0]
 	n = kwargs["n"]
 	q = kwargs['q']
-	p = kwargs["p"]
-	pg = kwargs['pg']
-	fine = pg * p / n
-	benef = ((pg * (1 - p)) ** kwargs["betaTech"]) / n
 	
-	payoff = (1 - kwargs['q']) * (1 - x) * res + kwargs['q'] * ((1 - x) * res - fine) + benef
-	f = (kwargs["rb"] + payoff) / (1 + kwargs["gamma"] * kwargs["n"])
+	assert type(x) is float, "x is {0} when it should be a float".format(type(x))
+	assert x >= 0 and x <= 1, "x is not between 0 and 1: " + str(x)
+	assert type(n) is int, "n is {0} when it should be an integer".format(type(n))
+	assert n > 0, "n non-positive"
+	
+	payoff = (1 - q) * (1 - x) * res + q * ((1 - x) * res - kwargs['fine']) + kwargs['investmentReward']
+	f = (kwargs["rb"] + payoff) / (1 + kwargs["gamma"] * n)
+	
+	assert payoff >= 0, "payoff is negative"
+	assert f >= 0, "f is negative"
+	
 	return f
 
 def debate(res, **kwargs):

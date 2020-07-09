@@ -245,7 +245,7 @@ class TestReproductionFunction(object):
 		self.pop.createAndPopulateDemes()
 
 		try:
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 		except ValueError as e:
 			assert False, "could not run lifecycle on geometric function" + str(e)
 
@@ -257,11 +257,11 @@ class TestReproductionFunction(object):
 		self.pop.createAndPopulateDemes()
 
 		try:
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 		except ValueError as e:
 			assert False, "could not run lifecycle on policing function" + str(e)
 
-	def test_policing_function_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
+	def test_policing_function_number_two_runs_properly(self, instantiateSingleIndividualsDemes, getFitnessParameters):
 		self.pop = instantiateSingleIndividualsDemes(3)
 		self.pop.fit_fun = "policingdemog2"
 		self.pop.initialPhenotypes = [0.5,0.6,0.7,0.8]
@@ -270,7 +270,7 @@ class TestReproductionFunction(object):
 		self.pop.createAndPopulateDemes()
 
 		try:
-			self.pop.lifecycle(**self.pop.fitnessParameters)
+			self.pop.lifecycle()
 		except ValueError as e:
 			assert False, "could not run lifecycle on policing-deomography 2 function" + str(e)
 

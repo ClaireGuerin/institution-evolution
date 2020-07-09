@@ -9,16 +9,17 @@ class Deme(object):
 		self.varPhenotypes = None
 		self.totalPhenotypes = None
 		self.totalPhenotypeSquares = None
-		self.policingConsensus = None
-		self.progressValues = {"technologyLevel": None,
-		"numberOfLeaders": None, 
-		"proportionOfLeaders": None, 
-		"civilianPublicTime": None, 
+		self.numberOfLeaders = None,
+		self.technologyLevel = None,
+		self.politicsValues = {"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
-		"labourForce": None, 
-		"returnedGoods": None,
-		"effectivePublicGood": None,
+		"labourForce": None,
 		"consensus": None,
 		"consensusTime": None,
+		"productionTime": None}
+		self.progressValues = {"returnedGoods": None,
+		"effectivePublicGood": None,
 		"institutionQuality": None,
-		"fineBudget": None}
+		"fine": None,
+		"fineBudget": None,
+		"investmentReward": None}
