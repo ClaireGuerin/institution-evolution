@@ -79,11 +79,13 @@ class TestAutomaticWorkflow(object):
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		self.l.readParameterInfo()
 
+		#assert False, "names:{0},start:{1},end:{2},step:{3},fit:{4}".format(self.l.parname,self.l.parstart,self.l.parend,self.l.parstep,self.l.fitnessFunction)
+
 		assert self.l.parname == ["first", "secnd", "third"]
 		self.l.parstart == [1,2,3]
 		self.l.parend == [None] * 3
 		self.l.parstep == [None] * 3
-		assert self.l.fitnessFunction == 'pgg'
+		assert self.l.fitnessFunction == 'pgg', self.l.lastLine
 
 		# WITH RANGES
 		createParameterRangesFile(multi=True)

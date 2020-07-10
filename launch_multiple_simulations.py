@@ -41,9 +41,11 @@ class Launcher(object):
 		parend = []
 		parstep = []
 
-		with open(self.parfile, 'r') as parranges:
+		with open(self.parfile, mode='r', newline='\n') as parranges:
 			for line in parranges:
-				listLine = line.split(',')
+				removeTrailingNewline = line.replace('\n', '')
+				listLine = removeTrailingNewline.split(',')
+				#listLine = line.split(',')
 				parname.append(listLine[0])
 				parstart.append(listLine[1])
 				try:
@@ -60,6 +62,8 @@ class Launcher(object):
 		self.parstart = parstart[1:]
 		self.parend = parend[1:]
 		self.parstep = parstep[1:]
+
+		self.lastLine = listLine
 
 		self.fitnessFunction = parstart[0]
 

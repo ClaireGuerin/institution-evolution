@@ -227,7 +227,7 @@ def createParameterRangesFile():
 	def _foo(multi=False):
 		with open("parameter_ranges.txt", 'w') as f:
 			if multi:
-				f.write('fun,pgg\nfirst,1.1,1.2,0.1\nsecnd,2.3\nthird,3.5,3.6,0.1')
+				f.writelines(['fun,pgg\n','first,1.1,1.2,0.1\n','secnd,2.3\n','third,3.5,3.6,0.1\n'])
 			else:
-				f.write('fun,pgg\nfirst,1\nsecnd,2\nthird,3')
+				f.writelines(['fun,pgg\n','first,1\n','secnd,2\n','third,3\n'])
 	return _foo
