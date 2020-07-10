@@ -93,8 +93,8 @@ class TestAutomaticWorkflow(object):
 		self.l.readParameterInfo()
 
 		assert self.l.parname == ["first", "secnd", "third"]
-		self.l.parstart == [1.1,2.3,3.5]
-		self.l.parend == [1.2,None,3.6]
+		self.l.parstart == [1.1,2.3,3.4]
+		self.l.parend == [1.3,None,3.6]
 		self.l.parstep == [0.1,None,0.1]
 		assert self.l.fitnessFunction == 'pgg'
 
@@ -102,10 +102,18 @@ class TestAutomaticWorkflow(object):
 		createParameterRangesFile(multi=True)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		self.l.readParameterInfo()
+		assert self.l.parend == ['1.3',None,'3.6']
+		assert self.l.parstep == ['0.1', None, '0.1']
+
 		self.l.createRanges()
 
+		assert self.l.parend == ['1.3',None,'3.6']
+		assert self.l.parstep == ['0.1', None, '0.1']
+
 		assert len(self.l.ranges) == 3, "wrong number of ranges"
-		assert self.l.ranges == [[1.1,1.2],[2.3],[3.5,3.6]], "wrong ranges"
+		checkDict = {'first':[1.1,1.2],'secnd':[2.3], 'third':[3.4,3.5]}
+		for key, val in self.l.ranges.items():
+			assert pytest.approx(val) == checkDict[key], "wrong range for {0}: {1} when it should be {2}".format(key,val,checkDict[key])
 
 	def test_combinations_creation(self):
 		assert False, "write this test!"

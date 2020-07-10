@@ -1,7 +1,7 @@
 import os
 import sys
 from pathlib import Path
-from numpy import arange
+from numpy import linspace
 import institutionevolution.filemanip as fman
 from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
 
@@ -67,18 +67,22 @@ class Launcher(object):
 
 		self.fitnessFunction = parstart[0]
 
+	def _customArange(self, start, end, step):
+		return linspace(start, end, num=round((end-start)/step), endpoint=False)
+
 	def createRanges(self):
 		# CREATE RANGES
-		ranges = []
+		ranges = {}
 		for par in range(len(self.parname)):
 			tmpstart = float(self.parstart[par])
-			try:
+			if self.parend[par] == None:
+				tmpRange = [tmpstart]
+			else:
 				tmpend = float(self.parend[par])
 				tmpstep = float(self.parstep[par])
-				tmpRange = arange(tmpstart,tmpend,tmpstep).tolist()
-			except TypeError:
-				tmpRange = [tmpstart]
-			ranges.append(tmpRange)
+				tmpRange = self._customArange(tmpstart,tmpend,tmpstep).tolist()
+				
+			ranges.update({self.parname[par]: tmpRange})
 
 		self.ranges = ranges
 
