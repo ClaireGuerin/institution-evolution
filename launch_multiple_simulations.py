@@ -2,6 +2,7 @@ import os
 import sys
 from pathlib import Path
 from numpy import linspace
+import itertools as it
 import institutionevolution.filemanip as fman
 from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
 
@@ -72,7 +73,7 @@ class Launcher(object):
 
 	def createRanges(self):
 		# CREATE RANGES
-		ranges = {}
+		ranges = []
 		for par in range(len(self.parname)):
 			tmpstart = float(self.parstart[par])
 			if self.parend[par] == None:
@@ -82,13 +83,33 @@ class Launcher(object):
 				tmpstep = float(self.parstep[par])
 				tmpRange = self._customArange(tmpstart,tmpend,tmpstep).tolist()
 				
-			ranges.update({self.parname[par]: tmpRange})
+			ranges.append(tmpRange)
 
 		self.ranges = ranges
 
+	def _flattenTuple(self, object): 
+		
+		gather = []
+		for item in object:
+			if isinstance(item, tuple):
+				gather.extend(self._flattenTuple(item))
+			else:
+				gather.append(item)
+		return tuple(gather)
+
 	def createCombinations(self):
-		# CREATE COMBINATIONS	
-		pass
+		# CREATE COMBINATIONS
+		lst = self.ranges[0]
+		for par in range(len(self.ranges)-1):
+			tmplst = list(it.product(lst,self.ranges[par+1]))
+			lst = tmplst
+
+		flatlst = []
+		for comb in lst:
+			flatcomb = self._flattenTuple(comb)
+			flatlst.append(flatcomb)
+
+		self.combinations = flatlst
 
 	def writeParameterFiles(self, fitfun, pname, pval):
 		# CREATE SUBFOLDER 

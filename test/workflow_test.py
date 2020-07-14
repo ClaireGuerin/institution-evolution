@@ -98,6 +98,8 @@ class TestAutomaticWorkflow(object):
 		self.l.parstep == [0.1,None,0.1]
 		assert self.l.fitnessFunction == 'pgg'
 
+		os.remove('parameter_ranges.txt')
+
 	def test_ranges_creation(self, createParameterRangesFile):
 		createParameterRangesFile(multi=True)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
@@ -111,12 +113,24 @@ class TestAutomaticWorkflow(object):
 		assert self.l.parstep == ['0.1', None, '0.1']
 
 		assert len(self.l.ranges) == 3, "wrong number of ranges"
-		checkDict = {'first':[1.1,1.2],'secnd':[2.3], 'third':[3.4,3.5]}
-		for key, val in self.l.ranges.items():
-			assert pytest.approx(val) == checkDict[key], "wrong range for {0}: {1} when it should be {2}".format(key,val,checkDict[key])
+		checkList = [[1.1,1.2],[2.3],[3.4,3.5]]
+		for par in range(len(self.l.ranges)):
+			assert pytest.approx(self.l.ranges[par]) == checkList[par], "wrong range for {0}: {1} when it should be {2}".format(self.l.parname[par],self.l.ranges[par],checkList[par])
 
-	def test_combinations_creation(self):
-		assert False, "write this test!"
+		os.remove('parameter_ranges.txt')
+
+	def test_combinations_creation(self, createParameterRangesFile):
+		createParameterRangesFile(multi=True)
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.readParameterInfo()
+		self.l.createRanges()
+		self.l.createCombinations()
+
+		allCombs = [(1.1,2.3,3.4),(1.1,2.3,3.5),(1.2,2.3,3.4),(1.2,2.3,3.5)]
+		for parcomb in allCombs:
+			assert pytest.approx(parcomb) in self.l.combinations
+
+		os.remove('parameter_ranges.txt')
 
 	def test_script_reads_parameter_ranges_file_and_writes_files_correctly(self, createParameterRangesFile):
 		createParameterRangesFile()
