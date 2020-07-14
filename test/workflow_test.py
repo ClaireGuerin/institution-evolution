@@ -132,14 +132,13 @@ class TestAutomaticWorkflow(object):
 
 		os.remove('parameter_ranges.txt')
 
-	def test_script_reads_parameter_ranges_file_and_writes_files_correctly(self, createParameterRangesFile):
-		createParameterRangesFile()
+	def test_single_par_combination_gets_a_full_folder(self):
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.writeParameterFilesInAllFolders()
+		self.l.createFolder(self.l.metafolder)
+		self.l.writeParameterFiles(fitfun='pgg', pname=('small','big'), pval=(0.3,0.5))
 
-		self.subfoldername = 'pgg_first1.0secnd2.0third3.0'
-
-		assert os.path.exists('simulations/'+self.subfoldername), "did not create specific simulation file: {0}".format(os.listdir('simulations'))
+		self.subfoldername = 'pgg_small0.3big0.5'
+		assert os.path.exists('simulations/'+self.subfoldername), "create subfolder"
 		self.fileslist = os.listdir('simulations/'+self.subfoldername)
 		self.inputfiles = [INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE]
 		try:
@@ -147,14 +146,39 @@ class TestAutomaticWorkflow(object):
 				assert file in self.fileslist
 			pars = fman.extractColumnFromFile('simulations/'+self.subfoldername+'/'+FITNESS_PARAMETERS_FILE, 0, str)
 			vals = fman.extractColumnFromFile('simulations/'+self.subfoldername+'/'+FITNESS_PARAMETERS_FILE, 1, float)
-			assert pars == ['first','secnd','third'], "wrong parameter name"
-			assert vals == [float(1),float(2),float(3)], "wrong parameter value"
+			assert pars == ['small','big'], "wrong parameter name"
+			assert vals == [0.3,0.5], "wrong parameter value"
 			shutil.rmtree('simulations')
-			os.remove('parameter_ranges.txt')
 		except AssertionError:
 			shutil.rmtree('simulations')
-			os.remove('parameter_ranges.txt')
 			assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
+
+	def test_script_reads_parameter_ranges_file_and_writes_files_correctly_in_different_folders(self, createParameterRangesFile):
+		createParameterRangesFile(multi=True)
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.writeParameterFilesInAllFolders()
+
+		self.subfoldernames = ['pgg_first1.1secnd2.3third3.4','pgg_first1.1secnd2.3third3.5','pgg_first1.2secnd2.3third3.4','pgg_first1.2secnd2.3third3.5']
+		self.parvalues = [[1.1,2.3,3.4],[1.1,2.3,3.5],[1.2,2.3,3.4],[1.2,2.3,3.5]]
+		self.inputfiles = [INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE]
+
+		for comb in range(len(self.parvalues)):
+			folder = self.subfoldernames[comb]
+			assert os.path.exists('simulations/'+folder), "did not create specific simulation file: {0}".format(os.listdir('simulations'))
+			fileslist = os.listdir('simulations/'+folder)
+			try:
+				for file in self.inputfiles:
+					assert file in fileslist
+				pars = fman.extractColumnFromFile('simulations/'+folder+'/'+FITNESS_PARAMETERS_FILE, 0, str)
+				vals = fman.extractColumnFromFile('simulations/'+folder+'/'+FITNESS_PARAMETERS_FILE, 1, float)
+				assert pars == ['first','secnd','third'], "wrong parameter name"
+				assert pytest.approx(vals) == self.parvalues[comb], "wrong parameter value"
+			except AssertionError:
+				shutil.rmtree('simulations')
+				os.remove('parameter_ranges.txt')
+				assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
+		shutil.rmtree('simulations')
+		os.remove('parameter_ranges.txt')
 
 	def test_parameter_files_are_not_empty(self, createParameterRangesFile):
 		createParameterRangesFile()
@@ -184,8 +208,8 @@ class TestAutomaticWorkflow(object):
 		    files += len(filenames)
 		    folders += len(dirnames)
 
-		shutil.rmtree('simulations')
+		#shutil.rmtree('simulations')
 		os.remove('parameter_ranges.txt')
 
-		assert files == 5*4, "wrong total number of parameters files"
 		assert folders == 4, "wrong number of subfolders"
+		assert files == 5*4, "wrong total number of parameters files"

@@ -113,7 +113,8 @@ class Launcher(object):
 
 	def writeParameterFiles(self, fitfun, pname, pval):
 		# CREATE SUBFOLDER 
-		subfolder = Path(self.metafolder, fitfun+"_"+"".join([i+str(j) for i,j in zip(pname, pval)]))
+		values = [round(num,3) for num in list(pval)]
+		subfolder = Path(self.metafolder, fitfun+"_"+"".join([i+str(j) for i,j in zip(pname, values)]))
 		self.createFolder(subfolder)
 		
 		# WRITE PARAMETER FILE FOR SPECIFIC COMBINATION
@@ -136,5 +137,14 @@ class Launcher(object):
 			d.write(self.strPARAFILE)
 
 	def writeParameterFilesInAllFolders(self):
+		# READ PARAMETER RANGES AND CREATE COMBINATIONS
+		self.readParameterInfo()
+		self.createRanges()
+		self.createCombinations()
+
 		# CREATE METAFOLDER
 		self.createFolder(self.metafolder)
+
+		# WRITE PARAMETER FILES IN EACH SUBFOLDER
+		for comb in self.combinations:
+			self.writeParameterFiles(fitfun=self.fitnessFunction, pname=self.parname, pval=comb)
