@@ -8,16 +8,22 @@ from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLO
 
 class Launcher(object):
 
-	def __init__(self, metafolder, parfile):
-		ndemes = 10
-		demesize = 20
-		ngen = 20
-		baseres = 1
-		phen = [0.0] * 4
-		tech = 1
-		mutrate = 0.01
-		mutstep = 0.02
-		migrate = 0.5
+	def __init__(self, metafolder, parfile, launchfile=None):
+		if launchfile == None:
+			ndemes = 10
+			demesize = 20
+			ngen = 20
+			baseres = 1
+			phen = [0.0] * 4
+			tech = 1
+			mutrate = 0.01
+			mutstep = 0.02
+			migrate = 0.5
+		else:
+			with open(launchfile, 'r') as f:
+				for line in f:
+					splitline = line.split(',')
+					locals()[splitline[0]] = eval(splitline[1])
 
 		self.strINITFILE = "numberOfDemes,{0}\ninitialDemeSize,{1}\nnumberOfGenerations,{2}\nindividualBaseResources,{3}".format(ndemes,demesize,ngen,baseres)
 		self.strPHENFILE = "\n".join(map(str,phen))

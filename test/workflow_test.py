@@ -213,3 +213,10 @@ class TestAutomaticWorkflow(object):
 
 		assert folders == 4, "wrong number of subfolders"
 		assert files == 5*4, "wrong total number of parameters files"
+
+	def test_script_can_launch_single_simulation(self):
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.launchSimulation(path='simulations/pgg_fb2b0.5c0.05gamma0.01')
+
+	def test_script_can_launch_all_simulations(self):
+		assert False, "write this test!"
