@@ -3,6 +3,7 @@ import re
 import os
 import sys
 import shutil
+import time
 from pathlib import Path
 from io import StringIO
 from ast import literal_eval
@@ -46,7 +47,7 @@ class TestAutomaticWorkflow(object):
 	def test_script_writes_par_files(self):
 		self.l = Launcher("simulations", "blablabla")
 		self.l.createFolder(self.l.metafolder)
-		self.l.writeParameterFiles(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
+		self.l.writeParameterFilesInFolder(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
 
 		self.dirpath = os.getcwd()
 		self.fileslist = os.listdir('simulations/func_first1secnd2third3')
@@ -63,7 +64,7 @@ class TestAutomaticWorkflow(object):
 	def test_script_handles_files_already_exists_issue(self):
 		shutil.copytree('pars/test', 'simulations')
 		self.l = Launcher('simulations', 'blablabla')
-		self.l.writeParameterFiles(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
+		self.l.writeParameterFilesInFolder(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
 		try:
 			with open('simulations/func_first1secnd2third3/'+FITNESS_PARAMETERS_FILE, 'r') as f:
 				assert len(f.readlines()) == 3, "file not replaced by correct parameter values"
@@ -135,7 +136,7 @@ class TestAutomaticWorkflow(object):
 	def test_single_par_combination_gets_a_full_folder(self):
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		self.l.createFolder(self.l.metafolder)
-		self.l.writeParameterFiles(fitfun='pgg', pname=('small','big'), pval=(0.3,0.5))
+		self.l.writeParameterFilesInFolder(fitfun='pgg', pname=('small','big'), pval=(0.3,0.5))
 
 		self.subfoldername = 'pgg_small0.3big0.5'
 		assert os.path.exists('simulations/'+self.subfoldername), "create subfolder"
@@ -156,7 +157,7 @@ class TestAutomaticWorkflow(object):
 	def test_script_reads_parameter_ranges_file_and_writes_files_correctly_in_different_folders(self, createParameterRangesFile):
 		createParameterRangesFile(multi=True)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.writeParameterFilesInAllFolders()
+		self.l.writeParameterFilesInFolders()
 
 		self.subfoldernames = ['pgg_first1.1secnd2.3third3.4','pgg_first1.1secnd2.3third3.5','pgg_first1.2secnd2.3third3.4','pgg_first1.2secnd2.3third3.5']
 		self.parvalues = [[1.1,2.3,3.4],[1.1,2.3,3.5],[1.2,2.3,3.4],[1.2,2.3,3.5]]
@@ -183,7 +184,7 @@ class TestAutomaticWorkflow(object):
 	def test_parameter_files_are_not_empty(self, createParameterRangesFile):
 		createParameterRangesFile()
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.writeParameterFilesInAllFolders()
+		self.l.writeParameterFilesInFolders()
 
 		self.fileslist = os.listdir('simulations')
 		try:
@@ -199,7 +200,7 @@ class TestAutomaticWorkflow(object):
 	def test_script_can_take_parameter_ranges(self, createParameterRangesFile):
 		createParameterRangesFile(multi=True)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.writeParameterFilesInAllFolders()
+		self.l.writeParameterFilesInFolders()
 
 		files = folders = 0
 
@@ -208,15 +209,73 @@ class TestAutomaticWorkflow(object):
 		    files += len(filenames)
 		    folders += len(dirnames)
 
-		#shutil.rmtree('simulations')
+		shutil.rmtree('simulations')
 		os.remove('parameter_ranges.txt')
 
 		assert folders == 4, "wrong number of subfolders"
 		assert files == 5*4, "wrong total number of parameters files"
 
 	def test_script_can_launch_single_simulation(self):
+		self.dir = 'simulations/pgg_fb2b0.5c0.05gamma0.01'
+		shutil.copytree('pars/test', self.dir)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.launchSimulation(path='simulations/pgg_fb2b0.5c0.05gamma0.01')
+		self.l.launchSimulation(path=self.dir)
+
+		assert os.path.exists(self.dir)
+		self.fileslist = os.listdir(self.dir)
+		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
+
+		try:
+			for file in self.outputfiles:
+				assert file in self.fileslist, "file {0} missing from output".format(file)
+		except:
+			shutil.rmtree('simulations')
+			assert False, "file {0} missing from output".format(file)
+
+		shutil.rmtree('simulations')
+
+	def test_single_simulation_output_not_empty(self):
+		self.dir = 'simulations/pgg_fb2b0.5c0.05gamma0.01'
+		shutil.copytree('pars/test', self.dir)
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.launchSimulation(path=self.dir)
+
+		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
+
+		for file in self.outputfiles:
+			with open(self.dir+'/'+file) as f:
+				lines = f.readlines()
+				assert len(lines) == 10, "printed {0} generations instead of 10".format(len(lines))
+				try:
+					floatlines = [float(x.split(',')[0]) for x in lines]
+				except:
+					shutil.rmtree('simulations')
+					assert False, "{0} are not numbers".format(lines)
+
+		shutil.rmtree('simulations')
 
 	def test_script_can_launch_all_simulations(self):
+		self.dirs = ['simulations/pgg_fb2b0.5c0.05gamma0.01','simulations/pgg_fb3b0.5c0.05gamma0.01','simulations/pgg_fb4b0.5c0.05gamma0.01']
+		
+		for fold in self.dirs:
+			shutil.copytree('pars/test', fold)
+
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		self.l.launchSimulations(path='simulations')
+		time.sleep(30)
+
+		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
+
+		for fold in self.dirs:
+			for file in self.outputfiles:
+				try:
+					print(os.listdir(fold))
+					assert file in os.listdir(fold), "file {0} missing from output in folder {1}".format(file,fold)
+				except AssertionError:
+					#shutil.rmtree('simulations')
+					assert False, "file {0} missing from output in folder {1}".format(file,fold)
+
+		#shutil.rmtree('simulations')
+
+	def test_full_workflow(self):
 		assert False, "write this test!"

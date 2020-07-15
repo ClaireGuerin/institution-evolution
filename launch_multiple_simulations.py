@@ -4,6 +4,7 @@ from pathlib import Path
 from numpy import linspace
 import itertools as it
 import institutionevolution.filemanip as fman
+from institutionevolution.population import Population as Pop
 from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
 
 class Launcher(object):
@@ -117,7 +118,7 @@ class Launcher(object):
 
 		self.combinations = flatlst
 
-	def writeParameterFiles(self, fitfun, pname, pval):
+	def writeParameterFilesInFolder(self, fitfun, pname, pval):
 		# CREATE SUBFOLDER 
 		values = [round(num,3) for num in list(pval)]
 		subfolder = Path(self.metafolder, fitfun+"_"+"".join([i+str(j) for i,j in zip(pname, values)]))
@@ -142,7 +143,7 @@ class Launcher(object):
 			## Parameters
 			d.write(self.strPARAFILE)
 
-	def writeParameterFilesInAllFolders(self):
+	def writeParameterFilesInFolders(self):
 		# READ PARAMETER RANGES AND CREATE COMBINATIONS
 		self.readParameterInfo()
 		self.createRanges()
@@ -153,4 +154,17 @@ class Launcher(object):
 
 		# WRITE PARAMETER FILES IN EACH SUBFOLDER
 		for comb in self.combinations:
-			self.writeParameterFiles(fitfun=self.fitnessFunction, pname=self.parname, pval=comb)
+			self.writeParameterFilesInFolder(fitfun=self.fitnessFunction, pname=self.parname, pval=comb)
+
+	def launchSimulation(self, path, mutbound=True):
+		folderName = path.split('/')[-1]
+		fitfun = folderName.split('_')[0]
+		populationInstance = Pop(fit_fun=fitfun, inst=path, mutationBoundaries=mutbound)
+		populationInstance.runSimulation()
+
+	def launchSimulations(self, path, mutbound=True):
+		directories =  os.listdir(path)
+
+		for listing in directories:
+			if os.path.isdir(listing):
+				self.launchSimulation(path+'/'+listing, mutbound=mutbound)
