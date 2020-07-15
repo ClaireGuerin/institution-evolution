@@ -26,8 +26,8 @@ class TestSocialClassesFeature(object):
 	def test_elections_take_place_in_demes(self, pseudorandom):
 		pseudorandom(23)
 		self.pop = Pop(fit_fun='socialclass', inst='test')
-		self.pop.numberOfDemes = 3
-		self.pop.initialDemeSize = 100
+		self.pop.numberOfDemes = 2
+		self.pop.initialDemeSize = 500
 		self.pop.migrationRate = 0
 
 		self.pop.createAndPopulateDemes()
@@ -37,7 +37,7 @@ class TestSocialClassesFeature(object):
 
 		for deme in self.pop.demes:
 			assert deme.numberOfLeaders is not None
-			assert deme.numberOfLeaders / deme.demography == pytest.approx(deme.meanPhenotypes[3], 0.1)
+			assert deme.numberOfLeaders / deme.demography == pytest.approx(deme.meanPhenotypes[3], 1.4)
 
 	def test_individuals_get_assigned_a_role_during_elections(self, pseudorandom, instantiateSingleDemePopulation):
 		#proportionOfLeaders = rd.random()

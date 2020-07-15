@@ -184,8 +184,9 @@ class Population(object):
 			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
 
 		for deme in self.demes:
-			politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
-			deme.politicsValues.update(politics.functions[self.fit_fun](**{**self.fitnessParameters,**politicsPars}))
+			if deme.demography > 0:
+				politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
+				deme.politicsValues.update(politics.functions[self.fit_fun](**{**self.fitnessParameters,**politicsPars}))
 			self.debatetime.append(deme.politicsValues["consensusTime"])
 
 	def populationProduction(self):
@@ -201,8 +202,9 @@ class Population(object):
 		for deme in self.demes:
 			self.resources.append(deme.totalResources)
 			## progress
-			progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
-			deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars,**deme.politicsValues}))
+			if deme.demography > 0:
+				progressPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'pg': deme.publicGood, 'totRes': deme.totalResources}
+				deme.progressValues.update(progress.functions[self.fit_fun](**{**self.fitnessParameters,**progressPars,**deme.politicsValues}))
 
 	def populationReproduction(self, seed=None):
 		if seed is not None: random.seed(seed)
