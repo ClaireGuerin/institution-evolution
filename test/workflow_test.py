@@ -3,7 +3,6 @@ import re
 import os
 import sys
 import shutil
-import time
 from pathlib import Path
 from io import StringIO
 from ast import literal_eval
@@ -260,10 +259,9 @@ class TestAutomaticWorkflow(object):
 			shutil.copytree('pars/test', 'simulations/'+fold)
 			assert fold in os.listdir('simulations')
 			assert os.path.isdir('simulations/'+fold), "not a directory"
-		
+
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		sim = self.l.launchSimulations(path='simulations')
-		#time.sleep(30)
 
 		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
 
@@ -272,10 +270,27 @@ class TestAutomaticWorkflow(object):
 				try:
 					assert file in os.listdir('simulations/'+fold), "file {0} missing from output in folder {1}".format(file,fold)
 				except AssertionError as e:
-					#shutil.rmtree('simulations')
+					shutil.rmtree('simulations')
 					assert False, "file {0} missing from output in folder {1}".format(file,fold)
 
 		shutil.rmtree('simulations')
 
 	def test_full_workflow(self):
-		assert False, "write this test!"
+		with open("parameter_ranges.txt", 'w') as f:
+			f.writelines(['fun,pgg\n','fb,2\n','b,0.5,0.7,0.1\n','c,0.05,0.07,0.01\n','gamma,0.01\n'])
+		self.l = Launcher('simulations', 'parameter_ranges.txt')
+		sims = self.l.launch()
+
+		self.dirs = os.listdir('simulations')
+		self.infiles = [INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE]
+		self.outfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
+		self.allfiles = self.infiles + self.outfiles
+
+		for fold in self.dirs:
+			for file in self.allfiles:
+				try:
+					assert file in os.listdir('simulations/'+fold), "file {0} missing from folder {1}".format(file,fold)
+				except AssertionError as e:
+					shutil.rmtree('simulations')
+					assert False, "file {0} missing from output in folder {1}".format(file,fold)
+		shutil.rmtree('simulations')

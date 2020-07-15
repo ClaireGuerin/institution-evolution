@@ -171,3 +171,10 @@ class Launcher(object):
 				self.launchSimulation(path+'/'+listing, mutbound=mutbound)
 			else:
 				print(listing+" is not a directory, moving on...")
+
+	def launch(self,mutbound=True):
+		self.readParameterInfo()
+		self.createRanges()
+		self.createCombinations()
+		self.writeParameterFilesInFolders()
+		self.launchSimulations(self.metafolder, mutbound=mutbound)
