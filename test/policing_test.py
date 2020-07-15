@@ -18,7 +18,7 @@ class TestPolicingFunction(object):
 
 	def test_fertility_depends_on_public_good(self, getFitnessParameters):
 		fitfun = 'policing'
-		self.fakepop = Pop(fit_fun=fitfun, inst='test')
+		self.fakepop = Pop(fit_fun=fitfun, inst='test/test')
 		self.fakepop.fitnessParameters = getFitnessParameters(fitfun)
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 1
@@ -50,7 +50,7 @@ class TestPolicingFunction(object):
 	def test_individual_fertility_calculation(self, getFitnessParameters):
 		fitfun = 'policing'
 		kwargs = getFitnessParameters(fitfun)
-		self.fakepop = Pop(fit_fun=fitfun, inst='test')
+		self.fakepop = Pop(fit_fun=fitfun, inst='test/test')
 		self.fakepop.fitnessParameters = kwargs
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 10
@@ -81,7 +81,7 @@ class TestPolicingFunction(object):
 
 	def test_population_fertility_calculation(self):
 		fitfun = 'policing'
-		self.fakepop = Pop(fit_fun=fitfun, inst='test')
+		self.fakepop = Pop(fit_fun=fitfun, inst='test/test')
 		self.fakepop.fitnessParameters = {"b":0.5,
 		"c":0.05,
 		"fb":2,
@@ -136,7 +136,7 @@ class TestPolicingFunction(object):
 		gc.collect()
 
 	def test_policing_function_in_population_reproduction(self):
-		self.fakepop = Pop(inst='test', fit_fun='policing')
+		self.fakepop = Pop(inst='test/test', fit_fun='policing')
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.initialDemeSize = 3
 		self.fakepop.createAndPopulateDemes()

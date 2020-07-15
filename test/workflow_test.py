@@ -18,7 +18,7 @@ class TestAutomaticWorkflow(object):
 		if dirpath.exists() and dirpath.is_dir():
 			shutil.rmtree(dirpath)
 
-		shutil.copytree('pars/test', 'simulations')
+		shutil.copytree('test/test', 'simulations')
 		self.pop = Pop(inst='simulations')
 		self.pop.numberOfGenerations = 3
 		self.pop.runSimulation()
@@ -61,7 +61,7 @@ class TestAutomaticWorkflow(object):
 			assert False, "one or more parameter file(s) missing. Folder contents: {0}".format(self.fileslist)
 
 	def test_script_handles_files_already_exists_issue(self):
-		shutil.copytree('pars/test', 'simulations')
+		shutil.copytree('test/test', 'simulations')
 		self.l = Launcher('simulations', 'blablabla')
 		self.l.writeParameterFilesInFolder(fitfun="func", pname=["first","secnd","third"], pval=[1,2,3])
 		try:
@@ -216,7 +216,7 @@ class TestAutomaticWorkflow(object):
 
 	def test_script_can_launch_single_simulation(self):
 		self.dir = 'simulations/pgg_test01'
-		shutil.copytree('pars/test', self.dir)
+		shutil.copytree('test/test', self.dir)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		sim = self.l.launchSimulation(path=self.dir)
 
@@ -234,7 +234,7 @@ class TestAutomaticWorkflow(object):
 
 	def test_single_simulation_output_not_empty(self):
 		self.dir = 'simulations/pgg_test02'
-		shutil.copytree('pars/test', self.dir)
+		shutil.copytree('test/test', self.dir)
 		assert os.path.isdir(self.dir), "not a directory"
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
 		sim = self.l.launchSimulation(path=self.dir)
@@ -256,7 +256,7 @@ class TestAutomaticWorkflow(object):
 		self.dirs = ['pgg_test1','pgg_test2','pgg_test3']
 		os.mkdir('simulations')
 		for fold in self.dirs:
-			shutil.copytree('pars/test', 'simulations/'+fold)
+			shutil.copytree('test/test', 'simulations/'+fold)
 			assert fold in os.listdir('simulations')
 			assert os.path.isdir('simulations/'+fold), "not a directory"
 

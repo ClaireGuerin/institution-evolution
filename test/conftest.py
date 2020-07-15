@@ -75,14 +75,14 @@ def pseudorandom():
 
 @pytest.fixture
 def instantiateSingleIndividualPopulation():
-		fakepop = Pop(inst='test')
+		fakepop = Pop(inst='test/test')
 		fakepop.createAndPopulateDemes(1,1)
 		return fakepop.individuals[0]
 
 @pytest.fixture
 def instantiateSingleDemePopulation():
 	def _foo(nIndivs):
-		fakepop = Pop(inst='test')
+		fakepop = Pop(inst='test/test')
 		fakepop.numberOfDemes = 1
 		fakepop.createAndPopulateDemes(fakepop.numberOfDemes,nIndivs)
 		return fakepop
@@ -92,7 +92,7 @@ def instantiateSingleDemePopulation():
 @pytest.fixture
 def instantiateSingleIndividualsDemes():
 	def _foo(nDemes):
-		fakepop = Pop(inst='test')
+		fakepop = Pop(inst='test/test')
 		fakepop.numberOfDemes = nDemes
 		fakepop.initialDemeSize = 1
 		fakepop.createAndPopulateDemes()
@@ -166,7 +166,7 @@ def pggParameters():
 @pytest.fixture
 def makePopulationReproduce():
 	def _foo(fitfun='pgg'):
-		fakepop = Pop(inst='test')
+		fakepop = Pop(inst='test/test')
 		fakepop.numberOfDemes = 3
 		fakepop.initialDemeSize = 10
 		fakepop.fitnessParameters = fitpardict[fitfun]
@@ -198,8 +198,8 @@ def getFitnessParameters():
 	
 @pytest.fixture
 def runSim():
-	def _foo(outputfile, fb=10, mutRate=0.1, fun='pgg', pars={"fb": 10, "b": 0.5, "c": 0.05, "gamma": 0.01}):
-		population = Pop(fit_fun=fun, inst='test')
+	def _foo(fb=10, mutRate=0.1, fun='pgg', pars={"fb": 10, "b": 0.5, "c": 0.05, "gamma": 0.01}):
+		population = Pop(fit_fun=fun, inst='test/test')
 		population.numberOfDemes = 5
 		population.initialDemeSize = 8
 		population.numberOfGenerations = 5
@@ -208,18 +208,18 @@ def runSim():
 		population.fitnessParameters.clear()
 		population.fitnessParameters.update(pars)
 		population.fitnessParameters.update({'fb': fb})
-		population.runSimulation(outputfile)
+		population.runSimulation()
 		return population.numberOfGenerations
 	return _foo
 
 @pytest.fixture
 def clearOutputFiles():
 	def _foo(path):
-		os.remove(path + '_phenotypes.txt')
-		os.remove(path + '_demography.txt')
-		os.remove(path + '_technology.txt')
-		os.remove(path + '_resources.txt')
-		os.remove(path + '_consensus.txt')
+		os.remove(path + 'out_phenotypes.txt')
+		os.remove(path + 'out_demography.txt')
+		os.remove(path + 'out_technology.txt')
+		os.remove(path + 'out_resources.txt')
+		os.remove(path + 'out_consensus.txt')
 	return _foo
 
 @pytest.fixture

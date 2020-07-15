@@ -15,7 +15,7 @@ class TestMultipleTraits(object):
 			for i in range(self.ntraits):
 				f.write('{0}\n'.format(i/self.ntraits))
 
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.initialDemeSize = 2
 		self.fakepop.numberOfGenerations = 5
@@ -23,12 +23,12 @@ class TestMultipleTraits(object):
 		self.fakepop.createAndPopulateDemes()
 
 		try:
-			self.fakepop.runSimulation('tmptest')
+			self.fakepop.runSimulation()
 		except Exception as e:
 			assert False, "Simulation does not run with multiple traits because of {0}: {1}".format(e.__class__.__name__, str(e))
 		else:
-			os.remove(OUTPUT_FOLDER + '/test/tmptest_phenotypes.txt')
-			os.remove(OUTPUT_FOLDER + '/test/tmptest_demography.txt')
+			os.remove('test/test/out_phenotypes.txt')
+			os.remove('test/test/out_demography.txt')
 
 	def test_all_phenotype_means_in_output(self):
 		self.ntraits = 4
@@ -36,7 +36,7 @@ class TestMultipleTraits(object):
 			for i in range(self.ntraits):
 				f.write('{0}\n'.format(i/self.ntraits))
 
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.initialDemeSize = 2
@@ -44,16 +44,16 @@ class TestMultipleTraits(object):
 
 		self.fakepop.createAndPopulateDemes()
 		assert self.fakepop.numberOfPhenotypes == self.ntraits, "uh-oh, the test did not change the number of phenotypes"
-		self.fakepop.runSimulation('tmptest')
+		self.fakepop.runSimulation()
 		
-		with open(OUTPUT_FOLDER + '/test/tmptest_phenotypes.txt') as fp:
+		with open('test/test/out_phenotypes.txt') as fp:
 			firstline = fp.readline()
 			phenotypeMeans = firstline.split(',')
 		### only take half of the line, since the second half is the variance in phenotypes, not the mean
 		assert len(phenotypeMeans)/2 == self.ntraits, "Simulation returns mean of {0} phenotypes instead of {1}".format(len(phenotypeMeans), self.ntraits)
 
-		os.remove(OUTPUT_FOLDER + '/test/tmptest_phenotypes.txt')
-		os.remove(OUTPUT_FOLDER + '/test/tmptest_demography.txt')
+		os.remove('test/test/out_phenotypes.txt')
+		os.remove('test/test/out_demography.txt')
 
 	def test_stabilizing_selection_fitness_function_is_set(self):
 		assert 'geom' in fitness.functions, "Did not find 'geom' method in fitness functions dictionary"

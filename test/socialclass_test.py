@@ -25,7 +25,7 @@ class TestSocialClassesFeature(object):
 
 	def test_elections_take_place_in_demes(self, pseudorandom):
 		pseudorandom(23)
-		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop = Pop(fit_fun='socialclass', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 500
 		self.pop.migrationRate = 0
@@ -62,7 +62,7 @@ class TestSocialClassesFeature(object):
 
 	def test_deme_gets_number_of_leaders(self, pseudorandom, getFitnessParameters):
 		pseudorandom(10)
-		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop = Pop(fit_fun='socialclass', inst='test/test')
 		self.pop.fitnessParameters = getFitnessParameters('socialclass')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 1000
@@ -92,7 +92,7 @@ class TestSocialClassesFeature(object):
 
 	def test_deme_number_of_leaders_is_number_of_individuals_with_that_role(self, pseudorandom, getFitnessParameters):
 		pseudorandom(0)
-		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop = Pop(fit_fun='socialclass', inst='test/test')
 		self.pop.fitnessParameters = getFitnessParameters('socialclass')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 10
@@ -132,7 +132,7 @@ class TestSocialClassesFeature(object):
 		assert self.firstInd.fertilityValue != self.secndInd.fertilityValue, "leaders and commoners should not get the same fitness"
 
 	def test_fitness_function_runs_at_population_level(self):
-		self.pop = Pop(fit_fun='socialclass', inst='test')
+		self.pop = Pop(fit_fun='socialclass', inst='test/test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 5
 		self.pop.initialPhenotypes = [0.9,0.7,0.5,0.3]

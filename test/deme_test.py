@@ -41,14 +41,14 @@ class TestDeme(object):
 		gc.collect()
 		
 	def test_deme_mean_phenotype_gets_calculated(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.createAndPopulateDemes(10, 2)
 		
 		for dem in self.fakepop.demes:
 			assert dem.meanPhenotypes == self.fakepop.initialPhenotypes, "Deme mean phenotype not calculated"
 			
 	def test_deme_mean_phenotype_updated_after_mutation(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 50
 		self.fakepop.migrationRate = 0# the two following lines are very important so that the test does not fail at the boundaries, 
