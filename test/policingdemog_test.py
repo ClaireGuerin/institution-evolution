@@ -76,7 +76,7 @@ class TestPolicingDemographyFunction(object):
 	# 		assert False, "do not let simulations be called when pars are missing"
 
 	def test_function_runs_at_population_level(self):
-		fakepop = Pop(fit_fun='policingdemog', inst='test')
+		fakepop = Pop(fit_fun='policingdemog', inst='test/test')
 		fakepop.numberOfDemes = 3
 		fakepop.initialDemeSize = 4
 
@@ -93,16 +93,14 @@ class TestPolicingDemographyFunction(object):
 			assert False, "not running"
 
 	def test_simulation_cycle(self):
-		fakepop = Pop(fit_fun='policingdemog', inst='test')
+		fakepop = Pop(fit_fun='policingdemog', inst='test/test')
 		fakepop.numberOfDemes = 3
 		fakepop.initialDemeSize = 10
 		fakepop.numberOfGenerations = 10
 
-		self.out = 'output_test'
-
 		try:
-			fakepop.runSimulation(outputfile=self.out)
-			for f in glob.glob('{0}/test/{1}'.format(OUTPUT_FOLDER, self.out)):
+			fakepop.runSimulation()
+			for f in glob.glob('test/test/out_*.txt'):
 				os.remove(f)
 		except ValueError as e:
 			assert False, str(e)

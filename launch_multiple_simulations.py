@@ -1,0 +1,180 @@
+import os
+import sys
+from pathlib import Path
+from numpy import linspace
+import itertools as it
+import institutionevolution.filemanip as fman
+from institutionevolution.population import Population as Pop
+from files import INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, FITNESS_PARAMETERS_FILE
+
+class Launcher(object):
+
+	def __init__(self, metafolder, parfile, launchfile=None):
+		if launchfile == None:
+			locals()['ndemes'] = 10
+			locals()['demesize'] = 20
+			locals()['ngen'] = 20
+			locals()['baseres'] = 1
+			locals()['phen'] = [0.0] * 4
+			locals()['tech'] = 1
+			locals()['mutrate'] = 0.01
+			locals()['mutstep'] = 0.02
+			locals()['migrate'] = 0.5
+		else:
+			with open(launchfile, 'r') as f:
+				for line in f:
+					splitline = line.split(',')
+					locals()[splitline[0]] = eval(splitline[1])
+
+		self.strINITFILE = "numberOfDemes,{0}\ninitialDemeSize,{1}\nnumberOfGenerations,{2}\nindividualBaseResources,{3}".format(locals()['ndemes'],locals()['demesize'],locals()['ngen'],locals()['baseres'])
+		self.strPHENFILE = "\n".join(map(str,locals()['phen']))
+		self.strTECHFILE = str(locals()['tech'])
+		self.strPARAFILE = "mutationRate,{0}\nmutationStep,{1}\nmigrationRate,{2}".format(locals()['mutrate'],locals()['mutstep'],locals()['migrate'])
+
+		self.metafolder = metafolder
+		self.parfile = parfile
+
+	def createFolder(self,folder):
+		# CREATE FOLDER
+		try:
+			os.mkdir(folder)
+			print("Created folder {0} for simulation storage".format(folder))
+		except FileExistsError:
+			print("Folder {0} already exists".format(folder))
+
+	def readParameterInfo(self):
+		# READ PARAMETER RANGE FILE
+		parname = []
+		parstart = []
+		parend = []
+		parstep = []
+
+		with open(self.parfile, mode='r', newline='\n') as parranges:
+			for line in parranges:
+				removeTrailingNewline = line.replace('\n', '')
+				listLine = removeTrailingNewline.split(',')
+				#listLine = line.split(',')
+				parname.append(listLine[0])
+				parstart.append(listLine[1])
+				try:
+					parend.append(listLine[2])
+					try:
+						parstep.append(listLine[3])
+					except IndexError:
+						raise TypeError("provide a step for range of parameter "+listLine[0])
+				except IndexError:
+					parend.append(None)
+					parstep.append(None)
+
+		self.parname = parname[1:]
+		self.parstart = parstart[1:]
+		self.parend = parend[1:]
+		self.parstep = parstep[1:]
+
+		self.lastLine = listLine
+
+		self.fitnessFunction = parstart[0]
+
+	def _customArange(self, start, end, step):
+		return linspace(start, end, num=round((end-start)/step), endpoint=False)
+
+	def createRanges(self):
+		# CREATE RANGES
+		ranges = []
+		for par in range(len(self.parname)):
+			tmpstart = float(self.parstart[par])
+			if self.parend[par] == None:
+				tmpRange = [tmpstart]
+			else:
+				tmpend = float(self.parend[par])
+				tmpstep = float(self.parstep[par])
+				tmpRange = self._customArange(tmpstart,tmpend,tmpstep).tolist()
+				
+			ranges.append(tmpRange)
+
+		self.ranges = ranges
+
+	def _flattenTuple(self, object): 
+		
+		gather = []
+		for item in object:
+			if isinstance(item, tuple):
+				gather.extend(self._flattenTuple(item))
+			else:
+				gather.append(item)
+		return tuple(gather)
+
+	def createCombinations(self):
+		# CREATE COMBINATIONS
+		lst = self.ranges[0]
+		for par in range(len(self.ranges)-1):
+			tmplst = list(it.product(lst,self.ranges[par+1]))
+			lst = tmplst
+
+		flatlst = []
+		for comb in lst:
+			flatcomb = self._flattenTuple(comb)
+			flatlst.append(flatcomb)
+
+		self.combinations = flatlst
+
+	def writeParameterFilesInFolder(self, fitfun, pname, pval):
+		# CREATE SUBFOLDER 
+		values = [round(num,3) for num in list(pval)]
+		subfolder = Path(self.metafolder, fitfun+"_"+"".join([i+str(j) for i,j in zip(pname, values)]))
+		self.createFolder(subfolder)
+		
+		# WRITE PARAMETER FILE FOR SPECIFIC COMBINATION
+
+		with open(Path(subfolder, FITNESS_PARAMETERS_FILE), "w", buffering=1) as f, \
+		open(Path(subfolder, INITIALISATION_FILE), "w", buffering=1) as a, \
+		open(Path(subfolder, INITIAL_PHENOTYPES_FILE), "w", buffering=1) as b, \
+		open(Path(subfolder, INITIAL_TECHNOLOGY_FILE), "w", buffering=1) as c, \
+		open(Path(subfolder, PARAMETER_FILE), "w", buffering=1) as d:
+			## Fitness parameters
+			for par in range(len(pname)):
+				f.write("{0},{1}\n".format(pname[par],pval[par]))
+			## Initialisation
+			a.write(self.strINITFILE)
+			## Initial phenotypes
+			b.write(self.strPHENFILE)
+			## Initial technology
+			c.write(self.strTECHFILE)
+			## Parameters
+			d.write(self.strPARAFILE)
+
+	def writeParameterFilesInFolders(self):
+		# READ PARAMETER RANGES AND CREATE COMBINATIONS
+		self.readParameterInfo()
+		self.createRanges()
+		self.createCombinations()
+
+		# CREATE METAFOLDER
+		self.createFolder(self.metafolder)
+
+		# WRITE PARAMETER FILES IN EACH SUBFOLDER
+		for comb in self.combinations:
+			self.writeParameterFilesInFolder(fitfun=self.fitnessFunction, pname=self.parname, pval=comb)
+
+	def launchSimulation(self, path, mutbound=True):
+		folderName = path.split('/')[-1]
+		fitfun = folderName.split('_')[0]
+		populationInstance = Pop(fit_fun=fitfun, inst=path, mutationBoundaries=mutbound)
+		populationInstance.runSimulation()
+
+	def launchSimulations(self, path, mutbound=True):
+		directories =  os.listdir(path)
+
+		for listing in directories:
+			if os.path.isdir(path+'/'+listing):
+				print('starting simulation for '+listing)
+				self.launchSimulation(path+'/'+listing, mutbound=mutbound)
+			else:
+				print(listing+" is not a directory, moving on...")
+
+	def launch(self,mutbound=True):
+		self.readParameterInfo()
+		self.createRanges()
+		self.createCombinations()
+		self.writeParameterFilesInFolders()
+		self.launchSimulations(self.metafolder, mutbound=mutbound)

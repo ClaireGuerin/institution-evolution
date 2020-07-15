@@ -26,7 +26,7 @@ class TestDebateFeature(object):
 			assert False, "include a debate function"
 
 	def test_consensus_is_aggregate_of_opinions(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.fit_fun = 'debate'
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.4]
 		self.pop.numberOfDemes = 3
@@ -43,7 +43,7 @@ class TestDebateFeature(object):
 			assert deme.politicsValues["consensus"] == 0.3, "wrong consensus value"
 
 	def test_consensus_takes_time_to_reach(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.fit_fun = 'debate'
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.4]
 		self.pop.numberOfDemes = 3
@@ -63,7 +63,7 @@ class TestDebateFeature(object):
 			assert deme.politicsValues["consensusTime"] == self.pop.fitnessParameters["epsilon"] + disagreement / (self.pop.fitnessParameters["bconsensus"] + disagreement)
 
 	def test_consensus_time_affects_individual_time_for_production(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.fit_fun = 'debate'
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.4]
 		self.pop.numberOfDemes = 3
@@ -81,7 +81,7 @@ class TestDebateFeature(object):
 			assert deme.politicsValues["productionTime"] == 1 - deme.politicsValues["consensusTime"] , "wrong individual production time"
 
 	def test_consensus_value_defines_policing_amount(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.fit_fun = 'debate'
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.4]
 		self.pop.numberOfDemes = 3
@@ -107,7 +107,7 @@ class TestDebateFeature(object):
 			assert deme.progressValues["fineBudget"] == deme.politicsValues['consensus'] * deme.publicGood * (1 - self.pop.fitnessParameters['aquality'])
 
 	def test_individual_consensus_time_always_less_than_one(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.fit_fun = 'debate'
 		self.pop.initialPhenotypes = [0.1,0.2,0.3,0.4]
 		self.pop.numberOfDemes = 3
