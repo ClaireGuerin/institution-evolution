@@ -166,5 +166,8 @@ class Launcher(object):
 		directories =  os.listdir(path)
 
 		for listing in directories:
-			if os.path.isdir(listing):
+			if os.path.isdir(path+'/'+listing):
+				print('starting simulation for '+listing)
 				self.launchSimulation(path+'/'+listing, mutbound=mutbound)
+			else:
+				print(listing+" is not a directory, moving on...")

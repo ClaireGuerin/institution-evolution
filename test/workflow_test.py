@@ -57,7 +57,7 @@ class TestAutomaticWorkflow(object):
 			for file in self.inputfiles:
 				assert file in self.fileslist
 			shutil.rmtree('simulations')
-		except AssertionError:
+		except AssertionError as e:
 			shutil.rmtree('simulations')
 			assert False, "one or more parameter file(s) missing. Folder contents: {0}".format(self.fileslist)
 
@@ -69,7 +69,7 @@ class TestAutomaticWorkflow(object):
 			with open('simulations/func_first1secnd2third3/'+FITNESS_PARAMETERS_FILE, 'r') as f:
 				assert len(f.readlines()) == 3, "file not replaced by correct parameter values"
 			shutil.rmtree('simulations')
-		except AssertionError:
+		except AssertionError as e:
 			shutil.rmtree('simulations')
 			assert False, "file not replaced by correct parameter values"
 
@@ -150,7 +150,7 @@ class TestAutomaticWorkflow(object):
 			assert pars == ['small','big'], "wrong parameter name"
 			assert vals == [0.3,0.5], "wrong parameter value"
 			shutil.rmtree('simulations')
-		except AssertionError:
+		except AssertionError as e:
 			shutil.rmtree('simulations')
 			assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
 
@@ -174,7 +174,7 @@ class TestAutomaticWorkflow(object):
 				vals = fman.extractColumnFromFile('simulations/'+folder+'/'+FITNESS_PARAMETERS_FILE, 1, float)
 				assert pars == ['first','secnd','third'], "wrong parameter name"
 				assert pytest.approx(vals) == self.parvalues[comb], "wrong parameter value"
-			except AssertionError:
+			except AssertionError as e:
 				shutil.rmtree('simulations')
 				os.remove('parameter_ranges.txt')
 				assert False, "one or more parameter value(s) missing. File contents: {0},{1}".format(pars,vals) 
@@ -192,7 +192,7 @@ class TestAutomaticWorkflow(object):
 				assert os.path.getsize('simulations/'+file) != 0, "file is empty"
 			shutil.rmtree('simulations')
 			os.remove('parameter_ranges.txt')
-		except AssertionError:
+		except AssertionError as e:
 			shutil.rmtree('simulations')
 			os.remove('parameter_ranges.txt')
 			assert False, "file is empty"
@@ -216,10 +216,10 @@ class TestAutomaticWorkflow(object):
 		assert files == 5*4, "wrong total number of parameters files"
 
 	def test_script_can_launch_single_simulation(self):
-		self.dir = 'simulations/pgg_fb2b0.5c0.05gamma0.01'
+		self.dir = 'simulations/pgg_test01'
 		shutil.copytree('pars/test', self.dir)
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.launchSimulation(path=self.dir)
+		sim = self.l.launchSimulation(path=self.dir)
 
 		assert os.path.exists(self.dir)
 		self.fileslist = os.listdir(self.dir)
@@ -228,17 +228,17 @@ class TestAutomaticWorkflow(object):
 		try:
 			for file in self.outputfiles:
 				assert file in self.fileslist, "file {0} missing from output".format(file)
-		except:
+			shutil.rmtree('simulations')
+		except AssertionError as e:
 			shutil.rmtree('simulations')
 			assert False, "file {0} missing from output".format(file)
 
-		shutil.rmtree('simulations')
-
 	def test_single_simulation_output_not_empty(self):
-		self.dir = 'simulations/pgg_fb2b0.5c0.05gamma0.01'
+		self.dir = 'simulations/pgg_test02'
 		shutil.copytree('pars/test', self.dir)
+		assert os.path.isdir(self.dir), "not a directory"
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.launchSimulation(path=self.dir)
+		sim = self.l.launchSimulation(path=self.dir)
 
 		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
 
@@ -248,34 +248,34 @@ class TestAutomaticWorkflow(object):
 				assert len(lines) == 10, "printed {0} generations instead of 10".format(len(lines))
 				try:
 					floatlines = [float(x.split(',')[0]) for x in lines]
-				except:
+				except AssertionError as e:
 					shutil.rmtree('simulations')
 					assert False, "{0} are not numbers".format(lines)
-
 		shutil.rmtree('simulations')
 
 	def test_script_can_launch_all_simulations(self):
-		self.dirs = ['simulations/pgg_fb2b0.5c0.05gamma0.01','simulations/pgg_fb3b0.5c0.05gamma0.01','simulations/pgg_fb4b0.5c0.05gamma0.01']
-		
+		self.dirs = ['pgg_test1','pgg_test2','pgg_test3']
+		os.mkdir('simulations')
 		for fold in self.dirs:
-			shutil.copytree('pars/test', fold)
-
+			shutil.copytree('pars/test', 'simulations/'+fold)
+			assert fold in os.listdir('simulations')
+			assert os.path.isdir('simulations/'+fold), "not a directory"
+		
 		self.l = Launcher('simulations', 'parameter_ranges.txt')
-		self.l.launchSimulations(path='simulations')
-		time.sleep(30)
+		sim = self.l.launchSimulations(path='simulations')
+		#time.sleep(30)
 
 		self.outputfiles = ['out_phenotypes.txt', 'out_demography.txt', 'out_technology.txt', 'out_resources.txt', 'out_consensus.txt']
 
 		for fold in self.dirs:
 			for file in self.outputfiles:
 				try:
-					print(os.listdir(fold))
-					assert file in os.listdir(fold), "file {0} missing from output in folder {1}".format(file,fold)
-				except AssertionError:
+					assert file in os.listdir('simulations/'+fold), "file {0} missing from output in folder {1}".format(file,fold)
+				except AssertionError as e:
 					#shutil.rmtree('simulations')
 					assert False, "file {0} missing from output in folder {1}".format(file,fold)
 
-		#shutil.rmtree('simulations')
+		shutil.rmtree('simulations')
 
 	def test_full_workflow(self):
 		assert False, "write this test!"
