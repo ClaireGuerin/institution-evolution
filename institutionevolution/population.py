@@ -25,8 +25,8 @@ class Population(object):
 			self.pathToInputFiles = PARAMETER_FOLDER
 			self.pathToOutputFiles = OUTPUT_FOLDER
 		else:
-			self.pathToInputFiles = '{0}/{1}'.format(PARAMETER_FOLDER,inst)
-			self.pathToOutputFiles = '{0}/{1}'.format(OUTPUT_FOLDER,inst)
+			self.pathToInputFiles = inst
+			self.pathToOutputFiles = inst
 		
 		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=self.pathToInputFiles)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
@@ -248,7 +248,7 @@ class Population(object):
 		logging.info("reproduction")
 		self.populationReproduction()
 		
-	def runSimulation(self, outputfile):
+	def runSimulation(self):
 		
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
@@ -257,11 +257,11 @@ class Population(object):
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 
-			phenotypesfile = '{0}/{1}_phenotypes.txt'.format(self.pathToOutputFolder, outputfile)
-			demographyfile = '{0}/{1}_demography.txt'.format(self.pathToOutputFolder, outputfile)
-			technologyfile = '{0}/{1}_technology.txt'.format(self.pathToOutputFolder, outputfile)
-			resourcesfile = '{0}/{1}_resources.txt'.format(self.pathToOutputFolder, outputfile)
-			consensusfile = '{0}/{1}_consensus.txt'.format(self.pathToOutputFolder, outputfile)
+			phenotypesfile = self.pathToOutputFolder + '/out_phenotypes.txt'
+			demographyfile = self.pathToOutputFolder + '/out_demography.txt'
+			technologyfile = self.pathToOutputFolder + '/out_technology.txt'
+			resourcesfile = self.pathToOutputFolder + '/out_resources.txt'
+			consensusfile = self.pathToOutputFolder + '/out_consensus.txt'
 			
 			with open(phenotypesfile, "w", buffering=1) as fp, \
 			open(demographyfile, "w", buffering=1) as fd, \

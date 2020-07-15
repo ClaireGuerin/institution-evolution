@@ -201,7 +201,7 @@ class TestMutationFunction(object):
 		assert any([i > 1 for i in collectPhenotypes]), "no phenotype went over 1, even when unbounded."
 
 	def test_population_mutation_can_be_unbounded(self, instantiateSingleIndividualsDemes):
-		self.pop = Pop(inst='test', mutationBoundaries = False)
+		self.pop = Pop(inst='test/test', mutationBoundaries = False)
 		self.pop.numberOfDemes = 10
 		self.pop.initialDemeSize = 10
 		self.pop.mutationRate = 1

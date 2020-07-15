@@ -1,0 +1,9 @@
+ndemes,10
+demesize,20
+ngen,20
+baseres,1
+phen,[0.0]*4
+tech,1
+mutrate,0.01
+mutstep,0.02
+migrate,0.5

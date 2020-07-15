@@ -12,7 +12,7 @@ import gc
 class TestPopulation(object):
 	
 	def test_population_contains_demes(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.createAndPopulateDemes()
 		assert hasattr(self.pop, "demes"), "This population has no deme yet!"
 		
@@ -22,7 +22,7 @@ class TestPopulation(object):
 		gc.collect()
 			
 	def test_identify_deme_neighbours(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.nd = self.fakepop.numberOfDemes
 		
 		for deme in range(self.nd):
@@ -36,7 +36,7 @@ class TestPopulation(object):
 		gc.collect()
 			
 	def test_demes_are_populated(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.createAndPopulateDemes()
 		for deme in self.pop.demes:
 			assert deme.demography is not None, "Deme {0} is not populated".format(deme)
@@ -44,7 +44,7 @@ class TestPopulation(object):
 		gc.collect()
 				
 	def test_individual_attributes_are_non_empty(self, objectAttributesAreNotNone):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.createAndPopulateDemes()
 		for ind in self.pop.individuals:
 			testObj, attrObj = objectAttributesAreNotNone(ind, ["phenotypicValues", "currentDeme"])
@@ -55,13 +55,13 @@ class TestPopulation(object):
 	def test_population_has_the_right_size(self):
 		self.howManyDemes = 10
 		self.howManyIndividualsPerDeme = 10
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.createAndPopulateDemes(nDemes=self.howManyDemes, dSize=self.howManyIndividualsPerDeme)
 		
 		assert len(self.pop.individuals) == self.howManyIndividualsPerDeme * self.howManyDemes, "You created a population of {0} individuals instead of {1}!".format(len(self.pop.individuals), self.howManyIndividualsPerDeme * self.howManyDemes)
 		
 	def test_population_has_fitness_method_or_pgg_parameters(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		
 		assert hasattr(self.fakepop, "fitnessParameters"), "Provide fitness parameters"
 		
@@ -70,7 +70,7 @@ class TestPopulation(object):
 					assert key in self.fakepop.fitnessParameters, "PGG parameter {0} not provided".format(key)
 
 	def test_simulation_stops_if_population_extinct(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.numberOfDemes = 10
 		self.fakepop.numberOfGenerations = 10
 
@@ -80,7 +80,7 @@ class TestPopulation(object):
 		assert self.fakepop.demography == self.fakepop.numberOfDemes * self.fakepop.initialDemeSize
 
 	def test_population_mutation_updates_individual_phenotypes(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.numberOfDemes = 2
 		self.fakepop.initialDemeSize = 50
 		self.fakepop.migrationRate = 0
@@ -125,7 +125,7 @@ class TestPopulation(object):
 			assert origPhenDeme1[i] != phenDeme1[i], "Individual {0} in deme 1 mutated from {1} to {2} when deviation was supposed to be {3}".format(i, origPhenDeme1[i], phenDeme1[i], devDeme1[i])
 		
 	def test_demes_update_function(self):
-		self.fakepop = Pop(inst='test')
+		self.fakepop = Pop(inst='test/test')
 		self.fakepop.numberOfDemes = 2
 
 		self.fakepop.createAndPopulateDemes()

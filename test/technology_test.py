@@ -7,7 +7,7 @@ import gc
 class TestTechnology(object):
 
 	def test_deme_technology_is_right_format(self):
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 3
 		#self.fakeDeme.publicGood = 20
@@ -195,7 +195,7 @@ class TestTechnology(object):
 		gc.collect()
 
 	def test_initial_deme_technology_is_not_null(self):
-		self.pop = Pop(inst='test')
+		self.pop = Pop(inst='test/test')
 		self.pop.createAndPopulateDemes()
 
 		assert type(self.pop.demes[0].technologyLevel) is float, "initial technology level info missing"
@@ -205,7 +205,7 @@ class TestTechnology(object):
 
 	def test_deme_technology_level_gets_updated_with_individual_investments(self, getFitnessParameters):
 		self.pars = getFitnessParameters('technology')
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.initialPhenotypes = [0.5] * 4
@@ -222,7 +222,7 @@ class TestTechnology(object):
 		gc.collect()
 
 	def test_public_good_gets_updated(self):
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.initialPhenotypes = [0.5] * 4
@@ -240,7 +240,7 @@ class TestTechnology(object):
 		gc.collect()
 
 	def test_technology_updates_with_correct_number(self):
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 10
 		self.pop.fit_fun = 'technology'
@@ -328,7 +328,7 @@ class TestTechnology(object):
 		gc.collect()
 
 	def test_group_labour_force_is_calculated_and_given_to_individual_instance(self):
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 20
 		self.pop.createAndPopulateDemes()
@@ -359,7 +359,7 @@ class TestTechnology(object):
 
 	def test_production_increase_function(self):
 		#pars = getFitnessParameters('technology')
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 2
 		self.pop.initialDemeSize = 5
 
@@ -390,7 +390,7 @@ class TestTechnology(object):
 			gc.collect()
 
 	def test_fitness_function_returns_correct_value(self):
-		self.pop = Pop(fit_fun='technology', inst='test')
+		self.pop = Pop(fit_fun='technology', inst='test/test')
 		self.pop.numberOfDemes = 3
 		self.pop.initialDemeSize = 5
 		self.pop.createAndPopulateDemes()
