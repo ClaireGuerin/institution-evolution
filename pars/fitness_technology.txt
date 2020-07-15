@@ -1,0 +1,9 @@
+function,technology
+q,0.1,1,0.1
+rb,2
+gamma,0.01
+alphaResources,0.1,1,0.1
+betaTech,0.1,1,0.1
+p,0.1,1,0.1
+atech,2
+btech,1
