@@ -11,7 +11,7 @@ class TestMultipleTraits(object):
 
 	def test_phenotype_can_be_multiple(self):
 		self.ntraits = 2
-		with open('{0}/{1}'.format(PARAMETER_FOLDER, INITIAL_PHENOTYPES_FILE), "w") as f:
+		with open('test/test/'+INITIAL_PHENOTYPES_FILE, "w") as f:
 			for i in range(self.ntraits):
 				f.write('{0}\n'.format(i/self.ntraits))
 
@@ -32,7 +32,7 @@ class TestMultipleTraits(object):
 
 	def test_all_phenotype_means_in_output(self):
 		self.ntraits = 4
-		with open('{0}/{1}'.format(PARAMETER_FOLDER, INITIAL_PHENOTYPES_FILE), "w") as f:
+		with open('test/test/'+INITIAL_PHENOTYPES_FILE, "w") as f:
 			for i in range(self.ntraits):
 				f.write('{0}\n'.format(i/self.ntraits))
 

@@ -36,6 +36,14 @@ class TestAutomaticWorkflow(object):
 		assert self.l.metafolder == "tralala"
 		assert self.l.parfile == "blablabla"
 
+	def test_launcher_can_read_general_parameter_file(self):
+		self.l = Launcher(metafolder="tralala", parfile="blablabla", launchfile="test/test/general_parameters.txt")
+
+		assert self.l.strINITFILE == "numberOfDemes,10\ninitialDemeSize,20\nnumberOfGenerations,20\nindividualBaseResources,1"
+		assert self.l.strPHENFILE == "0.0\n0.0\n0.0\n0.0"
+		assert self.l.strTECHFILE == "1"
+		assert self.l.strPARAFILE == "mutationRate,0.01\nmutationStep,0.02\nmigrationRate,0.5"
+
 	def test_script_creates_metafolder(self):
 		self.l = Launcher("simulations", "blablabla")
 		self.l.createFolder(self.l.metafolder)
@@ -292,5 +300,7 @@ class TestAutomaticWorkflow(object):
 					assert file in os.listdir('simulations/'+fold), "file {0} missing from folder {1}".format(file,fold)
 				except AssertionError as e:
 					shutil.rmtree('simulations')
+					os.remove('parameter_ranges.txt')
 					assert False, "file {0} missing from output in folder {1}".format(file,fold)
 		shutil.rmtree('simulations')
+		os.remove('parameter_ranges.txt')

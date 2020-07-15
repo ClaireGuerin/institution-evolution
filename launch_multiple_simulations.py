@@ -11,25 +11,25 @@ class Launcher(object):
 
 	def __init__(self, metafolder, parfile, launchfile=None):
 		if launchfile == None:
-			ndemes = 10
-			demesize = 20
-			ngen = 20
-			baseres = 1
-			phen = [0.0] * 4
-			tech = 1
-			mutrate = 0.01
-			mutstep = 0.02
-			migrate = 0.5
+			locals()['ndemes'] = 10
+			locals()['demesize'] = 20
+			locals()['ngen'] = 20
+			locals()['baseres'] = 1
+			locals()['phen'] = [0.0] * 4
+			locals()['tech'] = 1
+			locals()['mutrate'] = 0.01
+			locals()['mutstep'] = 0.02
+			locals()['migrate'] = 0.5
 		else:
 			with open(launchfile, 'r') as f:
 				for line in f:
 					splitline = line.split(',')
 					locals()[splitline[0]] = eval(splitline[1])
 
-		self.strINITFILE = "numberOfDemes,{0}\ninitialDemeSize,{1}\nnumberOfGenerations,{2}\nindividualBaseResources,{3}".format(ndemes,demesize,ngen,baseres)
-		self.strPHENFILE = "\n".join(map(str,phen))
-		self.strTECHFILE = str(tech)
-		self.strPARAFILE = "mutationRate,{0}\nmutationStep,{1}\nmigrationRate,{2}".format(mutrate,mutstep,migrate)
+		self.strINITFILE = "numberOfDemes,{0}\ninitialDemeSize,{1}\nnumberOfGenerations,{2}\nindividualBaseResources,{3}".format(locals()['ndemes'],locals()['demesize'],locals()['ngen'],locals()['baseres'])
+		self.strPHENFILE = "\n".join(map(str,locals()['phen']))
+		self.strTECHFILE = str(locals()['tech'])
+		self.strPARAFILE = "mutationRate,{0}\nmutationStep,{1}\nmigrationRate,{2}".format(locals()['mutrate'],locals()['mutstep'],locals()['migrate'])
 
 		self.metafolder = metafolder
 		self.parfile = parfile
