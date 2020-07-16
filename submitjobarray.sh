@@ -23,7 +23,7 @@ module load gcc python
 # Create folders in metafolder with python
 
 # Loop over all subfolders
-for directory in `find /home/claire/institution-evolution/simulations/. -type d -maxdepth 1 -mindepth 1`
+for directory in `find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/simulations -type d -maxdepth 1 -mindepth 1`
 do
     # launch simulation on subfolder
     echo $SLURM_ARRAY_TASK_ID
