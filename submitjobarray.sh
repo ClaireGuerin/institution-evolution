@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --account llehmann_social_evolution
-#SBATCH --job-name <name>
+#SBATCH --job-name techno1
 #SBATCH --partition wally
 #SBATCH --array 1-x # Create a job array of x replicates with indice 1-x
 #SBATCH --output %x_%A-%a.out
@@ -19,14 +19,14 @@
 source /dcsrsoft/spack/bin/setup_dcsrsoft
 module load gcc python
 
-# Job commands.
+# Job commands:
+# Move to working directory
+cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution
 # Create folders in metafolder with python
+python prepare_simulation_folders.py ../$SLURM_JOB_NAME pars/fitness_technology.txt pars/general_parameters.txt
 
-# Loop over all subfolders
-for directory in `find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/simulations -type d -maxdepth 1 -mindepth 1`
-do
-    # launch simulation on subfolder
-    echo $SLURM_ARRAY_TASK_ID
-    python script.py $directory
-done
+# List all subfolders
+SIM_FOLDERS=$(find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/simulations -type d -maxdepth 1 -mindepth 1)
+# launch simulation for each folder
+python launch_simulation_from_folder.py $SIM_FOLDERS{$SLURM_ARRAY_TASK_ID}
 exit 0
