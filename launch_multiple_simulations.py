@@ -106,17 +106,7 @@ class Launcher(object):
 
 	def createCombinations(self):
 		# CREATE COMBINATIONS
-		lst = self.ranges[0]
-		for par in range(len(self.ranges)-1):
-			tmplst = list(it.product(lst,self.ranges[par+1]))
-			lst = tmplst
-
-		flatlst = []
-		for comb in lst:
-			flatcomb = self._flattenTuple(comb)
-			flatlst.append(flatcomb)
-
-		self.combinations = flatlst
+		self.combinations = list(it.product(*self.ranges))
 
 	def writeParameterFilesInFolder(self, fitfun, pname, pval):
 		# CREATE SUBFOLDER 
