@@ -23,10 +23,13 @@ module load gcc python
 # Move to working directory
 cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution
 # Create folders in metafolder with python
-python prepare_simulation_folders.py ../$SLURM_JOB_NAME pars/fitness_technology.txt pars/general_parameters.txt
+python /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/prepare_simulation_folders.py \
+/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/$SLURM_JOB_NAME \
+/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/pars/fitness_technology.txt \
+/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/pars/general_parameters.txt
 
 # List all subfolders
-SIM_FOLDERS=$(find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/simulations -type d -maxdepth 1 -mindepth 1)
+SIM_FOLDERS=$(find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/$SLURM_JOB_NAME -type d -maxdepth 1 -mindepth 1)
 # launch simulation for each folder
-python launch_simulation_from_folder.py $SIM_FOLDERS{$SLURM_ARRAY_TASK_ID}
+python /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/launch_simulation_from_folder.py $SIM_FOLDERS{$SLURM_ARRAY_TASK_ID}
 exit 0
