@@ -20,16 +20,12 @@ source /dcsrsoft/spack/bin/setup_dcsrsoft
 module load gcc python
 
 # Job commands:
-# Move to working directory
-cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution
-# Create folders in metafolder with python
-python /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/prepare_simulation_folders.py \
-/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/$SLURM_JOB_NAME \
-/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/pars/fitness_technology.txt \
-/scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/pars/general_parameters.txt
+cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution
 
-# List all subfolders
-SIM_FOLDERS=$(find /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/$SLURM_JOB_NAME -type d -maxdepth 1 -mindepth 1)
-# launch simulation for each folder
-python /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution/launch_simulation_from_folder.py $SIM_FOLDERS{$SLURM_ARRAY_TASK_ID}
+# Read list of subfolders
+IN=$(sed -n ${SLURM_ARRAY_TASK_ID}p /metafolder/folders_list.txt)
+echo "Running analysis on $IN"
+
+# Launch simulation for each folder
+python institution-evolution/launch_simulation_from_folder.py $IN
 exit 0
