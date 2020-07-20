@@ -9,4 +9,4 @@ module load gcc python
 cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/institution-evolution
 
 # Create folders in metafolder with python
-python prepare_simulation_folders.py ../$SLURM_JOB_NAME pars/fitness_technology.txt pars/general_parameters.txt
+python prepare_simulation_folders.py ../technofirstbatch pars/fitness_technology.txt pars/general_parameters.txt
