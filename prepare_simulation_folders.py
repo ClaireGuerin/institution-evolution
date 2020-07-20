@@ -25,7 +25,7 @@ listMetaFolder = os.listdir(metafolder)
 
 with open(metafolder+"/folders_list.txt", "w") as f:
 	for listing in listMetaFolder:
-		pathToItem = os.path.join(wd, metafolder, listing)
+		pathToItem = os.path.abspath(os.path.join(wd, metafolder, listing))
 		if os.path.isdir(pathToItem):
 			f.write(pathToItem+'\n')
 		else:
