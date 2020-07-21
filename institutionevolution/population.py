@@ -22,34 +22,34 @@ class Population(object):
 		logging.info('Creating population')
 
 		if inst is None:
-			self.pathToInputFiles = PARAMETER_FOLDER
-			self.pathToOutputFiles = OUTPUT_FOLDER
+			self.pathToInputFiles = os.path.abspath(PARAMETER_FOLDER)
+			self.pathToOutputFiles = os.path.abspath(OUTPUT_FOLDER)
 		else:
-			self.pathToInputFiles = inst
-			self.pathToOutputFiles = inst
+			self.pathToInputFiles = os.path.abspath(inst)
+			self.pathToOutputFiles = os.path.abspath(inst)
 		
-		self.pathToInitFile = fman.getPathToFile(filename=INITIALISATION_FILE, dirname=self.pathToInputFiles)		
+		self.pathToInitFile = os.path.join(self.pathToInputFiles, INITIALISATION_FILE)		
 		self.attrs = fman.extractColumnFromFile(self.pathToInitFile, 0, str)
 		self.vals = fman.extractColumnFromFile(self.pathToInitFile, 1, int)
 		
 		for attr,val in zip(self.attrs, self.vals):
 			setattr(self, attr, val)
 			
-		self.pathToPhenFile = fman.getPathToFile(filename=INITIAL_PHENOTYPES_FILE, dirname=self.pathToInputFiles)
+		self.pathToPhenFile = os.path.join(self.pathToInputFiles, INITIAL_PHENOTYPES_FILE)
 		with open(self.pathToPhenFile) as f:
 			self.initialPhenotypes = [float(line) for line in f.readlines()]
 
-		self.pathToTechFile = fman.getPathToFile(filename=INITIAL_TECHNOLOGY_FILE, dirname=self.pathToInputFiles)
+		self.pathToTechFile = os.path.join(self.pathToInputFiles, INITIAL_TECHNOLOGY_FILE)
 		self.initialTechnologyLevel = fman.extractColumnFromFile(self.pathToTechFile, 0, float)[0]
 			
-		self.pathToParFile = fman.getPathToFile(filename=PARAMETER_FILE, dirname=self.pathToInputFiles)		
+		self.pathToParFile = os.path.join(self.pathToInputFiles, PARAMETER_FILE)		
 		self.parattrs = fman.extractColumnFromFile(self.pathToParFile, 0, str)
 		self.parvals = fman.extractColumnFromFile(self.pathToParFile, 1, float)
 		
 		for parattr,parval in zip(self.parattrs, self.parvals):
 			setattr(self, parattr, parval)
 			
-		self.pathToFitFile = fman.getPathToFile(filename=FITNESS_PARAMETERS_FILE, dirname=self.pathToInputFiles)		
+		self.pathToFitFile = os.path.join(self.pathToInputFiles, FITNESS_PARAMETERS_FILE)		
 		self.fitattrs = fman.extractColumnFromFile(self.pathToFitFile, 0, str)
 		self.fitvals = fman.extractColumnFromFile(self.pathToFitFile, 1, float)
 		
@@ -253,7 +253,7 @@ class Population(object):
 		if self.numberOfDemes >= 2 and self.fit_fun in fitness.functions:
 			self.createAndPopulateDemes()
 		
-			self.pathToOutputFolder = fman.getPathToFile(self.pathToOutputFiles)
+			self.pathToOutputFolder = self.pathToOutputFiles
 			if not os.path.exists(self.pathToOutputFolder):
 				os.makedirs(self.pathToOutputFolder, exist_ok=True)
 

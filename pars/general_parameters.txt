@@ -1,8 +1,8 @@
-ndemes,10
+ndemes,20
 demesize,20
-ngen,20
+ngen,10000
 baseres,1
-phen,[0.0]*4
+phen,[0.01]*4
 tech,1
 mutrate,0.01
 mutstep,0.02

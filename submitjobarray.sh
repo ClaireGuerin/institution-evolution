@@ -23,7 +23,7 @@ module load gcc python
 cd /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution
 
 # Read list of subfolders
-IN=$(sed -n ${SLURM_ARRAY_TASK_ID}p /metafolder/folders_list.txt)
+IN=$(sed -n ${SLURM_ARRAY_TASK_ID}p /scratch/wally/FAC/FBM/DEE/llehmann/social_evolution/$SLURM_JOB_NAME/folders_list.txt)
 echo "Running analysis on $IN"
 
 # Launch simulation for each folder
