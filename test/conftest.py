@@ -63,7 +63,11 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "xmean": [0.2], 
 			  "fb": 2, 
 			  "gamma": 0.01,
-			  "n": 10}}
+			  "n": 10},
+			  'fullmodel': {
+			  "n": 10,
+			  "xmean": [0.6,0.2,0.7,0.5]
+			  }}
 
 @pytest.fixture
 def pseudorandom():
