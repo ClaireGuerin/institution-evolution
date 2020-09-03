@@ -10,6 +10,7 @@ branches:
   - policing-demog
   - boundaries-feature
   - technology-feature
+  - fullmodel
 
 # safelist
 branches:
