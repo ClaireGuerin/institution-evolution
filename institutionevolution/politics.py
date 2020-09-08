@@ -35,6 +35,10 @@ def socialclass(**kwargs):
 	pol = {'consensusTime':0.0}
 	return pol
 
+def full(**kwargs):
+	pol = {'consensusTime':0.0}
+	return pol
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

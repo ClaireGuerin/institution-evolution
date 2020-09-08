@@ -45,6 +45,10 @@ def socialclass(**kwargs):
 	prog['proportionOfLeaders'] = kwargs['phen'][3]
 	return prog
 
+def full(**kwargs):
+	prog = {}
+	return prog
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:

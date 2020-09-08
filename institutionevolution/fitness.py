@@ -76,7 +76,7 @@ def socialclass(res, **kwargs):
 	f = (res + 2 * kwargs['leadership']) / (1 + kwargs["gamma"] * kwargs["n"])
 	return f
 
-def fullmodel(res, **kwargs):
+def full(res, **kwargs):
 	f = 1
 	return f
 

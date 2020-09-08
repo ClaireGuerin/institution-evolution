@@ -64,8 +64,9 @@ fitpardict = {'pgg': {"x": [0.5],
 			  "fb": 2, 
 			  "gamma": 0.01,
 			  "n": 10},
-			  'fullmodel': {
+			  'full': {
 			  "n": 10,
+			  "x": [0.5,0.1,0.6,0.4],
 			  "xmean": [0.6,0.2,0.7,0.5]
 			  }}
 
@@ -234,4 +235,19 @@ def createParameterRangesFile():
 				f.writelines(['fun,pgg\n','first,1.1,1.3,0.1\n','secnd,2.3\n','third,3.4,3.6,0.1\n'])
 			else:
 				f.writelines(['fun,pgg\n','first,1\n','secnd,2\n','third,3\n'])
+	return _foo
+
+@pytest.fixture
+def runElections():
+	def _foo(prop, d=6, s=6):
+		pop = Pop(fit_fun="full", inst="test/test")
+		pop.initialPhenotypes = [prop] * 4
+		pop.numberOfDemes = d
+		pop.initialDemeSize = s
+		pop.mutationRate = 0
+		pop.createAndPopulateDemes()
+		pop.clearDemeInfo()
+		pop.populationMutationMigration()
+		pop.updateDemeInfoPreProduction()
+		return pop.individuals
 	return _foo

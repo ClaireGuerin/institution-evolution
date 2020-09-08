@@ -1,20 +1,24 @@
 import pytest
+from random import random as rdreal
 import institutionevolution.fitness as fitness
+import institutionevolution.progress as progress
+import institutionevolution.politics as politics
 from institutionevolution.individual import Individual as Ind
+from institutionevolution.population import Population as Pop
 
 class TestFullModel(object):
 
 	def test_full_model_fitness_function_exists(self):
 		funcdict = fitness.functions
-		assert 'fullmodel' in funcdict, "missing fitness function for full model"
+		assert 'full' in funcdict, "missing fitness function for full model"
 
 	def test_individual_can_reproduce_correctly(self, getFitnessParameters):
-		fitpars = getFitnessParameters("fullmodel")
+		fitpars = getFitnessParameters("full")
 		indiv = Ind()
 		indiv.neighbours = [1,2,3]
 
 		try:
-			indiv.reproduce("fullmodel", **fitpars)
+			indiv.reproduce("full", **fitpars)
 			assert indiv.fertilityValue is not None
 			assert type(indiv.fertilityValue) is float
 			assert indiv.fertilityValue > 0
@@ -24,14 +28,72 @@ class TestFullModel(object):
 		except Exception as e:
 			assert False, str(e)
 
-	def test_individuals_have_leadership_opinions(self):
-		assert False, "write this test!"
+	def test_full_model_progress_function_exists(self):
+		progressdict = progress.functions
+		assert 'full' in progressdict, "missing progress function for full model"
 
-	def test_elections_take_place_in_demes(self):
-		assert False, "write this test!"
+	def test_full_model_politics_function_exists(self):
+		politicsdict = politics.functions
+		assert 'full' in politicsdict, "missing politics function for full model"
 
-	def test_individual_gets_social_status_after_elections(self):
-		assert False, "write this test!"
+	def test_all_phenotypes_are_provided(self, getFitnessParameters):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		assert len(self.fakepop.initialPhenotypes) == 4
+
+		pars = getFitnessParameters('full')
+		assert len(pars['x']) == 4
+		assert len(pars['xmean']) == 4
+
+	def test_elections_take_place_in_demes(self, runElections):
+		# set leader proportion to 1
+		# set mutation rate to 0
+		# execute population step up to pre-tech update
+		# check that all individuals are leaders
+		# do the same for leader proportion of 0.5 and 1
+
+		allleaders = runElections(1)
+		for indiv in allleaders:
+			assert indiv.leader, "all individuals should be leaders!"
+
+		noleaders = runElections(0)
+		for indiv in noleaders:
+			assert not indiv.leader, "no individual should be a leader!"
+
+		expectedProportion = rdreal()
+		halfleaders = runElections(prop=expectedProportion, d=100, s=100)
+		nLeaders = 0
+		nIndivs = len(halfleaders)
+		for indiv in halfleaders:
+			nLeaders += indiv.leader
+
+		assert pytest.approx(nLeaders, abs=60) == expectedProportion * nIndivs, "there should be {0} perc. leaders, instead there is {1}".format(expectedProportion, nLeaders/nIndivs)
+
+	def test_mean_deme_phenotype_determines_leader_number(self):
+		#NB: opinion on leadership is a phenotype, stored in 4th position (i.e. index 3 in python) 
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.numberOfDemes = 100
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.mutationRate = 1
+		self.fakepop.mutationStep = 0.15
+		self.fakepop.initialPhenotypes = [0.5] * 4
+
+		self.fakepop.createAndPopulateDemes()
+
+		for i in range(10):
+			# have a good shuffling of things and allow mutations to introduce great variety
+			self.fakepop.clearDemeInfo()
+			self.fakepop.populationMutationMigration()
+		
+		self.fakepop.updateDemeInfoPreProduction()
+
+		leadersCount = individualsCount = [0] * self.fakepop.numberOfDemes
+		for ind in self.fakepop.individuals:
+			leadersCount[ind.currentDeme] += ind.leader
+			individualsCount[ind.currentDeme] += 1
+
+		for deme in range(self.fakepop.numberOfDemes):
+			demeMean = self.fakepop.demes[deme].meanPhenotypes[3]
+			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean), "mean opinion is {0} when rendered proportion of leaders is {1}".format(demeMean, leadersCount[deme]/individualsCount[deme])
 
 	def test_individuals_have_policing_opinions(self):
 		assert False, "write this test!"
