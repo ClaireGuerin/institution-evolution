@@ -72,8 +72,8 @@ class TestFullModel(object):
 	def test_mean_deme_phenotype_determines_leader_number(self):
 		#NB: opinion on leadership is a phenotype, stored in 4th position (i.e. index 3 in python) 
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
-		self.fakepop.numberOfDemes = 100
-		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.initialDemeSize = 1000
 		self.fakepop.mutationRate = 1
 		self.fakepop.mutationStep = 0.15
 		self.fakepop.initialPhenotypes = [0.5] * 4
@@ -88,18 +88,22 @@ class TestFullModel(object):
 		self.fakepop.updateDemeInfoPreProduction()
 
 		collectCommoners = []
-		leadersCount = individualsCount = [0] * self.fakepop.numberOfDemes
+		leadersCount = [0] * self.fakepop.numberOfDemes
+		commonersCount = [0] * self.fakepop.numberOfDemes
+		individualsCount = [0] * self.fakepop.numberOfDemes
 		for ind in self.fakepop.individuals:
 			collectCommoners.append(not ind.leader)
 			leadersCount[ind.currentDeme] += ind.leader
+			commonersCount[ind.currentDeme] += not ind.leader
 			individualsCount[ind.currentDeme] += 1
 
 		assert any(collectCommoners), "there is no commoner at all"
+		assert any([x - y for (x,y) in zip(individualsCount,commonersCount)]), "as many commoners as indivs in each deme!"
 		assert any([x - y for (x,y) in zip(individualsCount,leadersCount)]), "as many leaders as indivs in each deme!"
 
 		for deme in range(self.fakepop.numberOfDemes):
 			demeMean = self.fakepop.demes[deme].meanPhenotypes[3]
-			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean), \
+			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean, abs=100), \
 			"mean opinion is {0}, when rendered proportion of leaders is {1}".format(demeMean, \
 				leadersCount[deme] / individualsCount[deme])
 
