@@ -32,7 +32,7 @@ combinfile = 'combinationslist.txt'
 folder = '../{0}{1}-{2}'.format(args.target, args.boundaries[0], args.boundaries[1])
 
 ### ACTION ###
-if "f" and "l" not in args.action:
+if not any([i in args.action for i in ["f","l"]]):
 	raise NameError(args.action + " is not a valid action argument. Use l, f or both")
 else:
 	if "l" in args.action:
@@ -56,24 +56,28 @@ else:
 		## let's ensure that start and end info has been provided
 		start = args.boundaries[0]
 		end = args.boundaries[1]
-		assert start and end is int, "provide a start and end value for the subset of combinations"
+		assert all([type(val) is int for val in args.boundaries]), "provide integers as start and end value for the subset of combinations, \
+		not {0} ({1} of {2} and {3})".format(args.boundaries,type(args.boundaries),type(start),type(end))
 		assert start < end, "starting value must be less than end value"
-		## Read file lines from start to end of specified range
-		desiredRange = range(start, end)
-		combinationCollector = []
-		with open(combfilename, 'r') as f:
-			## For each line, create folder in metafolder (named globalname + 'x-y')
-			lineIterator = 0
-			for line in f:
-				line = f.readline()
-				linestr = line.strip('\n')
-				lineIterator += 1
-				if lineIterator in desiredRange:
-					combinationCollector.append(literal_eval(linestr))
-				else:
-					continue
-		if "l" not in args.action:
-			## create launcher if not already done
+		if "l" in args.action:
+			## change combination values to only the ones of interest
+			launch.combinations = launch.combinations[start:end]
+		else:
+			## Read file lines from start to end of specified range
+			desiredRange = range(start, end)
+			combinationCollector = []
+			with open(combinfile, 'r') as f:
+				## For each line, create folder in metafolder (named globalname + 'x-y')
+				lineIterator = 0
+				for line in f:
+					line = f.readline()
+					linestr = line.strip('\n')
+					lineIterator += 1
+					if lineIterator in desiredRange:
+						combinationCollector.append(literal_eval(linestr))
+					else:
+						continue
+			## create launcher and give it the combinations
 			launch = Launcher(metafolder=folder, parfile=fitparfile, launchfile=genparfile)
 			launch.readParameterInfo()
 			launch.combinations = combinationCollector
