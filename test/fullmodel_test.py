@@ -66,7 +66,8 @@ class TestFullModel(object):
 		for indiv in halfleaders:
 			nLeaders += indiv.leader
 
-		assert pytest.approx(nLeaders, abs=60) == expectedProportion * nIndivs, "there should be {0} perc. leaders, instead there is {1}".format(expectedProportion, nLeaders/nIndivs)
+		assert pytest.approx(nLeaders, abs=60) == expectedProportion * nIndivs, \
+		"there should be {0} perc. leaders, instead there is {1}".format(expectedProportion, nLeaders/nIndivs)
 
 	def test_mean_deme_phenotype_determines_leader_number(self):
 		#NB: opinion on leadership is a phenotype, stored in 4th position (i.e. index 3 in python) 
@@ -86,14 +87,21 @@ class TestFullModel(object):
 		
 		self.fakepop.updateDemeInfoPreProduction()
 
+		collectStatus = []
 		leadersCount = individualsCount = [0] * self.fakepop.numberOfDemes
 		for ind in self.fakepop.individuals:
+			collectStatus.append(ind.leader)
 			leadersCount[ind.currentDeme] += ind.leader
 			individualsCount[ind.currentDeme] += 1
 
+		assert any(collectStatus), "all individuals have been elected leaders"
+		assert any(individualsCount - leadersCount), "as many leaders as indivs in each deme!"
+
 		for deme in range(self.fakepop.numberOfDemes):
 			demeMean = self.fakepop.demes[deme].meanPhenotypes[3]
-			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean), "mean opinion is {0} when rendered proportion of leaders is {1}".format(demeMean, leadersCount[deme]/individualsCount[deme])
+			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean), \
+			"mean opinion is {0}, when rendered proportion of leaders is {1}".format(demeMean, \
+				leadersCount[deme] / individualsCount[deme])
 
 	def test_individuals_have_policing_opinions(self):
 		assert False, "write this test!"
