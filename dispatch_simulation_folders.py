@@ -1,4 +1,4 @@
-#import os
+import os
 import pathlib
 import argparse
 #import sys
@@ -30,6 +30,7 @@ fitparfile = 'pars/fitness_' + args.target + '.txt'
 genparfile = 'pars/general_parameters.txt'
 combinfile = 'combinationslist.txt'
 folder = '../{0}{1}-{2}'.format(args.target, args.boundaries[0], args.boundaries[1])
+wd = os.getcwd()
 
 ### ACTION ###
 if not any([i in args.action for i in ["f","l"]]):
@@ -84,5 +85,15 @@ else:
 		launch.createFolder(launch.metafolder)
 		for comb in launch.combinations:
 			launch.writeParameterFilesInFolder(fitfun=launch.fitnessFunction, pname=launch.parname, pval=comb)
+		## create txt file with list of all subfolders in main folder
+		listSubFolders = os.listdir(folder)
+
+		with open(folder+"/folders_list.txt", "w") as f:
+			for listing in listSubFolders:
+			pathToItem = os.path.abspath(os.path.join(wd, folder, listing))
+			if os.path.isdir(pathToItem):
+				f.write(pathToItem+'\n')
+			else:
+				print(listing + ' is not a directory')
 ### THE END ###
-print('End of task')
+print('Task completed')
