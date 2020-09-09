@@ -87,15 +87,15 @@ class TestFullModel(object):
 		
 		self.fakepop.updateDemeInfoPreProduction()
 
-		collectStatus = []
+		collectCommoners = []
 		leadersCount = individualsCount = [0] * self.fakepop.numberOfDemes
 		for ind in self.fakepop.individuals:
-			collectStatus.append(ind.leader)
+			collectCommoners.append(not ind.leader)
 			leadersCount[ind.currentDeme] += ind.leader
 			individualsCount[ind.currentDeme] += 1
 
-		assert any(collectStatus), "all individuals have been elected leaders"
-		assert any(individualsCount - leadersCount), "as many leaders as indivs in each deme!"
+		assert any(collectCommoners), "there is no commoner at all"
+		assert any([x - y for (x,y) in zip(individualsCount,leadersCount)]), "as many leaders as indivs in each deme!"
 
 		for deme in range(self.fakepop.numberOfDemes):
 			demeMean = self.fakepop.demes[deme].meanPhenotypes[3]
