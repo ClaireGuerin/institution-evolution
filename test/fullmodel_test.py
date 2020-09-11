@@ -181,8 +181,7 @@ class TestFullModel(object):
 		totalPhenSq = [[0] * 4] * self.fakepop.numberOfDemes
 
 		for ind in self.fakepop.individuals:
-			for phen in range(self.fakepop.numberOfPhenotypes):
-				totalPhenSq[ind.currentDeme][phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
+			totalPhenSq[ind.currentDeme] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
 
 		listDemePhen = [] * self.fakepop.numberOfDemes
 		# check that squares are 0.25 * deme size
