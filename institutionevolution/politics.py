@@ -36,7 +36,8 @@ def socialclass(**kwargs):
 	return pol
 
 def full(**kwargs):
-	pol = {'consensusTime':0.0}
+	pol = {}
+	pol['consensus'] = kwargs['phen'][2]
 	return pol
 
 functions = {}

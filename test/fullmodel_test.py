@@ -5,6 +5,7 @@ import institutionevolution.progress as progress
 import institutionevolution.politics as politics
 from institutionevolution.individual import Individual as Ind
 from institutionevolution.population import Population as Pop
+import institutionevolution.myarithmetics as ar
 
 class TestFullModel(object):
 
@@ -66,7 +67,7 @@ class TestFullModel(object):
 		for indiv in halfleaders:
 			nLeaders += indiv.leader
 
-		assert pytest.approx(nLeaders, abs=60) == expectedProportion * nIndivs, \
+		assert pytest.approx(nLeaders, abs=100) == expectedProportion * nIndivs, \
 		"there should be {0} perc. leaders, instead there is {1}".format(expectedProportion, nLeaders/nIndivs)
 
 	def test_mean_deme_phenotype_determines_leader_number(self):
@@ -107,14 +108,49 @@ class TestFullModel(object):
 			"mean opinion is {0}, when rendered proportion of leaders is {1}".format(demeMean, \
 				leadersCount[deme] / individualsCount[deme])
 
-	def test_individuals_have_policing_opinions(self):
-		assert False, "write this test!"
+	def test_consensus_is_mean_opinion_when_no_leaders(self):
+		#NB: opinion on policing vs R&D is a phenotype, stored in 3rd position (i.e. index 2 in python)
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
 
-	def test_leaders_have_cooperation_level(self):
-		assert False, "write this test!"
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
 
-	def test_political_debate_takes_place(self):
-		assert False, "write this test!"
+		collectVotes = [0] * self.fakepop.numberOfDemes
+
+		for indiv in self.fakepop.individuals:
+			collectVotes[indiv.currentDeme] += indiv.phenotypicValues[2]
+
+		for deme in self.fakepop.demes:
+			expectedMean = collectVotes[deme.id] / deme.demography
+			assert expectedMean == deme.politicsValues['consensus'], "wrong proportion of policing!"
+
+	def test_consensus_time_is_correct_when_no_leaders(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		# consensus time (when everyone is a commoner) is 
+		# aConsensus * n * var(z) / (bConsensus + aConsensus * n * var(z)) + epsilon
+		acons = self.fakepop.fitnessParameters["aconsensus"]
+		bcons = self.fakepop.fitnessParameters["bconsensus"]
+		epsil = self.fakepop.fitnessParameters["epsilon"]
+
+		for deme in self.fakepop.demes:
+			opinions = [ind.phenotypicValues[2] for ind in self.fakepop.individuals if ind.currentDeme == deme.id]
+			opinionBreadth = deme.demography * ar.specialvariance(sum(opinions), sum(x ** 2 for x in opinions), len(opinions))
+			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
+			assert deme.politicsValues["consensusTime"] == expectedTime, "wrong time to reach consensus"
 
 	def test_leader_cooperation_influences_debate_time(self):
 		assert False, "write this test!"
@@ -134,7 +170,7 @@ class TestFullModel(object):
 	def test_individuals_produce_resources_depending_on_consensus_time(self):
 		assert False, "write this test!"
 
-	def test_producers_have_cooperation_level(self):
+	def test_only_producers_have_economic_cooperation_level(self):
 		assert False, "write this test!"
 
 	def test_public_good_game_takes_place_and_pg_is_gathered(self):
@@ -147,6 +183,9 @@ class TestFullModel(object):
 		assert False, "write this test!"
 
 	def test_policing_takes_place_in_demes(self):
+		assert False, "write this test!"
+
+	def test_policing_corresponds_to_consensus(self):
 		assert False, "write this test!"
 
 	def test_producers_who_cheat_are_punished(self):
