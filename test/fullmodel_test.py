@@ -129,6 +129,21 @@ class TestFullModel(object):
 			expectedMean = collectVotes[deme.id] / deme.demography
 			assert expectedMean == deme.politicsValues['consensus'], "wrong proportion of policing!"
 
+	def test_deme_phen_sum_of_square_correct(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.5] * 4
+		self.fakepop.initialDemeSize = 10
+		self.fakepop.numberOfDemes = 3
+		self.fakepop.mutationRate = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+
+		# check that squares are 0.25 * deme size
+		for deme in self.fakepop.demes:
+			assert deme.totalPhenotypeSquares == [0.25 * deme.demography] * 4, "there is a problem in the square sum"
+
 	def test_consensus_time_is_correct_when_no_leaders(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
@@ -146,9 +161,28 @@ class TestFullModel(object):
 		bcons = self.fakepop.fitnessParameters["bconsensus"]
 		epsil = self.fakepop.fitnessParameters["epsilon"]
 
+
+
 		for deme in self.fakepop.demes:
+			collectVotes = []
+			for indiv in self.fakepop.individuals:
+				if indiv.currentDeme == deme.id:
+					collectVotes.append(indiv.phenotypicValues[2])
+
 			opinions = [ind.phenotypicValues[2] for ind in self.fakepop.individuals if ind.currentDeme == deme.id]
-			opinionBreadth = deme.demography * ar.specialvariance(sum(opinions), sum(x ** 2 for x in opinions), len(opinions))
+			assert opinions == collectVotes, "some kind of issue when collecting opinions"
+			assert sum(opinions) == deme.totalPhenotypes[2], "wrong sum of phenotypes"
+			assert len(opinions) == deme.demography, "wrong deme size"
+			
+			getSquare = 0
+			for phen in opinions:
+				getSquare += phen * phen
+			assert getSquare == deme.totalPhenotypeSquares[2], "wrong phenotype squares"
+			assert sum([x * x for x in opinions]) == deme.totalPhenotypeSquares[2], "wrong phenotype squares"
+
+			var = ar.specialvariance(sum(opinions), sum([x * x for x in opinions]), len(opinions))
+			assert var == deme.varPhenotypes[2], "wrong variance calculation"
+			opinionBreadth = deme.demography * var
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == expectedTime, "wrong time to reach consensus"
 
