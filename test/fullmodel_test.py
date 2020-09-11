@@ -129,20 +129,69 @@ class TestFullModel(object):
 			expectedMean = collectVotes[deme.id] / deme.demography
 			assert expectedMean == deme.politicsValues['consensus'], "wrong proportion of policing!"
 
+	def test_i_am_sane_and_can_sum_squares(self):
+		# simple vector, sort of equivalent to a single phenotype
+		self.somevector = [1,2,3,4,5,6,7,8,9]
+		self.somevectorsquared = [1,4,9,16,25,36,49,64,81]
+
+		assert self.somevectorsquared == [x * x for x in self.somevector], "what is this list comprehension doing??"
+
+		self.somesquaressummed = 285
+
+		assert self.somesquaressummed == sum(self.somevectorsquared), "what is this sum function doing??"
+
+		self.mySumSquare = 0
+		self.mySumMultip = 0
+		for i in self.somevector:
+			self.mySumSquare += i **2
+			self.mySumMultip += i * i
+
+		assert self.mySumMultip == self.mySumSquare, "why are they not the same??"
+		assert self.mySumMultip == self.somesquaressummed, "why are they not the same??"
+		assert self.mySumSquare == self.somesquaressummed, "why are they not the same??"
+
+		# list of lists, equivalent to three individuals, two phenotypes
+		self.phen = [[1,2],[3,4],[5,6]]
+		self.phenSquared = [[1,4],[9,16],[25,36]]
+
+		sumofsq = [0,0]
+		for phenpair in self.phen:
+			for phen in range(2):
+				sumofsq[phen] += phenpair[phen] * phenpair[phen]
+
+		assert sumofsq == [35,56], "why????"
+
+
 	def test_deme_phen_sum_of_square_correct(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.5] * 4
 		self.fakepop.initialDemeSize = 10
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.mutationRate = 0
+		self.fakepop.migrationRate = 0
 
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
 
+		# could the error come from the fakepop registered phenotype number?
+		assert self.fakepop.numberOfPhenotypes == 4, "you need to update the number of phenotypes in your tests"
+
+		# repeat method from population code
+		totalPhenSq = [[0] * 4] * self.fakepop.numberOfDemes
+
+		for ind in self.fakepop.individuals:
+			for phen in range(self.fakepop.numberOfPhenotypes):
+				totalPhenSq[ind.currentDeme][phen] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
+
+		listDemePhen = [] * self.fakepop.numberOfDemes
 		# check that squares are 0.25 * deme size
 		for deme in self.fakepop.demes:
-			assert deme.totalPhenotypeSquares == [0.25 * deme.demography] * 4, "there is a problem in the square sum"
+			assert totalPhenSq[deme.id] == deme.totalPhenotypeSquares, "same method, different results. expected:{0}".format([0.25 * deme.demography] * 4)
+			#assert totalPhenSq[deme.id] == [0.25 * deme.demography] * 4, "the method is wrong"
+			#assert deme.totalPhenotypeSquares == [0.25 * deme.demography] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
+			assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
+			assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
 
 	def test_consensus_time_is_correct_when_no_leaders(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
@@ -161,27 +210,13 @@ class TestFullModel(object):
 		bcons = self.fakepop.fitnessParameters["bconsensus"]
 		epsil = self.fakepop.fitnessParameters["epsilon"]
 
-
-
 		for deme in self.fakepop.demes:
-			collectVotes = []
-			for indiv in self.fakepop.individuals:
-				if indiv.currentDeme == deme.id:
-					collectVotes.append(indiv.phenotypicValues[2])
-
 			opinions = [ind.phenotypicValues[2] for ind in self.fakepop.individuals if ind.currentDeme == deme.id]
-			assert opinions == collectVotes, "some kind of issue when collecting opinions"
-			assert sum(opinions) == deme.totalPhenotypes[2], "wrong sum of phenotypes"
-			assert len(opinions) == deme.demography, "wrong deme size"
-			
-			getSquare = 0
-			for phen in opinions:
-				getSquare += phen * phen
-			assert getSquare == deme.totalPhenotypeSquares[2], "wrong phenotype squares"
 			assert sum([x * x for x in opinions]) == deme.totalPhenotypeSquares[2], "wrong phenotype squares"
 
 			var = ar.specialvariance(sum(opinions), sum([x * x for x in opinions]), len(opinions))
 			assert var == deme.varPhenotypes[2], "wrong variance calculation"
+			
 			opinionBreadth = deme.demography * var
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == expectedTime, "wrong time to reach consensus"
