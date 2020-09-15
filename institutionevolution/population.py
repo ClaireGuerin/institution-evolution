@@ -122,6 +122,7 @@ class Population(object):
 
 			# RESET ALL OTHER DEME INFORMATION
 			self.demes[deme].totalPhenotypes = [0] * self.numberOfPhenotypes
+			self.demes[deme].totalPhenotypeSquares = [0] * self.numberOfPhenotypes
 			self.demes[deme].demography = 0
 			self.demes[deme].publicGood = 0
 			self.demes[deme].totalResources = 0

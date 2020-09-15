@@ -168,7 +168,7 @@ class TestFullModel(object):
 		self.fakepop.initialDemeSize = 10
 		self.fakepop.numberOfDemes = 3
 		self.fakepop.mutationRate = 0
-		self.fakepop.migrationRate = 0
+		self.fakepop.migrationRate = 0.5
 
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()
@@ -177,20 +177,63 @@ class TestFullModel(object):
 		# could the error come from the fakepop registered phenotype number?
 		assert self.fakepop.numberOfPhenotypes == 4, "you need to update the number of phenotypes in your tests"
 
+		# collect individual phenotypes BY DEME:
+		deme1Phenotypes = []
+		deme2Phenotypes = []
+		deme3Phenotypes = []
+		deme1Squares = []
+		deme2Squares = []
+		deme3Squares = []
+
+		for indiv in self.fakepop.individuals:
+			if indiv.currentDeme == 0:
+				deme1Phenotypes.append(indiv.phenotypicValues)
+				deme1Squares.append([x * x for x in indiv.phenotypicValues])
+			elif indiv.currentDeme == 1:
+				deme2Phenotypes.append(indiv.phenotypicValues)
+				deme2Squares.append([x * x for x in indiv.phenotypicValues])
+			else:
+				deme3Phenotypes.append(indiv.phenotypicValues)
+				deme3Squares.append([x * x for x in indiv.phenotypicValues])
+
+		assert len(deme1Phenotypes) == self.fakepop.demes[0].demography
+		assert len(deme2Phenotypes) == self.fakepop.demes[1].demography
+		assert len(deme3Phenotypes) == self.fakepop.demes[2].demography
+
+		alldemePhens = [deme1Phenotypes, deme2Phenotypes, deme3Phenotypes]
+		alldemeSqrs = [deme1Squares, deme2Squares, deme3Squares]
+
+		for deme in range(3):
+			phen = alldemePhens[deme]
+			sqrs = alldemeSqrs[deme]
+			addSquares = [0] * 4
+			for ind in range(len(phen)):
+				for pheno in range(4):
+					assert phen[ind][pheno] ** 2 == sqrs[ind][pheno]
+					addSquares[pheno] += sqrs[ind][pheno]
+			assert addSquares == [0.25 * len(phen)] * 4, len(phen)
+
 		# repeat method from population code
-		totalPhenSq = [[0] * 4] * self.fakepop.numberOfDemes
+		totalPhenSq = [[0] * 4 for i in range(self.fakepop.numberOfDemes)]
+		demeSizes = [0] * self.fakepop.numberOfDemes
 
 		for ind in self.fakepop.individuals:
-			totalPhenSq[ind.currentDeme] += ind.phenotypicValues[phen] * ind.phenotypicValues[phen]
+			demeSizes[ind.currentDeme] += 1
+			for phen in range(4):
+				totalPhenSq[ind.currentDeme][phen] += (ind.phenotypicValues[phen] * ind.phenotypicValues[phen])
 
-		listDemePhen = [] * self.fakepop.numberOfDemes
 		# check that squares are 0.25 * deme size
 		for deme in self.fakepop.demes:
 			assert totalPhenSq[deme.id] == deme.totalPhenotypeSquares, "same method, different results. expected:{0}".format([0.25 * deme.demography] * 4)
-			#assert totalPhenSq[deme.id] == [0.25 * deme.demography] * 4, "the method is wrong"
-			#assert deme.totalPhenotypeSquares == [0.25 * deme.demography] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
-			assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
-			assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
+			assert totalPhenSq[deme.id] == [0.25 * deme.demography] * 4, "the method is wrong"
+			assert all([x / deme.demography == 0.25 for x in totalPhenSq[deme.id]]), "phen={0}, n={1}".format(totalPhenSq, deme.demography)
+			assert deme.totalPhenotypeSquares == [0.25 * deme.demography] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
+			assert demeSizes[deme.id] == deme.demography, "wrong deme size"
+
+			# THE TESTS BELOW ONLY PASS IF MIGRATION RATE = 0
+			if self.fakepop.migrationRate == 0:
+				assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
+				assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
 
 	def test_consensus_time_is_correct_when_no_leaders(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
@@ -218,7 +261,7 @@ class TestFullModel(object):
 			
 			opinionBreadth = deme.demography * var
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
-			assert deme.politicsValues["consensusTime"] == expectedTime, "wrong time to reach consensus"
+			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
 
 	def test_leader_cooperation_influences_debate_time(self):
 		assert False, "write this test!"
