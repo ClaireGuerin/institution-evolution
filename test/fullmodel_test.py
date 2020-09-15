@@ -235,7 +235,7 @@ class TestFullModel(object):
 				assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
 				assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
 
-	def test_consensus_time_is_correct_when_no_leaders(self):
+	def test_global_consensus_time_is_correct_regardless_of_leaders(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -263,8 +263,34 @@ class TestFullModel(object):
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
 
-	def test_leader_cooperation_influences_debate_time(self):
-		assert False, "write this test!"
+	def test_leader_cooperation_influences_individual_debate_time(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0.5
+		self.fakepop.mutationStep = 0.2
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		# good shuffling and mutating:
+		for i in range(10):
+			self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		leaderTotalTimeCoop = [0] * self.fakepop.numberOfDemes
+
+		for ind in self.fakepop.individuals:
+			cons = self.fakepop.demes[ind.currentDeme].politicsValues['consensusTime']
+			if ind.leader:
+				# LEADERS DEBATE TIME INCREASES
+				ind.consensusTime == ind.phenotypicValues[1] * cons
+				leaderTotalTimeCoop[ind.currentDeme] =+ ind.phenotypicValues[1]
+		for ind in self.fakepop.individuals:
+			if not ind.leader:
+				# PRODUCERS DEBATE TIME DECREASES
+				ind.consensusTime == (1 - leaderTotalTimeCoop[ind.currentDeme] / self.fakepop.demes[ind.currentDeme].numberOfLeaders) * cons
+
 
 	def test_producer_cooperation_does_not_influence_debate_time(self):
 		assert False, "write this test!"
