@@ -286,11 +286,20 @@ class TestFullModel(object):
 				# LEADERS DEBATE TIME INCREASES
 				ind.consensusTime == ind.phenotypicValues[1] * cons
 				leaderTotalTimeCoop[ind.currentDeme] =+ ind.phenotypicValues[1]
+
+		totalTimeSpent = [0] * self.fakepop.numberOfDemes
+
 		for ind in self.fakepop.individuals:
+			assert ind.consensusTime is not None, "{0}".format(ind.consensusTime)
+			assert type(ind.consensusTime) is float, "{0}".format(ind.consensusTime)
+			assert ind.consensusTime >= 0, "{0}".format(ind.consensusTime)
+			totalTimeSpent[ind.currentDeme] += ind.consensusTime
 			if not ind.leader:
 				# PRODUCERS DEBATE TIME DECREASES
 				ind.consensusTime == (1 - leaderTotalTimeCoop[ind.currentDeme] / self.fakepop.demes[ind.currentDeme].numberOfLeaders) * cons
 
+		for deme in self.fakepop.deme:
+			assert totalTimeSpent[deme.id] == deme.politicsValues["consensusTime"]
 
 	def test_producer_cooperation_does_not_influence_debate_time(self):
 		assert False, "write this test!"
