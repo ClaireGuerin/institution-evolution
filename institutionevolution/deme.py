@@ -9,8 +9,9 @@ class Deme(object):
 		self.varPhenotypes = None
 		self.totalPhenotypes = None
 		self.totalPhenotypeSquares = None
-		self.numberOfLeaders = None,
-		self.technologyLevel = None,
+		self.numberOfLeaders = None
+		self.totalConsensusContributions = None
+		self.technologyLevel = None
 		self.politicsValues = {"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
 		"labourForce": None,

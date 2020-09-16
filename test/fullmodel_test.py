@@ -5,6 +5,7 @@ import institutionevolution.progress as progress
 import institutionevolution.politics as politics
 from institutionevolution.individual import Individual as Ind
 from institutionevolution.population import Population as Pop
+from institutionevolution.deme import Deme as Dem
 import institutionevolution.myarithmetics as ar
 
 class TestFullModel(object):
@@ -263,7 +264,7 @@ class TestFullModel(object):
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
 
-	def test_leader_cooperation_influences_individual_debate_time(self):
+	def test_leader_cooperation_influences_individual_production_time(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -277,29 +278,23 @@ class TestFullModel(object):
 		for i in range(10):
 			self.fakepop.populationMutationMigration()
 		self.fakepop.updateDemeInfoPreProduction()
+		self.fakepop.populationProduction()
+		# Rig = (1 - Tig) * SUM(1 - Tjg) ** (1 - alphaResources) * tech ** alphaResources
 
-		leaderTotalTimeCoop = [0] * self.fakepop.numberOfDemes
-
+		aRes = self.fakepop.fitnessParameters["alphaResources"]
+		
 		for ind in self.fakepop.individuals:
-			cons = self.fakepop.demes[ind.currentDeme].politicsValues['consensusTime']
+			n = self.fakepop.demes[ind.currentDeme].demography
+			assert type(self.fakepop.demes[ind.currentDeme].totalConsensusContributions) is not tuple, self.fakepop.demes[ind.currentDeme].totalConsensusContributions
+			t = self.fakepop.demes[ind.currentDeme].totalConsensusContributions * self.fakepop.demes[ind.currentDeme].politicsValues["consensusTime"]
+			tech = self.fakepop.demes[ind.currentDeme].technologyLevel
 			if ind.leader:
-				# LEADERS DEBATE TIME INCREASES
-				ind.consensusTime == ind.phenotypicValues[1] * cons
-				leaderTotalTimeCoop[ind.currentDeme] =+ ind.phenotypicValues[1]
-
-		totalTimeSpent = [0] * self.fakepop.numberOfDemes
-
-		for ind in self.fakepop.individuals:
-			assert ind.consensusTime is not None, "{0}".format(ind.consensusTime)
-			assert type(ind.consensusTime) is float, "{0}".format(ind.consensusTime)
-			assert ind.consensusTime >= 0, "{0}".format(ind.consensusTime)
-			totalTimeSpent[ind.currentDeme] += ind.consensusTime
-			if not ind.leader:
-				# PRODUCERS DEBATE TIME DECREASES
-				ind.consensusTime == (1 - leaderTotalTimeCoop[ind.currentDeme] / self.fakepop.demes[ind.currentDeme].numberOfLeaders) * cons
-
-		for deme in self.fakepop.deme:
-			assert totalTimeSpent[deme.id] == deme.politicsValues["consensusTime"]
+				# LEADERS PRODUCTION TIME DECREASES WITH OWN TIME COOPERATION
+				ctime = ind.phenotypicValues[1] * cons
+			else:
+				# COMMONERS PRODUCTION TIME DECREASES WITH AVERAGE LEADER TIME COOPERATION
+				ctime = self.fakepop.demes[ind.currentDeme] * cons
+			assert ind.resourcesAmount == (1 - ctime) * ((n - t) ** (1 - aRes)) * (tech ** aRes), "wrong production time. Leader: {0}".format(bool(ind.leader))
 
 	def test_producer_cooperation_does_not_influence_debate_time(self):
 		assert False, "write this test!"

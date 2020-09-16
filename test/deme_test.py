@@ -93,6 +93,16 @@ class TestDeme(object):
 		assert self.fakepop.demes[0].meanPhenotypes[0] == pytest.approx(mean(phenDeme0)), "deme 0: mean returned by pop mut func not mean of all indivs in deme"
 		assert self.fakepop.demes[1].meanPhenotypes[0] == pytest.approx(mean(phenDeme1)), "deme 1: mean returned by pop mut func not mean of all indivs in deme"
 
+
+	def test_deme_initialization_does_not_create_tuple(self):
+		self.fakedeme = Dem()
+		attrs = ["id", "demography", "publicGood", "meanPhenotypes", "varPhenotypes", "totalPhenotypes", "totalPhenotypeSquares", "numberOfLeaders", "totalConsensusContributions", "technologyLevel"]
+
+		for attribute in attrs:
+			tmp = getattr(self.fakedeme, attribute)
+			assert tmp is None, "{0} is not none".format(attribute)
+			assert type(tmp) is not tuple, "{0} is a tuple!".format(attribute)
+	
 	# def test_deme_public_good_calculated_from_cooperation(self):
 	# 	self.fakepop = Pop()
 	# 	self.fakepop.initialDemeSize = 2

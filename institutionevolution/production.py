@@ -32,6 +32,9 @@ def debate(res, **kwargs):
 def socialclass(res, **kwargs):
 	return res
 
+def full(res, **kwargs):
+	return 1
+
 functions = {}
 for key, value in list(locals().items()):
     if callable(value) and value.__module__ == __name__:
