@@ -411,7 +411,31 @@ class TestFullModel(object):
 		assert low == high
 
 	def test_consensus_result_depends_on_leadership(self):
-		assert False, "write this test!"
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+		self.fakepop.mutationStep = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		sumVotes = [0] * self.fakepop.numberOfDemes
+		sumWeights = [0] * self.fakepop.numberOfDemes
+		for ind in self.fakepop.individuals:
+			weight = ind.phenotypicValues[1] if ind.leader else (1 - self.fakepop.demes[ind.currentDeme].meanLeaderContribution)
+			sumVotes[ind.currentDeme] += ind.phenotypicValues[2] * weight
+			sumWeights[ind.currentDeme] += weight
+
+		for deme in self.fakepop.demes:
+			expectedConsensusValue = sumVotes[deme.id] / sumWeights[deme.id]
+			assert deme.politicsValues['consensus'] == expectedConsensusValue
+
+		## TO DO IN POP:
+		## sum([v * w for v, w in values, weights] / sum(weights))
 
 	def test_consensus_time_depends_on_leadership(self):
 		assert False, "write this test!"

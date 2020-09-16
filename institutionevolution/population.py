@@ -177,8 +177,14 @@ class Population(object):
 			setattr(deme, "varPhenotypes", varphen)
 
 		leaderContribTime = []
+		votes = []
+		weights = [None] * self.demography
+		ethny = []
 
 		for ind in self.individuals:
+			# COLLECT VOTES FOR DEBATE
+			votes.append(ind.phenotypicValues[2])
+			ethny.append(ind.currentDeme)
 			# ELECTIONS
 			try:
 				proportion = self.demes[ind.currentDeme].meanPhenotypes[3]
@@ -189,11 +195,20 @@ class Population(object):
 			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
 			## Individual contribution to debate time depends on status
 			if ind.leader:
+				weights.append(ind.phenotypicValues[1])
 				leaderContribTime.append(ind.phenotypicValues[1])
 
 		for deme in self.demes:
 			tmpMeanContrib = ar.specialmean(leaderContribTime)
 			deme.meanLeaderContribution = tmpMeanContrib if tmpMeanContrib is not None else 0
+
+			# WEIGHTED MEAN OF VOTES
+			findVotes = [e == deme.id for e in ethny]
+			demeWeights = [deme.meanLeaderContribution if x is None else x for x in weights[findVotes]]
+			demeVotes = votes[findVotes]
+			weightedMean = [v * w for v, w in demeVotes, demeWeights]
+
+			# CONTRIBUTION TIME
 			deme.totalConsensusContributions = sum(leaderContribTime) + (deme.demography - deme.numberOfLeaders) * deme.meanLeaderContribution
 			if deme.demography > 0:
 				politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
