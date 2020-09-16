@@ -312,6 +312,55 @@ class TestFullModel(object):
 			assert resourcesProduced == expectedResources, "same method, different result"
 			assert ind.resourcesAmount == expectedResources, "wrong production time. {0} produced {1} instead of {2}".format(status, ind.resourcesAmount, expectedResources)
 
+	def test_leader_cooperation_increases_producer_production_but_decreases_own(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0.5
+		self.fakepop.mutationStep = 0.2
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		for ind in self.fakepop.individuals:
+			ind.phenotypicValues[1] = 0
+
+		# LOW LEADER CONTRIBUTION
+		for deme in self.fakepop.demes:
+			deme.meanLeaderContribution = 0
+			deme.totalConsensusContributions = deme.demography - deme.numberOfLeaders
+
+		self.fakepop.populationProduction()
+
+		lowCommoners = []
+		lowLeaders = []
+		for ind in self.fakepop.individuals:
+			if ind.leader:
+				lowLeaders.append(ind.resourcesAmount)
+			else:
+				lowCommoners.append(ind.resourcesAmount)
+
+		# HIGH LEADER CONTRIBUTION
+		for deme in self.fakepop.demes:
+			deme.meanLeaderContribution = 1
+			deme.totalConsensusContributions = deme.numberOfLeaders
+
+		self.fakepop.populationProduction()
+
+		highCommoners = []
+		highLeaders = []
+		for ind in self.fakepop.individuals:
+			if ind.leader:
+				highLeaders.append(ind.resourcesAmount)
+			else:
+				highCommoners.append(ind.resourcesAmount)
+
+		assert ar.specialmean(lowCommoners) < ar.specialmean(highCommoners), "commoners should produce less when low leader contribution"
+		assert ar.specialmean(lowLeaders) > ar.specialmean(highLeaders), "leaders should produce more when they contribute less"
+
 	def test_producer_cooperation_does_not_influence_debate_time(self):
 		assert False, "write this test!"
 
