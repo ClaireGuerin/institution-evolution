@@ -361,8 +361,54 @@ class TestFullModel(object):
 		assert ar.specialmean(lowCommoners) < ar.specialmean(highCommoners), "commoners should produce less when low leader contribution"
 		assert ar.specialmean(lowLeaders) > ar.specialmean(highLeaders), "leaders should produce more when they contribute less"
 
-	def test_producer_cooperation_does_not_influence_debate_time(self):
-		assert False, "write this test!"
+	def test_producer_time_cooperation_does_not_influence_production_time(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+		self.fakepop.mutationStep = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		# LOW COMMONER COOPERATION
+		for ind in self.fakepop.individuals:
+			if ind.leader:
+				ind.phenotypicValues[1] = 0.5
+			else:
+				ind.phenotypicValues[1] = 0
+
+		for deme in self.fakepop.demes:
+			deme.meanLeaderContribution = 0.5
+			deme.totalConsensusContributions = deme.demography * 0.5
+
+		self.fakepop.populationProduction()
+
+		low = []
+		for ind in self.fakepop.individuals:
+			low.append(ind.resourcesAmount)
+		
+		# HIGH COMMONER COOPERATION
+		for ind in self.fakepop.individuals:
+			if ind.leader:
+				ind.phenotypicValues[1] = 0.5
+			else:
+				ind.phenotypicValues[1] = 1
+
+		for deme in self.fakepop.demes:
+			deme.meanLeaderContribution = 0.5
+			deme.totalConsensusContributions = deme.demography * 0.5
+
+		self.fakepop.populationProduction()
+
+		high = []
+		for ind in self.fakepop.individuals:
+			high.append(ind.resourcesAmount)
+
+		assert low == high
 
 	def test_consensus_result_depends_on_leadership(self):
 		assert False, "write this test!"
