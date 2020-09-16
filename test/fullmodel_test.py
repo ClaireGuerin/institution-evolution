@@ -278,23 +278,39 @@ class TestFullModel(object):
 		for i in range(10):
 			self.fakepop.populationMutationMigration()
 		self.fakepop.updateDemeInfoPreProduction()
+
+		for deme in self.fakepop.demes:
+			assert deme.technologyLevel > 0
+			assert (deme.demography - deme.totalConsensusContributions) > 0
+
 		self.fakepop.populationProduction()
-		# Rig = (1 - Tig) * SUM(1 - Tjg) ** (1 - alphaResources) * tech ** alphaResources
+		# Rig = (1 - Tig) * SUM(1 - Tjg) ** (- alphaResources) * tech ** alphaResources
 
 		aRes = self.fakepop.fitnessParameters["alphaResources"]
 		
 		for ind in self.fakepop.individuals:
 			n = self.fakepop.demes[ind.currentDeme].demography
-			assert type(self.fakepop.demes[ind.currentDeme].totalConsensusContributions) is not tuple, self.fakepop.demes[ind.currentDeme].totalConsensusContributions
-			t = self.fakepop.demes[ind.currentDeme].totalConsensusContributions * self.fakepop.demes[ind.currentDeme].politicsValues["consensusTime"]
+			assert self.fakepop.demes[ind.currentDeme].totalConsensusContributions is not None, self.fakepop.demes[ind.currentDeme].totalConsensusContributions
+			assert self.fakepop.demes[ind.currentDeme].meanLeaderContribution is not None
+			cons = self.fakepop.demes[ind.currentDeme].politicsValues['consensusTime']
+			t = self.fakepop.demes[ind.currentDeme].totalConsensusContributions * cons
 			tech = self.fakepop.demes[ind.currentDeme].technologyLevel
+			# WHAT THE PRODUCTION FUNCTION DOES:
+			contrib = ind.phenotypicValues[1] if ind.leader else (1 - self.fakepop.demes[ind.currentDeme].meanLeaderContribution)
+			resourcesProduced = (1 - contrib * cons) * (n - t) ** (-aRes) * (tech ** aRes)
+	
 			if ind.leader:
 				# LEADERS PRODUCTION TIME DECREASES WITH OWN TIME COOPERATION
+				status = 'Leader'
 				ctime = ind.phenotypicValues[1] * cons
 			else:
 				# COMMONERS PRODUCTION TIME DECREASES WITH AVERAGE LEADER TIME COOPERATION
-				ctime = self.fakepop.demes[ind.currentDeme] * cons
-			assert ind.resourcesAmount == (1 - ctime) * ((n - t) ** (1 - aRes)) * (tech ** aRes), "wrong production time. Leader: {0}".format(bool(ind.leader))
+				status = 'Commoner'
+				ctime = (1 - self.fakepop.demes[ind.currentDeme].meanLeaderContribution) * cons
+			assert (1 - ctime) == (1 - contrib * cons)
+			expectedResources = (1 - ctime) * ((n - t) ** (-aRes)) * (tech ** aRes)
+			assert resourcesProduced == expectedResources, "same method, different result"
+			assert ind.resourcesAmount == expectedResources, "wrong production time. {0} produced {1} instead of {2}".format(status, ind.resourcesAmount, expectedResources)
 
 	def test_producer_cooperation_does_not_influence_debate_time(self):
 		assert False, "write this test!"

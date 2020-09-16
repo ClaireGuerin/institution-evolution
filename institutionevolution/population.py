@@ -109,7 +109,7 @@ class Population(object):
 		self.advances = []
 		for deme in range(self.numberOfDemes):
 			# INCREMENT TECHNOLOGY LEVEL IN DEME
-			if self.fit_fun == 'technology':
+			if self.fit_fun in ['technology', 'full']:
 				tech = self.demes[deme].technologyLevel
 				try:
 					tmpTech = tech * (self.fitnessParameters['atech'] + ((1 - self.fitnessParameters['p']) * self.demes[deme].publicGood) ** (1 - self.fitnessParameters['betaTech'])) / (1 + self.fitnessParameters['btech'] * tech)
@@ -127,6 +127,8 @@ class Population(object):
 			self.demes[deme].publicGood = 0
 			self.demes[deme].totalResources = 0
 			self.demes[deme].numberOfLeaders = 0
+			self.demes[deme].totalConsensusContributions = 0
+			self.demes[deme].meanLeaderContribution = 0
 			# politics
 			self.demes[deme].politicsValues = {"civilianPublicTime": 0, 
 			"leaderPublicTime": 0, 
@@ -174,6 +176,8 @@ class Population(object):
 			setattr(deme, "meanPhenotypes", meanphen)
 			setattr(deme, "varPhenotypes", varphen)
 
+		leaderContribTime = []
+
 		for ind in self.individuals:
 			# ELECTIONS
 			try:
@@ -183,8 +187,14 @@ class Population(object):
 			ind.ascend(leadProp=proportion)
 			## increment number of leaders within deme
 			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
+			## Individual contribution to debate time depends on status
+			if ind.leader:
+				leaderContribTime.append(ind.phenotypicValues[1])
 
 		for deme in self.demes:
+			tmpMeanContrib = ar.specialmean(leaderContribTime)
+			deme.meanLeaderContribution = tmpMeanContrib if tmpMeanContrib is not None else 0
+			deme.totalConsensusContributions = sum(leaderContribTime) + (deme.demography - deme.numberOfLeaders) * deme.meanLeaderContribution
 			if deme.demography > 0:
 				politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
 				deme.politicsValues.update(politics.functions[self.fit_fun](**{**self.fitnessParameters,**politicsPars}))
@@ -193,7 +203,11 @@ class Population(object):
 	def populationProduction(self):
 		# INDIVIDUAL PRODUCTION AND CONTRIBUTION TO PUBLIC GOOD:
 		for ind in self.individuals:
-			infoToAdd = {'n': self.demes[ind.currentDeme].demography, 'tech': self.demes[ind.currentDeme].technologyLevel}
+			infoToAdd = {'n': self.demes[ind.currentDeme].demography, 
+			'tech': self.demes[ind.currentDeme].technologyLevel,
+			'meanLeadContrib': self.demes[ind.currentDeme].meanLeaderContribution,
+			'totalTimeContrib': self.demes[ind.currentDeme].totalConsensusContributions,
+			'leader': ind.leader}
 			ind.produceResources(self.fit_fun, **{**infoToAdd, **self.fitnessParameters, **self.demes[ind.currentDeme].politicsValues})
 			self.demes[ind.currentDeme].totalResources += ind.resourcesAmount
 			self.demes[ind.currentDeme].publicGood += ind.phenotypicValues[0] * ind.resourcesAmount

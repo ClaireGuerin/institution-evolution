@@ -11,6 +11,7 @@ class Deme(object):
 		self.totalPhenotypeSquares = None
 		self.numberOfLeaders = None
 		self.totalConsensusContributions = None
+		self.meanLeaderContribution = None
 		self.technologyLevel = None
 		self.politicsValues = {"civilianPublicTime": None, 
 		"leaderPublicTime": None, 

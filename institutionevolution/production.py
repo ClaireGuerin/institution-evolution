@@ -26,14 +26,17 @@ def technology(res, **kwargs):
 	return resourcesProduced
 		
 def debate(res, **kwargs):
-	payoff = kwargs['productionTime'] * kwargs['labourForce'] ** (-kwargs['alphaResources']) * kwargs['techcapital'] ** kwargs['alphaResources']
+	payoff = kwargs['productionTime'] * kwargs['labourForce'] ** (-kwargs['alphaResources']) * kwargs['tech'] ** kwargs['alphaResources']
 	return payoff
 
 def socialclass(res, **kwargs):
 	return res
 
 def full(res, **kwargs):
-	return 1
+	contrib = kwargs['x'][1] if kwargs['leader'] else (1 - kwargs['meanLeadContrib'])
+	# Rig = (1 - Tig) * SUM(1 - Tjg) ** (- alphaResources) * tech ** alphaResources
+	resourcesProduced = (1 - contrib * kwargs['consensusTime']) * (kwargs['n'] - kwargs['totalTimeContrib'] * kwargs['consensusTime']) ** (-kwargs['alphaResources']) * (kwargs['tech'] ** kwargs['alphaResources'])
+	return resourcesProduced
 
 functions = {}
 for key, value in list(locals().items()):
