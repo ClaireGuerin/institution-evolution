@@ -112,9 +112,10 @@ class TestFullModel(object):
 	def test_consensus_is_mean_opinion_when_no_leaders(self):
 		#NB: opinion on policing vs R&D is a phenotype, stored in 3rd position (i.e. index 2 in python)
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
-		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.0] # NO LEADERSHIP
 		self.fakepop.initialDemeSize = 100
 		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
 
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()

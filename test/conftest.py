@@ -241,7 +241,7 @@ def createParameterRangesFile():
 def runElections():
 	def _foo(prop, d=6, s=6):
 		pop = Pop(fit_fun="full", inst="test/test")
-		pop.initialPhenotypes = [prop] * 4
+		pop.initialPhenotypes = [0.2,0.2,0.2,prop] 
 		pop.numberOfDemes = d
 		pop.initialDemeSize = s
 		pop.mutationRate = 0
