@@ -265,6 +265,9 @@ class TestFullModel(object):
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
 
+	def test_deme_demography_is_correctly_calculated_after_migration(self):
+		assert False, "write this test!"
+
 	def test_leader_cooperation_influences_individual_production_time(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4

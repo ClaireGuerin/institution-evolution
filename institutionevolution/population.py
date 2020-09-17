@@ -211,7 +211,8 @@ class Population(object):
 
 				# WEIGHTED MEAN OF VOTES
 				inThisDeme = [e == deme.id for e in ethny]
-				assert sum(inThisDeme) == deme.demography, "deme {2} has size {0} yet {3} ({4}) individual(s) are assigned this ethny. Count individual ethnies = {1}".format(deme.demography, [(x, ethny.count(x)) for x in range(self.numberOfDemes)], deme.id, sum(inThisDeme), ethny.count(deme.id))
+				summaryForAssertError = [(x, self.demes[x].demography, ethny.count(x)) for x in range(self.numberOfDemes)]
+				assert sum(inThisDeme) == deme.demography, "inconsistency between deme size and ethnic counts (deme, size, ethnic counts): {0}. Total sizes = {1}, Total counts = {2}".format(summaryForAssertError, sum([y for x,y,z in summaryForAssertError]), sum([z for x,y,z in summaryForAssertError]))
 				demeWeights = [(1 - deme.meanLeaderContribution) if x is None else x for x in list(compress(weights, inThisDeme))]
 				assert sum(demeWeights) > 0, "Total weights = {0}; Mean leader contribution = {1}; Deme weights = {2}, Number of Leaders = {3}".format(sum(demeWeights), deme.meanLeaderContribution, list(compress(weights, inThisDeme)), deme.numberOfLeaders)
 				demeVotes = list(compress(votes, inThisDeme))
