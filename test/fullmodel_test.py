@@ -266,7 +266,22 @@ class TestFullModel(object):
 			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
 
 	def test_deme_demography_is_correctly_calculated_after_migration(self):
-		assert False, "write this test!"
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0.5
+		self.fakepop.mutationStep = 0.2
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+
+		total = 0
+		for deme in self.fakepop.demes:
+			total += deme.demography
+
+		assert total == 1000, "wrong number of inidividuals in demes"
 
 	def test_leader_cooperation_influences_individual_production_time(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
@@ -278,9 +293,7 @@ class TestFullModel(object):
 
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()
-		# good shuffling and mutating:
-		for i in range(10):
-			self.fakepop.populationMutationMigration()
+		self.fakepop.populationMutationMigration()
 		self.fakepop.updateDemeInfoPreProduction()
 
 		for deme in self.fakepop.demes:

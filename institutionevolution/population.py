@@ -201,6 +201,8 @@ class Population(object):
 				leaderContribTime.append(ind.phenotypicValues[1])
 			i += 1
 
+		assert sum([x.demography for x in self.demes]) == self.demography, "population size is {0} yet total of all deme sizes is {1}".format(self.demography, sum([x.demography for x in self.demes]))
+
 		for deme in self.demes:
 			# CONTRIBUTION TIME
 			tmpMeanContrib = ar.specialmean(leaderContribTime)
