@@ -451,9 +451,6 @@ class TestFullModel(object):
 			expectedConsensusValue = sumVotes[deme.id] / sumWeights[deme.id]
 			assert deme.politicsValues['consensus'] == pytest.approx(expectedConsensusValue, abs=1.0e-10)
 
-		## TO DO IN POP:
-		## sum([v * w for v, w in values, weights] / sum(weights))
-
 	def test_consensus_time_depends_on_leadership(self):
 		assert False, "write this test!"
 
