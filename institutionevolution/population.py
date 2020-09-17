@@ -10,6 +10,7 @@ import institutionevolution.myarithmetics as ar
 from statistics import variance
 from files import PARAMETER_FOLDER, INITIALISATION_FILE, INITIAL_PHENOTYPES_FILE, INITIAL_TECHNOLOGY_FILE, PARAMETER_FILE, OUTPUT_FOLDER, FITNESS_PARAMETERS_FILE
 import random
+from itertools import compress
 
 class Population(object):
 	
@@ -180,6 +181,7 @@ class Population(object):
 		votes = []
 		weights = [None] * self.demography
 		ethny = []
+		i = 0
 
 		for ind in self.individuals:
 			# COLLECT VOTES FOR DEBATE
@@ -194,24 +196,31 @@ class Population(object):
 			## increment number of leaders within deme
 			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
 			## Individual contribution to debate time depends on status
-			if ind.leader:
-				weights.append(ind.phenotypicValues[1])
+			if bool(ind.leader):
+				weights[i] = ind.phenotypicValues[1]
 				leaderContribTime.append(ind.phenotypicValues[1])
+			i += 1
 
 		for deme in self.demes:
+			# CONTRIBUTION TIME
 			tmpMeanContrib = ar.specialmean(leaderContribTime)
 			deme.meanLeaderContribution = tmpMeanContrib if tmpMeanContrib is not None else 0
-
-			# WEIGHTED MEAN OF VOTES
-			findVotes = [e == deme.id for e in ethny]
-			demeWeights = [deme.meanLeaderContribution if x is None else x for x in weights[findVotes]]
-			demeVotes = votes[findVotes]
-			weightedMean = [v * w for v, w in demeVotes, demeWeights]
-
-			# CONTRIBUTION TIME
 			deme.totalConsensusContributions = sum(leaderContribTime) + (deme.demography - deme.numberOfLeaders) * deme.meanLeaderContribution
+						
 			if deme.demography > 0:
-				politicsPars = {'n': deme.demography, 'phen': deme.meanPhenotypes, 'varphen': deme.varPhenotypes}
+
+				# WEIGHTED MEAN OF VOTES
+				inThisDeme = [e == deme.id for e in ethny]
+				assert sum(inThisDeme) == deme.demography, "deme {2} has size {0} yet {4} ({5}) individual(s) are assigned this ethny. All individual ethnies = {1}. Boolean = {3} ".format(deme.demography, ethny, deme.id, inThisDeme, sum(inThisDeme), ethny.count(deme.id))
+				demeWeights = [(1 - deme.meanLeaderContribution) if x is None else x for x in list(compress(weights, inThisDeme))]
+				assert sum(demeWeights) > 0, "Total weights = {0}; Mean leader contribution = {1}; Deme weights = {2}, Number of Leaders = {3}".format(sum(demeWeights), deme.meanLeaderContribution, list(compress(weights, inThisDeme)), deme.numberOfLeaders)
+				demeVotes = list(compress(votes, inThisDeme))
+				weightedPoll = sum([v * w for v, w in zip(demeVotes, demeWeights)]) / sum(demeWeights)
+
+				politicsPars = {'n': deme.demography, 
+				'phen': deme.meanPhenotypes, 
+				'varphen': deme.varPhenotypes,
+				'weightedPoll': weightedPoll}
 				deme.politicsValues.update(politics.functions[self.fit_fun](**{**self.fitnessParameters,**politicsPars}))
 			self.debatetime.append(deme.politicsValues["consensusTime"])
 

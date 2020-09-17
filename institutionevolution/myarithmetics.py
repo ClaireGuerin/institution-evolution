@@ -1,7 +1,7 @@
 def specialmean(lst):
 	length, total = 0, 0
-	for phenotype in lst:
-		total += phenotype
+	for value in lst:
+		total += value
 		length += 1
 	if length == 0:
 		tmpmean = None

@@ -37,7 +37,7 @@ def socialclass(**kwargs):
 
 def full(**kwargs):
 	pol = {}
-	pol['consensus'] = kwargs['phen'][2]
+	pol['consensus'] = kwargs['weightedPoll']
 	tmpDisagreement = kwargs["aconsensus"] * kwargs['n'] * kwargs['varphen'][2]
 	pol['consensusTime'] = kwargs['epsilon'] + tmpDisagreement / (kwargs['bconsensus'] + tmpDisagreement)
 	return pol

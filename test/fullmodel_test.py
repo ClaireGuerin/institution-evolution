@@ -128,7 +128,7 @@ class TestFullModel(object):
 
 		for deme in self.fakepop.demes:
 			expectedMean = collectVotes[deme.id] / deme.demography
-			assert expectedMean == deme.politicsValues['consensus'], "wrong proportion of policing!"
+			assert expectedMean == pytest.approx(deme.politicsValues['consensus'], abs=1.0e-10), "wrong proportion of policing!"
 
 	def test_i_am_sane_and_can_sum_squares(self):
 		# simple vector, sort of equivalent to a single phenotype
@@ -432,7 +432,7 @@ class TestFullModel(object):
 
 		for deme in self.fakepop.demes:
 			expectedConsensusValue = sumVotes[deme.id] / sumWeights[deme.id]
-			assert deme.politicsValues['consensus'] == expectedConsensusValue
+			assert deme.politicsValues['consensus'] == pytest.approx(expectedConsensusValue, abs=1.0e-10)
 
 		## TO DO IN POP:
 		## sum([v * w for v, w in values, weights] / sum(weights))
