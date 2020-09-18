@@ -323,7 +323,6 @@ class TestFullModel(object):
 			assert len(leadersW) == deme.numberOfLeaders
 			assert producersW == [(2 * deme.numberOfLeaders - sum(leadersW)) / nProd] * nProd
 
-
 	def test_consensus_result_depends_on_leadership(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
