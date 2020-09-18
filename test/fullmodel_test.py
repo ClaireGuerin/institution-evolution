@@ -264,7 +264,7 @@ class TestFullModel(object):
 			expectedMean = collectVotes[deme.id] / deme.demography
 			assert expectedMean == pytest.approx(deme.politicsValues['consensus'], abs=1.0e-10), "wrong proportion of policing!"
 
-	def test_leaders_vote_weight_one_plus_time_contribution(self):
+	def test_leaders_votes_weight_one_plus_time_contribution(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,1.0] # ALL LEADERS
 		self.fakepop.initialDemeSize = 100
@@ -288,7 +288,7 @@ class TestFullModel(object):
 			# weird that the assertion below does not pass
 			#assert sum(deme.opinionWeights) == deme.demography + sum(demeTimeInvestments["deme"+str(deme.id)])
 
-	def test_producers_vote_all_weight_the_same(self):
+	def test_producers_votes_all_weight_the_same(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.0] # NO LEADERS
 		self.fakepop.initialDemeSize = 100
@@ -300,12 +300,8 @@ class TestFullModel(object):
 		self.fakepop.populationMutationMigration()
 		self.fakepop.updateDemeInfoPreProduction()
 
-		collectWeights = []
-		for indiv in self.fakepop.individuals:
-			assert indiv.opinionWeight > 0
-			collectWeights.append(indiv.opinionWeight)
-
-		assert len(list(dict.fromkeys(collectWeights))) == 1
+		for deme in self.fakepop.demes:
+			assert len(list(dict.fromkeys(deme.opinionWeights))) == 1
 
 	def test_producers_vote_weight_depends_on_leaders(self):
 		assert False, "write this test"
