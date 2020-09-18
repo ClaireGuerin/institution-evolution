@@ -303,8 +303,26 @@ class TestFullModel(object):
 		for deme in self.fakepop.demes:
 			assert len(list(dict.fromkeys(deme.opinionWeights))) == 1
 
-	def test_producers_vote_weight_depends_on_leaders(self):
-		assert False, "write this test"
+	def test_producers_vote_weights_depend_on_leaders(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.5] # NO LEADERS
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0.5
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		for deme in self.fakepop.demes:
+			leadersW = [x for x in deme.opinionWeights if x > 1]
+			producersW = [x for x in deme.opinionWeights if x < 1]
+			nProd = deme.demography - deme.numberOfLeaders
+			assert len(producersW) == nProd
+			assert len(leadersW) == deme.numberOfLeaders
+			assert producersW == [(2 * deme.numberOfLeaders - sum(leadersW)) / nProd] * nProd
+
 
 	def test_consensus_result_depends_on_leadership(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
