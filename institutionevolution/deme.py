@@ -13,6 +13,7 @@ class Deme(object):
 		self.totalConsensusContributions = None
 		self.meanLeaderContribution = None
 		self.technologyLevel = None
+		self.opinionWeights = None
 		self.politicsValues = {"civilianPublicTime": None, 
 		"leaderPublicTime": None, 
 		"labourForce": None,

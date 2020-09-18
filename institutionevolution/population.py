@@ -177,7 +177,6 @@ class Population(object):
 			setattr(deme, "meanPhenotypes", meanphen)
 			setattr(deme, "varPhenotypes", varphen)
 
-		leaderContribTime = []
 		votes = []
 		weights = [None] * self.demography
 		ethny = []
@@ -197,28 +196,28 @@ class Population(object):
 			self.demes[ind.currentDeme].numberOfLeaders += ind.leader
 			## Individual contribution to debate time depends on status
 			if bool(ind.leader):
-				weights[i] = ind.phenotypicValues[1]
-				leaderContribTime.append(ind.phenotypicValues[1])
+				weights[i] = 1 + ind.phenotypicValues[1]
 			i += 1
 
 		assert sum([x.demography for x in self.demes]) == self.demography, "population size is {0} yet total of all deme sizes is {1}".format(self.demography, sum([x.demography for x in self.demes]))
 
 		for deme in self.demes:
-			# CONTRIBUTION TIME
-			tmpMeanContrib = ar.specialmean(leaderContribTime)
-			deme.meanLeaderContribution = tmpMeanContrib if tmpMeanContrib is not None else 0
-			deme.totalConsensusContributions = sum(leaderContribTime) + (deme.demography - deme.numberOfLeaders) * deme.meanLeaderContribution
+			# CALCULATING PRODUCERS OPINION WEIGHT
+			inThisDeme = [e == deme.id for e in ethny]
+			summaryForAssertError = [(x, self.demes[x].demography, ethny.count(x)) for x in range(self.numberOfDemes)]
+			assert sum(inThisDeme) == deme.demography, "inconsistency between deme size and ethnic counts (deme, size, ethnic counts): {0}. Total sizes = {1}, Total counts = {2}".format(summaryForAssertError, sum([y for x,y,z in summaryForAssertError]), sum([z for x,y,z in summaryForAssertError]))
+			demeWeights = list(compress(weights, inThisDeme))
+			totalLeaderWeights = sum(filter(None, demeWeights))
+			producerWeight = 1 if deme.numberOfLeaders == 0 or deme.numberOfLeaders == deme.demography else (2 * deme.numberOfLeaders - totalLeaderWeights) / (deme.demography - deme.numberOfLeaders)
+			deme.opinionWeights = [producerWeight if x is None else x for x in demeWeights]
+			#deme.meanLeaderContribution = tmpMeanContrib if tmpMeanContrib is not None else 0
+			#deme.totalConsensusContributions = sum(leaderContribTime) + (deme.demography - deme.numberOfLeaders) * deme.meanLeaderContribution
 						
 			if deme.demography > 0:
-
-				# WEIGHTED MEAN OF VOTES
-				inThisDeme = [e == deme.id for e in ethny]
-				summaryForAssertError = [(x, self.demes[x].demography, ethny.count(x)) for x in range(self.numberOfDemes)]
-				assert sum(inThisDeme) == deme.demography, "inconsistency between deme size and ethnic counts (deme, size, ethnic counts): {0}. Total sizes = {1}, Total counts = {2}".format(summaryForAssertError, sum([y for x,y,z in summaryForAssertError]), sum([z for x,y,z in summaryForAssertError]))
-				demeWeights = [(1 - deme.meanLeaderContribution) if x is None else x for x in list(compress(weights, inThisDeme))]
-				assert sum(demeWeights) > 0, "Total weights = {0}; Mean leader contribution = {1}; Deme weights = {2}, Number of Leaders = {3}".format(sum(demeWeights), deme.meanLeaderContribution, list(compress(weights, inThisDeme)), deme.numberOfLeaders)
+				# CALCULATING CONSENSUS = WEIGHTED MEAN OF VOTES
+				assert sum(deme.opinionWeights) > 0, "Total weights = {0}; leaders weights = {1}; Deme weights = {2}, Number of Leaders = {3}".format(sum(deme.opinionWeights), totalLeaderWeights, deme.opinionWeights, deme.numberOfLeaders)
 				demeVotes = list(compress(votes, inThisDeme))
-				weightedPoll = sum([v * w for v, w in zip(demeVotes, demeWeights)]) / sum(demeWeights)
+				weightedPoll = sum([v * w for v, w in zip(demeVotes, deme.opinionWeights)]) / sum(deme.opinionWeights)
 
 				politicsPars = {'n': deme.demography, 
 				'phen': deme.meanPhenotypes, 

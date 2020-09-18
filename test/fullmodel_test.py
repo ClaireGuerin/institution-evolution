@@ -7,6 +7,7 @@ from institutionevolution.individual import Individual as Ind
 from institutionevolution.population import Population as Pop
 from institutionevolution.deme import Deme as Dem
 import institutionevolution.myarithmetics as ar
+from collections import defaultdict
 
 class TestFullModel(object):
 
@@ -112,28 +113,26 @@ class TestFullModel(object):
 				leadersCount[deme] / individualsCount[deme])
 
 	###======================== CONSENSUS ========================###
+	### 0 - CHECK SUM OF SQUARES ###
 
-	def test_consensus_is_mean_opinion_when_no_leaders(self):
-		#NB: opinion on policing vs R&D is a phenotype, stored in 3rd position (i.e. index 2 in python)
+	def test_deme_demography_is_correctly_calculated_after_migration(self):
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
-		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.0] # NO LEADERSHIP
+		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
 		self.fakepop.numberOfDemes = 10
-		self.fakepop.mutationRate = 0
+		self.fakepop.mutationRate = 0.5
+		self.fakepop.mutationStep = 0.2
 
 		self.fakepop.createAndPopulateDemes()
 		self.fakepop.clearDemeInfo()
 		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfoPreProduction()
 
-		collectVotes = [0] * self.fakepop.numberOfDemes
-
-		for indiv in self.fakepop.individuals:
-			collectVotes[indiv.currentDeme] += indiv.phenotypicValues[2]
-
+		total = 0
 		for deme in self.fakepop.demes:
-			expectedMean = collectVotes[deme.id] / deme.demography
-			assert expectedMean == pytest.approx(deme.politicsValues['consensus'], abs=1.0e-10), "wrong proportion of policing!"
+			total += deme.demography
+
+		assert total == 1000, "wrong number of inidividuals in demes"
+
 
 	def test_i_am_sane_and_can_sum_squares(self):
 		# simple vector, sort of equivalent to a single phenotype
@@ -241,6 +240,102 @@ class TestFullModel(object):
 				assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
 				assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
 
+	### 1 - DETERMINE AGREEMENT VALUE ###
+
+	def test_consensus_is_mean_opinion_when_no_leaders(self):
+		#NB: opinion on policing vs R&D is a phenotype, stored in 3rd position (i.e. index 2 in python)
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.0] # NO LEADERSHIP
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		collectVotes = [0] * self.fakepop.numberOfDemes
+
+		for indiv in self.fakepop.individuals:
+			collectVotes[indiv.currentDeme] += indiv.phenotypicValues[2]
+
+		for deme in self.fakepop.demes:
+			expectedMean = collectVotes[deme.id] / deme.demography
+			assert expectedMean == pytest.approx(deme.politicsValues['consensus'], abs=1.0e-10), "wrong proportion of policing!"
+
+	def test_leaders_vote_weight_one_plus_time_contribution(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,1.0] # ALL LEADERS
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		demeTimeInvestments = defaultdict(list)
+		for ind in self.fakepop.individuals:
+			demeTimeInvestments["deme"+str(ind.currentDeme)].append(ind.phenotypicValues[1])
+
+		for deme in self.fakepop.demes:
+			assert len(demeTimeInvestments["deme"+str(deme.id)]) == deme.demography
+			assert len(deme.opinionWeights) == deme.demography
+			assert deme.opinionWeights == [1 + x for x in demeTimeInvestments["deme"+str(deme.id)]]
+			assert sum(deme.opinionWeights) == sum([1 + x for x in demeTimeInvestments["deme"+str(deme.id)]])
+			# weird that the assertion below does not pass
+			#assert sum(deme.opinionWeights) == deme.demography + sum(demeTimeInvestments["deme"+str(deme.id)])
+
+	def test_producers_vote_all_weight_the_same(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2,0.3,0.4,0.0] # NO LEADERS
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		collectWeights = []
+		for indiv in self.fakepop.individuals:
+			assert indiv.opinionWeight > 0
+			collectWeights.append(indiv.opinionWeight)
+
+		assert len(list(dict.fromkeys(collectWeights))) == 1
+
+	def test_producers_vote_weight_depends_on_leaders(self):
+		assert False, "write this test"
+
+	def test_consensus_result_depends_on_leadership(self):
+		self.fakepop = Pop(fit_fun="full", inst="test/test")
+		self.fakepop.initialPhenotypes = [0.2] * 4
+		self.fakepop.initialDemeSize = 100
+		self.fakepop.numberOfDemes = 10
+		self.fakepop.mutationRate = 0
+		self.fakepop.mutationStep = 0
+
+		self.fakepop.createAndPopulateDemes()
+		self.fakepop.clearDemeInfo()
+		self.fakepop.populationMutationMigration()
+		self.fakepop.updateDemeInfoPreProduction()
+
+		sumVotes = [0] * self.fakepop.numberOfDemes
+		sumWeights = [0] * self.fakepop.numberOfDemes
+		for ind in self.fakepop.individuals:
+			weight = ind.phenotypicValues[1] if ind.leader else (1 - self.fakepop.demes[ind.currentDeme].meanLeaderContribution)
+			sumVotes[ind.currentDeme] += ind.phenotypicValues[2] * weight
+			sumWeights[ind.currentDeme] += weight
+
+		for deme in self.fakepop.demes:
+			expectedConsensusValue = sumVotes[deme.id] / sumWeights[deme.id]
+			assert deme.politicsValues['consensus'] == pytest.approx(expectedConsensusValue, abs=1.0e-10)
+
+	### 2 - DETERMINE TIME TO REACH CONSENSUS ###
+
 	def test_consensus_time_is_correct_without_leaders(self):
 		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
@@ -269,24 +364,6 @@ class TestFullModel(object):
 			opinionBreadth = deme.demography * var
 			expectedTime = epsil + (acons * opinionBreadth) / (bcons + acons * opinionBreadth)
 			assert deme.politicsValues["consensusTime"] == pytest.approx(expectedTime), "wrong time to reach consensus"
-
-	def test_deme_demography_is_correctly_calculated_after_migration(self):
-		self.fakepop = Pop(fit_fun="full", inst="test/test")
-		self.fakepop.initialPhenotypes = [0.2] * 4
-		self.fakepop.initialDemeSize = 100
-		self.fakepop.numberOfDemes = 10
-		self.fakepop.mutationRate = 0.5
-		self.fakepop.mutationStep = 0.2
-
-		self.fakepop.createAndPopulateDemes()
-		self.fakepop.clearDemeInfo()
-		self.fakepop.populationMutationMigration()
-
-		total = 0
-		for deme in self.fakepop.demes:
-			total += deme.demography
-
-		assert total == 1000, "wrong number of inidividuals in demes"
 
 	def test_leader_cooperation_influences_individual_production_time(self):
 		assert False, "re-write this test!"
@@ -434,31 +511,6 @@ class TestFullModel(object):
 			high.append(ind.resourcesAmount)
 
 		assert low == high
-
-	def test_consensus_result_depends_on_leadership(self):
-		assert False, "re-write this test!"
-		self.fakepop = Pop(fit_fun="full", inst="test/test")
-		self.fakepop.initialPhenotypes = [0.2] * 4
-		self.fakepop.initialDemeSize = 100
-		self.fakepop.numberOfDemes = 10
-		self.fakepop.mutationRate = 0
-		self.fakepop.mutationStep = 0
-
-		self.fakepop.createAndPopulateDemes()
-		self.fakepop.clearDemeInfo()
-		self.fakepop.populationMutationMigration()
-		self.fakepop.updateDemeInfoPreProduction()
-
-		sumVotes = [0] * self.fakepop.numberOfDemes
-		sumWeights = [0] * self.fakepop.numberOfDemes
-		for ind in self.fakepop.individuals:
-			weight = ind.phenotypicValues[1] if ind.leader else (1 - self.fakepop.demes[ind.currentDeme].meanLeaderContribution)
-			sumVotes[ind.currentDeme] += ind.phenotypicValues[2] * weight
-			sumWeights[ind.currentDeme] += weight
-
-		for deme in self.fakepop.demes:
-			expectedConsensusValue = sumVotes[deme.id] / sumWeights[deme.id]
-			assert deme.politicsValues['consensus'] == pytest.approx(expectedConsensusValue, abs=1.0e-10)
 
 	def test_consensus_time_depends_on_leadership(self):
 		assert False, "write this test!"
