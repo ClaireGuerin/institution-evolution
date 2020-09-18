@@ -46,6 +46,8 @@ class TestFullModel(object):
 		assert len(pars['x']) == 4
 		assert len(pars['xmean']) == 4
 
+	###======================== ELECTIONS ========================###
+
 	def test_elections_take_place_in_demes(self, runElections):
 		# set leader proportion to 1
 		# set mutation rate to 0
@@ -108,6 +110,8 @@ class TestFullModel(object):
 			assert leadersCount[deme] == pytest.approx(individualsCount[deme] * demeMean, abs=100), \
 			"mean opinion is {0}, when rendered proportion of leaders is {1}".format(demeMean, \
 				leadersCount[deme] / individualsCount[deme])
+
+	###======================== CONSENSUS ========================###
 
 	def test_consensus_is_mean_opinion_when_no_leaders(self):
 		#NB: opinion on policing vs R&D is a phenotype, stored in 3rd position (i.e. index 2 in python)
@@ -237,7 +241,8 @@ class TestFullModel(object):
 				assert totalPhenSq[deme.id] == [2.5] * 4, "the method is wrong"
 				assert deme.totalPhenotypeSquares == [2.5] * 4, "there is a problem in the square sum, n={0}".format(deme.demography)
 
-	def test_global_consensus_time_is_correct_regardless_of_leaders(self):
+	def test_consensus_time_is_correct_without_leaders(self):
+		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -284,6 +289,7 @@ class TestFullModel(object):
 		assert total == 1000, "wrong number of inidividuals in demes"
 
 	def test_leader_cooperation_influences_individual_production_time(self):
+		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -330,6 +336,7 @@ class TestFullModel(object):
 			assert ind.resourcesAmount == expectedResources, "wrong production time. {0} produced {1} instead of {2}".format(status, ind.resourcesAmount, expectedResources)
 
 	def test_leader_cooperation_increases_producer_production_but_decreases_own(self):
+		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -379,6 +386,7 @@ class TestFullModel(object):
 		assert ar.specialmean(lowLeaders) > ar.specialmean(highLeaders), "leaders should produce more when they contribute less"
 
 	def test_producer_time_cooperation_does_not_influence_production_time(self):
+		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -428,6 +436,7 @@ class TestFullModel(object):
 		assert low == high
 
 	def test_consensus_result_depends_on_leadership(self):
+		assert False, "re-write this test!"
 		self.fakepop = Pop(fit_fun="full", inst="test/test")
 		self.fakepop.initialPhenotypes = [0.2] * 4
 		self.fakepop.initialDemeSize = 100
@@ -454,11 +463,15 @@ class TestFullModel(object):
 	def test_consensus_time_depends_on_leadership(self):
 		assert False, "write this test!"
 
+	###======================== PRODUCTION ========================###
+
 	def test_individuals_produce_resources_depending_on_status(self):
 		assert False, "write this test!"
 
 	def test_individuals_produce_resources_depending_on_consensus_time(self):
 		assert False, "write this test!"
+
+	###======================== PUBLIC GOOD GAME ========================###
 
 	def test_only_producers_have_economic_cooperation_level(self):
 		assert False, "write this test!"
@@ -472,6 +485,8 @@ class TestFullModel(object):
 	def test_leaders_cooperation_does_not_influence_public_good(self):
 		assert False, "write this test!"
 
+	###======================== POLICING ========================###
+
 	def test_policing_takes_place_in_demes(self):
 		assert False, "write this test!"
 
@@ -484,11 +499,17 @@ class TestFullModel(object):
 	def test_leaders_who_cheat_are_punished(self):
 		assert False, "write this test!"
 
+	###======================== TECHNOLOGY ========================###
+
 	def test_technology_level_increases_at_next_gen(self):
 		assert False, "write this test!"
 
+	###======================== TAXES ========================###
+
 	def test_taxes_are_applied(self):
 		assert False, "write this test!"
+
+	###======================== REPRODUCTION ========================###
 
 	def test_final_individual_fertility_is_correct(self):
 		assert False, "write this test!"
