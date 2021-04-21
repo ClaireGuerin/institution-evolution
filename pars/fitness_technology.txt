@@ -1,9 +1,9 @@
 fun,technology
-alphaResources,0.1,0.5,0.1
-betaTech,0.1,0.5,0.1
-p,0.1,0.5,0.1
+alphaResources,0.1,1,0.1
+betaTech,0.1,1,0.1
+p,0.1,1,0.1
 atech,2
 btech,1
-q,0.1,0.5,0.1
+q,0.1,1,0.1
 gamma,0.01
 rb,2

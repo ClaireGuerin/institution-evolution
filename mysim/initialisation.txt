@@ -1,0 +1,4 @@
+numberOfDemes,20
+initialDemeSize,2
+numberOfGenerations,50000
+individualBaseResources,1

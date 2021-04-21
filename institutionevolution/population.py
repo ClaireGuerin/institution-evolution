@@ -184,7 +184,10 @@ class Population(object):
 
 		for ind in self.individuals:
 			# COLLECT VOTES FOR DEBATE
-			votes.append(ind.phenotypicValues[2])
+			try:
+				votes.append(ind.phenotypicValues[2])
+			except IndexError as e:
+				votes.append(0)	
 			ethny.append(ind.currentDeme)
 			# ELECTIONS
 			try:
